@@ -83,19 +83,28 @@ const SOFTWARE = {
   downloadUrl: FAB,
   image: OG_IMG,
   description:
-    'A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume '
-    + 'rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.',
+    'A production-grade, heavily optimised sparse voxel octree navigation plugin for Unreal Engine, '
+    + 'built for AAA-scale projects. It pathfinds through true 3D volume rather than a walkable surface, '
+    + 'for flying, swimming and free-floating agents and Mass Entity crowds. GPU voxelization and GPU '
+    + '6-DOF compute with automatic CPU fallback, asynchronous pathfinding, deterministic results, '
+    + 'explicit frame-budget controls and World Partition support. Complete C++ source, Blueprint exposed.',
   author: { '@type': 'Person', name: AUTHOR },
   publisher: { '@id': `${SITE}/#organization` },
   featureList: [
     'Sparse voxel octree 3D pathfinding',
-    'Flying, swimming and free-floating agent locomotion',
-    'Mass Entity crowds at 10,000+ agents',
+    'GPU voxelization and GPU 6-DOF compute with automatic CPU fallback',
+    'Asynchronous pathfinding off the game thread',
+    'Deterministic results for replays, lockstep multiplayer and automated tests',
+    'Mass Entity ECS crowds at 10,000+ agents with LOD-culled rendering',
+    'Flying, swimming and free-floating 6-DOF locomotion',
     'True volumetric EQS generators and tests',
-    'Dynamic runtime obstacles',
+    'Dynamic runtime obstacles with coalesced octree restamping',
+    'World Partition and streaming support with a bake path',
     'Hybrid Recast and Nav3D navigation in one level',
     'Behavior Tree and StateTree tasks',
     'Gameplay Debugger integration',
+    'Setup wizard, health check and auto-tuner editor tooling',
+    'Complete C++ source, fully Blueprint exposed',
   ],
 };
 
@@ -347,8 +356,20 @@ writeCRLF(path.join(ROOT, 'llms.txt'),
 
 > ${SOFTWARE.description}
 
-LCM Nav3D is a navigation plugin for Unreal Engine 5.2 to 5.8 (Windows 64-bit and
-Linux). Unreal's stock Recast navmesh represents a walkable *surface* and answers
+LCM Nav3D is a production-grade, heavily optimised navigation plugin for Unreal
+Engine 5.2 to 5.8 (Windows 64-bit and Linux), built for AAA-scale projects. It
+ships complete C++ source and is fully exposed to Blueprint.
+
+Engineering characteristics: GPU voxelization and GPU 6-DOF compute with automatic
+CPU fallback when no GPU is present; asynchronous pathfinding off the game thread;
+deterministic results, so replays, lockstep multiplayer and automated tests are
+reproducible; explicit frame-budget controls, with dynamic-obstacle updates
+coalesced into a single window rather than restamped per event; a sparse octree
+whose memory cost is driven by how cluttered a level is rather than how large it
+is; World Partition and streaming support with a bake path; and 10,000+ agent
+crowds through the Mass Entity ECS with LOD-culled rendering.
+
+Unreal's stock Recast navmesh represents a walkable *surface* and answers
 "where can I stand?". LCM Nav3D represents the navigable *volume* and answers
 "where is there empty air?", which is what flying, swimming and free-floating
 agents need. The two run side by side in the same level.

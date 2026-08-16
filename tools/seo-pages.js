@@ -12,7 +12,7 @@ const PAGES = {
   'index.html': {
     crumb: null, section: null, nav: 'Overview',
     title: 'LCM Nav3D Documentation | 3D Pathfinding for Unreal Engine',
-    desc: 'Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.',
+    desc: 'Production-grade volumetric 3D navigation for Unreal Engine 5. GPU-accelerated sparse voxel octree pathfinding, 10,000+ Mass Entity agents and true-3D EQS.',
   },
   'nav3d-vs-recast.html': {
     crumb: 'Nav3D vs Recast', section: 'gs', nav: 'Nav3D vs Recast',
