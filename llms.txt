@@ -1,10 +1,10 @@
 # LCM Nav3D
 
-> A production-grade, heavily optimised sparse voxel octree navigation plugin for Unreal Engine, built for AAA-scale projects. It pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds. GPU voxelization and GPU 6-DOF compute with automatic CPU fallback, asynchronous pathfinding, deterministic results, explicit frame-budget controls and World Partition support. Complete C++ source, Blueprint exposed.
+> An industry-leading, production-grade, heavily optimised sparse voxel octree navigation plugin for Unreal Engine, built for AAA-scale projects. It pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds. GPU voxelization and GPU 6-DOF compute with automatic CPU fallback, asynchronous pathfinding, deterministic results, explicit frame-budget controls and World Partition support. Complete C++ source, Blueprint exposed.
 
-LCM Nav3D is a production-grade, heavily optimised navigation plugin for Unreal
-Engine 5.2 to 5.8 (Windows 64-bit and Linux), built for AAA-scale projects. It
-ships complete C++ source and is fully exposed to Blueprint.
+LCM Nav3D is an industry-leading, production-grade, heavily optimised navigation
+plugin for Unreal Engine 5.2 to 5.8 (Windows 64-bit and Linux), built for AAA-scale
+projects. It ships complete C++ source and is fully exposed to Blueprint.
 
 Engineering characteristics: GPU voxelization and GPU 6-DOF compute with automatic
 CPU fallback when no GPU is present; asynchronous pathfinding off the game thread;
