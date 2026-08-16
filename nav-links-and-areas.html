@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 10 - 3D NavLinks + volumetric NavArea modifiers | LCM Nav3D</title>
+<meta name="description" content="LCM Nav3D ships ULcmNavLinkComponent for vertical ladders/jump shafts/teleporters  and ALcmNavAreaModifier for volumetric cost overlays . Both auto-regi...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/nav-links-and-areas.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 10 - 3D NavLinks + volumetric NavArea modifiers | LCM Nav3D">
+<meta property="og:description" content="LCM Nav3D ships ULcmNavLinkComponent for vertical ladders/jump shafts/teleporters  and ALcmNavAreaModifier for volumetric cost overlays . Both auto-regi...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas" class="on">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1
+id="tutorial-10---3d-navlinks--volumetric-navarea-modifiers">Tutorial 10
+- 3D NavLinks + volumetric NavArea modifiers</h1>
+<p><strong>TL;DR:</strong> LCM Nav3D ships
+<code>ULcmNavLinkComponent</code> for vertical ladders/jump
+shafts/teleporters (3D-advantage over Recast's surface-projected links)
+and <code>ALcmNavAreaModifier</code> for volumetric cost overlays (storm
+clouds, water volumes, danger zones, preferred lanes). Both
+auto-register on BeginPlay; query via
+<code>ULcmNavAreaQueryLibrary</code> from BP or C++.</p>
+<h2 id="the-3d-advantage-angle">The 3D-advantage angle</h2>
+<p>Unreal's stock <code>UNavLinkCustomComponent</code> is fine for
+<strong>flat</strong> NavLinks projected onto the Recast navmesh.
+But:</p>
+<ul>
+<li><strong>Vertical ladders</strong> spanning 3 floors → Recast needs
+the navmesh at every floor + the link projects to those poly
+centres</li>
+<li><strong>Drop-down jumps</strong> from a rooftop to a balcony at
+Z=−500 → Recast clamps the endpoints to nearest navmesh polygons</li>
+<li><strong>Teleporters</strong> between Z=200 and Z=2000 → completely
+outside Recast's representation</li>
+</ul>
+<p>LCM Nav3D flying pawns can use <strong>any two world-space
+points</strong> for the link endpoints. The components below surface
+that capability so designers don't have to hand-roll a 3D-aware link
+system.</p>
+<h2 id="step-1---drop-a-3d-vertical-navlink-ladder-example">Step 1 -
+Drop a 3D vertical NavLink (ladder example)</h2>
+<ol type="1">
+<li>In the editor, spawn an empty actor (or reuse
+<code>ANavLinkProxy</code>).</li>
+<li>Add Component → search "LCM Nav Link (3D Vertical)".</li>
+<li>Set on the component:
+<ul>
+<li><code>LinkStart</code> = world position of the ladder bottom (e.g.
+<code>(0, 0, 0)</code>)</li>
+<li><code>LinkEnd</code> = world position of the ladder top (e.g.
+<code>(0, 0, 800)</code> - 8 m vertical)</li>
+<li><code>bBidirectional</code> = true (climb up or slide down)</li>
+<li><code>bAutoRegisterWithApex</code> = true (default)</li>
+<li><code>TraversalCostCm</code> = extra cm-cost of using the ladder (0
+= free; e.g. <code>400</code> to make agents prefer a nearby ramp).
+Queryable in v1 (see Step 3); auto-routing is v2.</li>
+</ul></li>
+</ol>
+<p>That's it. The link is now visible to:</p>
+<ul>
+<li>Stock Unreal nav-system tooling (it implements
+<code>INavLinkCustomInterface</code>)</li>
+<li>LCM Nav3D's extension registry (queryable via
+<code>ULcmNavAreaQueryLibrary</code>)</li>
+</ul>
+<h2 id="step-2---drop-a-volumetric-navarea-modifier-water-example">Step
+2 - Drop a volumetric NavArea modifier (water example)</h2>
+<ol type="1">
+<li>In the editor, spawn a <code>ALcmNavAreaModifier</code> actor.</li>
+<li>Move + scale the box gizmo to cover your water volume.</li>
+<li>Set:
+<ul>
+<li><code>CostMultiplier</code> = <code>3.0</code> (agents prefer dry
+routes by 3× cost)</li>
+<li><code>AreaTag</code> = <code>"Water"</code> (optional designer
+label)</li>
+<li><code>bAutoRegisterWithApex</code> = true</li>
+</ul></li>
+</ol>
+<p>Stack multiple modifiers in the same volume - costs
+<strong>multiply</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Volume</th>
+<th>Cost multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Water</td>
+<td>3.0</td>
+</tr>
+<tr>
+<td>+ storm cloud overlapping</td>
+<td>× 5.0</td>
+</tr>
+<tr>
+<td>Effective in overlap region</td>
+<td>15.0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="step-3---query-from-bt--statetree--blueprint">Step 3 - Query
+from BT / StateTree / Blueprint</h2>
+<pre class="cpp"><code>// In a BT service tick, or anywhere with C++ access:
+const float Cost = ULcmNavAreaQueryLibrary::GetCostMultiplierAt(AgentLocation);
+
+// Or evaluate a planned path&#39;s accumulated area cost (multiplicative):
+const float PathCost = ULcmNavAreaQueryLibrary::GetCostMultiplierAlongPath(Waypoints);
+
+//.and the additive cm-cost of any priced NavLinks the route uses:
+const float LinkCost = ULcmNavAreaQueryLibrary::GetNavLinkTraversalCostAlongPath(Waypoints);
+// Combine however your AI weighs routes, e.g. compare two candidate paths and pick
+// the one with the lower (length * PathCost + LinkCost).
+
+// Find the nearest ladder for &quot;approach the ladder&quot; patterns:
+ULcmNavLinkComponent* Nearest =
+    ULcmNavAreaQueryLibrary::FindNearestNavLink(AgentLocation, /*MaxDist*/ 500.0f);
+if (Nearest)
+{
+    FVector LadderStart, LadderEnd;
+    ENavLinkDirection::Type Dir;
+    Nearest-&gt;GetLinkData(LadderStart, LadderEnd, Dir);
+    // Have FlyTo task move to LadderStart, then trigger the link traversal.
+}</code></pre>
+<p>All of these are Blueprint-callable via the standard "LCM Navigation
+| Bridge" category.</p>
+<h2 id="solver-integration-v1-vs-v2">Solver integration (v1 vs v2)</h2>
+<p><strong>v1 (this release):</strong></p>
+<ul>
+<li>NavLinks register with the UE5 NavSystem → stock
+<code>UBTTask_MoveTo</code> workflows that involve smart-links work</li>
+<li>NavArea cost multipliers <strong>and</strong> NavLink
+<code>TraversalCostCm</code> are <strong>queryable</strong>
+(<code>GetCostMultiplierAlongPath</code> /
+<code>GetNavLinkTraversalCostAlongPath</code>) but the LCM Nav3D A*
+solver doesn't yet incorporate them into its own path-cost
+evaluation</li>
+<li>Buyer pattern: use the query library in a BT service to write the
+cost-along-path into a blackboard key, then a
+<code>LcmDecorator_PathLengthBelow</code>-style decorator gates on
+it</li>
+</ul>
+<p><strong>v2 (deferred):</strong></p>
+<ul>
+<li>Cost multipliers plumbed into the LCM Nav3D A* leaf-cost evaluation
+→ paths actually route around / through preferred lanes
+automatically</li>
+<li>NavLink edges added to the macro graph so the solver plans through
+them</li>
+<li>An additional cost channel under the same bounded-LSB parity
+discipline as the existing sweep-penalty plumbing</li>
+</ul>
+<p>v1 is the placement + registry + query surface; v2 is the solver-side
+cost integration. The data plane is ready; the planner-side wiring lands
+when the Marketplace v3.0 ramp justifies the solver-touch budget.</p>
+<h2 id="common-patterns">Common patterns</h2>
+<h3 id="ladder--drop-down-combo">Ladder + drop-down combo</h3>
+<p>Two <code>ULcmNavLinkComponent</code>s on the same actor:</p>
+<ul>
+<li>Ladder: bidirectional, <code>LinkStart = (0, 0, 0)</code>,
+<code>LinkEnd = (0, 0, 800)</code></li>
+<li>Drop-down: one-way, <code>LinkStart = (200, 0, 800)</code>,
+<code>LinkEnd = (200, 0, 0)</code>,
+<code>bBidirectional = false</code></li>
+</ul>
+<h3 id="storm-cloud--ground-danger">Storm cloud + ground danger</h3>
+<p>Two <code>ALcmNavAreaModifier</code>s:</p>
+<ul>
+<li>Storm cloud at Z=300.800, CostMultiplier 5.0, Tag "Storm"</li>
+<li>Danger zone at Z=0.150, CostMultiplier 10.0, Tag "Combat"</li>
+</ul>
+<p>Agents flying at Z=200 see normal cost; flying at Z=400 see 5× cost;
+flying through ground combat at Z=50 see 10× cost.</p>
+<h3 id="preferred-lane">Preferred lane</h3>
+<p>Single <code>ALcmNavAreaModifier</code> with
+<code>CostMultiplier = 0.5</code>. LCM Nav3D paths bias toward this
+volume when the v2 solver integration lands.</p>
+<h2 id="acceptance-test-manual">Acceptance test (manual)</h2>
+<ol type="1">
+<li>Drop a <code>ULcmNavLinkComponent</code> with LinkStart at
+<code>(0,0,0)</code>, LinkEnd at <code>(0,0,500)</code>, and
+<code>TraversalCostCm = 400</code>.</li>
+<li>In a Blueprint test actor:
+<code>Print String (ULcmNavAreaQueryLibrary::GetRegisteredLinkCount)</code>
+→ should print <code>1</code>.</li>
+<li>Move the test actor near <code>(0,0,0)</code>. Call
+<code>FindNearestNavLink(actor.location, 1000)</code> → returns your
+component.</li>
+<li><code>GetNavLinkTraversalCostAlongPath([(0,0,0),(0,0,500)])</code> →
+returns <code>400</code>. A path that stays away from the link (e.g.
+<code>[(5000,0,0),(6000,0,0)]</code>) → returns <code>0</code>.</li>
+<li>Drop a <code>ALcmNavAreaModifier</code> covering
+<code>(0,0,250)</code> with CostMultiplier 5.0.</li>
+<li><code>GetCostMultiplierAt((0,0,250))</code> → returns
+<code>5.0</code>. At <code>(0,0,800)</code> → returns
+<code>1.0</code>.</li>
+</ol>
+<h2 id="related-lcm-nav3d-unique-surfaces">Related LCM Nav3D-unique
+surfaces</h2>
+<ul>
+<li><code>ULcmTacticalQueryLibrary::GetSweepPenaltyAt</code> - §P9.3
+dynamic-obstacle risk byte (orthogonal to NavArea modifiers; both
+apply)</li>
+<li><code>LCM_BTDecorator_PathLengthBelow</code> - LCM Nav3D path-length
+predicate; complements cost-along-path</li>
+<li><code>LCM_BTService_ThreatFieldSampler</code> - write SweepPenalty
+into BB; pair with cost-multiplier write for full risk-aware AI</li>
+</ul>
+
+  <div class="pager"><a href="hybrid-recast.html">&larr; Hybrid Recast + Nav3D</a><a href="gameplay-debugger.html">The Gameplay Debugger &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BT MemoryDecay - use `FActorPerceptionInfo::GetLastStimulusLocation(&OutAge)` | LCM Nav3D</title>
+<meta name="description" content="Unreal Engine's UAIPerceptionComponent already tracks per-actor last-known stimulus location with age. No need to roll your own decay timer.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/bt-memory-decay.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BT MemoryDecay - use `FActorPerceptionInfo::GetLastStimulusLocation(&OutAge)` | LCM Nav3D">
+<meta property="og:description" content="Unreal Engine's UAIPerceptionComponent already tracks per-actor last-known stimulus location with age. No need to roll your own decay timer.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay" class="on">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1
+id="bt-memorydecay---use-factorperceptioninfogetlaststimuluslocationoutage">BT
+MemoryDecay - use
+<code>FActorPerceptionInfo::GetLastStimulusLocation(&amp;OutAge)</code></h1>
+<p><strong>TL;DR:</strong> Unreal Engine's
+<code>UAIPerceptionComponent</code> already tracks per-actor last-known
+stimulus location with age. No need to roll your own decay timer.</p>
+<h2 id="pattern-in-your-aicontroller-or-a-small-custom-service">Pattern
+(in your AIController or a small custom service)</h2>
+<pre class="cpp"><code>UAIPerceptionComponent* Perception = GetAIPerceptionComponent();
+if (!Perception) return;
+
+// Pull the last-known info for a specific actor (e.g. the threat you&#39;re tracking).
+if (const FActorPerceptionInfo* Info = Perception-&gt;GetActorInfo(*ThreatActor))
+{
+    float Age = 0.0f;
+    FVector LastKnown = Info-&gt;GetLastStimulusLocation(&amp;Age);
+
+    // Apply your project&#39;s memory window.
+    if (Age &lt; MemoryWindowSec)
+    {
+        Blackboard-&gt;SetValueAsVector(&quot;LastKnownThreatLoc&quot;, LastKnown);
+        Blackboard-&gt;SetValueAsFloat (&quot;MemoryAge&quot;,          Age);
+        Blackboard-&gt;SetValueAsBool  (&quot;bHasMemory&quot;,         true);
+    }
+    else
+    {
+        // Memory expired.
+        Blackboard-&gt;SetValueAsBool(&quot;bHasMemory&quot;, false);
+    }
+}</code></pre>
+<p>That's it. Perception's age tracking handles refresh-on-stimulus +
+decay automatically.</p>
+<h2 id="how-to-integrate-as-a-bt-service">How to integrate as a BT
+service</h2>
+<p>Wrap the snippet above in a <code>UBTService_BlueprintBase</code>
+subclass (Blueprint-only - no C++ needed):</p>
+<ol type="1">
+<li>Create a BP service. Override <code>Receive Tick</code>.</li>
+<li>Inputs: <code>ThreatActor</code> (Object BB key) +
+<code>MemoryWindowSec</code> (float).</li>
+<li>Inputs to write: <code>LastKnownThreatLoc</code> (Vector BB key) +
+<code>MemoryAge</code> (Float BB key) + <code>bHasMemory</code> (Bool BB
+key).</li>
+<li>Tick body: get perception component → <code>GetActorInfo</code> →
+<code>GetLastStimulusLocation(&amp;Age)</code> → branch on Age vs window
+→ write BB keys.</li>
+</ol>
+<p>Five nodes total. No C++ required.</p>
+<h2 id="why-we-didnt-ship-lcm_btservice_memorydecay">Why we didn't ship
+<code>LCM_BTService_MemoryDecay</code></h2>
+<p>The stock
+<code>FActorPerceptionInfo::GetLastStimulusLocation(&amp;OutAge)</code>
+provides everything our planned MemoryDecay service would - location +
+age tracked <strong>per sense, per actor</strong>, automatically
+refreshed on stimulus and aged each frame.</p>
+<p>Rolling our own decay timer would:</p>
+<ul>
+<li>Duplicate the perception component's bookkeeping</li>
+<li>Miss the per-sense granularity (perception tracks separately for
+Sight / Hearing / Damage / etc.)</li>
+<li>Force buyers to maintain two parallel "last seen" caches</li>
+</ul>
+<p>The LCM Nav3D StateTree variant <code>FLcmSTEval_Memory</code>. Same
+conclusion on both sides.</p>
+<h2 id="related-lcm-nav3d-unique-services">Related LCM Nav3D-unique
+services</h2>
+<p>If you want <strong>squad-level memory</strong> (where multiple
+allies' perceived-actor lists are aggregated), use
+<code>LCM_BTService_SquadSnapshot</code> - that's a genuinely LCM
+Nav3D-additive surface.</p>
+
+  <div class="pager"><a href="bt-perception-relay.html">&larr; Perception Relay</a><a href="editor-tools.html">Editor tools &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

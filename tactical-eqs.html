@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 07 - Authoring true-3D tactical EQS | LCM Nav3D</title>
+<meta name="description" content="LCM Nav3D ships EQS generators and tests that work in true 3D - candidate points anywhere in the navigable volume, scored by volumetric SVO line-of-sigh...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/tactical-eqs.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 07 - Authoring true-3D tactical EQS | LCM Nav3D">
+<meta property="og:description" content="LCM Nav3D ships EQS generators and tests that work in true 3D - candidate points anywhere in the navigable volume, scored by volumetric SVO line-of-sigh...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs" class="on">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-07---authoring-true-3d-tactical-eqs">Tutorial 07 -
+Authoring true-3D tactical EQS</h1>
+<p><strong>TL;DR:</strong> LCM Nav3D ships EQS generators and tests that
+work in <strong>true 3D</strong> - candidate points anywhere in the
+navigable volume, scored by volumetric SVO line-of-sight, cover,
+threat-exposure, LCM Nav3D-path-distance and height. Author a query from
+these nodes exactly like stock EQS; the only differences are the
+<code>Apex:</code>-prefixed generators/tests and that "distance" means
+<em>LCM Nav3D path</em>, not Euclidean or navmesh.</p>
+<h2 id="the-lcm-nav3d-eqs-node-catalog">The LCM Nav3D EQS node
+catalog</h2>
+<p><strong>Generators</strong> (<code>UEnvQueryGenerator</code>, produce
+3D points): | Node | Produces | |---|---| | <strong>LCM Nav3D | Points
+In SVO Volume</strong> | uniform 3D points in an AABB, filtered to
+unblocked SVO leaves | | <strong>LCM Nav3D | Hemispherical Ring
+3D</strong> | shells around a target (perch / orbit / high-ground);
+<em>Upper Hemisphere Only</em> option | | <strong>LCM Nav3D | Points
+Along Path</strong> | points sampled along the LCM Nav3D path between
+two contexts | | <strong>LCM Nav3D | Portal Proximity</strong> | points
+at macro-graph portal centres near a context (chokepoints) |</p>
+<p><strong>Tests</strong> (<code>UEnvQueryTest</code>, score/filter): |
+Node | Axis | Notes | |---|---|---| | <strong>LCM Nav3D | Line Of Sight
+3D</strong> | visible to context (bool) | volumetric SVO LOS, not 2.5D |
+| <strong>LCM Nav3D | Reachability 3D</strong> | an LCM Nav3D path
+exists (bool) | filter unreachable candidates | | <strong>LCM Nav3D |
+Path Distance 3D</strong> | LCM Nav3D path length (float) | NOT
+Euclidean; Context = Querier | | <strong>LCM Nav3D | Threat
+Exposure</strong> | summed SweepPenalty toward threats (float) | lower =
+safer | | <strong>LCM Nav3D | Cover Score 3D</strong> | fraction of
+threats occluded-from (float) | higher = better cover | | <strong>LCM
+Nav3D | Height Advantage</strong> | Z over context (float) | high ground
+|</p>
+<p><strong>Contexts</strong> (<code>UEnvQueryContext</code>): | Node |
+Returns | |---|---| | <strong>LCM Nav3D | Known Threats</strong> |
+actors tagged <code>ApexThreat</code> | | <strong>LCM Nav3D | Threats
+From AI Perception</strong> | the querier's perceived threats (Tutorial
+08) |</p>
+<h2 id="step-1---author-a-sniper-perch-query">Step 1 - Author a
+sniper-perch query</h2>
+<p>Create an EQS query <code>EQS_FindSniperPerch</code>:</p>
+<ol type="1">
+<li><strong>Generator: LCM Nav3D | Hemispherical Ring 3D</strong> -
+<code>GenerateAround</code> = the threat context (Known Threats /
+Threats From AI Perception), <code>RadiusMin/Max</code> = your
+engagement band, <code>Upper Hemisphere Only</code> = true (perch above
+the threat).</li>
+<li><strong>Test: LCM Nav3D | Line Of Sight 3D</strong> (Context =
+threats) - <em>Score, prefer should-have-LOS</em> - a perch must see its
+target.</li>
+<li><strong>Test: LCM Nav3D | Cover Score 3D</strong> (Context =
+threats) - <em>Score↑</em> - partial cover is good.</li>
+<li><strong>Test: LCM Nav3D | Height Advantage</strong> (Context =
+threats) - <em>Score↑</em> - favour high ground.</li>
+<li><strong>Test: LCM Nav3D | Reachability 3D</strong> (Context =
+Querier) - <em>Filter</em> - the agent must be able to get there.</li>
+</ol>
+<p>The winning item is a reachable, high, in-cover position that still
+has line of sight to the threat - a sniper perch, chosen in full 3D.</p>
+<p><img src="images/eqs-example.png"
+alt="An EQS query graph with the LCM Nav3D | Points In SVO Volume generator carrying LcmLineOfSight3D and LcmPathDistance3D tests, and the test Details panel open" /></p>
+<p><strong>Figure 07.1 - The anatomy of a Nav3D query.</strong> One
+<strong>generator</strong> produces candidate points, then
+<strong>tests</strong> score or filter them, top to bottom. Here
+<code>Apex: Points In SVO Volume</code> is emitting unblocked 3D points
+across an 800×800×400 half-extent at 200 spacing - <em>unblocked</em>
+being the part a floor-plane generator cannot do, because it never had a
+third axis to be blocked in.</p>
+<p>The two tests are colour-coded by role in the graph: a
+<strong>filter</strong> removes items, a <strong>score</strong> ranks
+them. The Details panel on the right belongs to the selected test:</p>
+<ul>
+<li><strong><code>Test Purpose</code></strong> -
+<code>Score Only</code>, <code>Filter Only</code>, or both. This is the
+switch that decides whether a failing item is <em>penalised</em> or
+<em>deleted</em>.</li>
+<li><strong><code>Context</code></strong> - what the test measures
+<em>against</em>. <code>EnvQueryContext_LcmKnownThreats</code> here, so
+line of sight is evaluated toward the threats the agent knows
+about.</li>
+<li><strong><code>Agent Radius</code></strong> - how wide the thing that
+has to fit is. Leave this at your real agent size; a query that scores a
+perch a 50 cm drone can reach tells you nothing about a 200 cm
+gunship.</li>
+<li><strong><code>Scoring Equation</code></strong> and the
+<strong>Preview</strong> graph - the curve mapping raw measurement to
+score. The preview updates live, so you can see a <code>Linear</code>
+ramp become a <code>Square</code> bias before you ever run the
+query.</li>
+</ul>
+<h2 id="step-2---the-eqs-testing-pawn">Step 2 - The EQS Testing
+Pawn</h2>
+<p>Drop an <strong>EQS Testing Pawn</strong> in the level, set its
+<code>QueryTemplate</code> to <code>EQS_FindSniperPerch</code>, and
+place threats so the contexts resolve. The candidate items render as
+colour-graded balls; tweak generator/test parameters and watch the
+scores update live.</p>
+<blockquote>
+<p>UE's stock <code>EQSTestingPawn</code> is all you need - the LCM
+Nav3D nodes render through it normally.</p>
+</blockquote>
+<h2 id="step-3---wire-the-result-into-a-behavior-tree">Step 3 - Wire the
+result into a Behavior Tree</h2>
+<ol type="1">
+<li>A <code>Run EQS Query</code> task/service runs
+<code>EQS_FindSniperPerch</code> and writes the best item to a
+blackboard <code>Vector</code> key.</li>
+<li>A <code>MoveTo</code> (or the LCM Nav3D <code>FlyTo</code> BT task)
+moves the agent to that key.</li>
+<li>Re-run on an interval (service) so the perch updates as threats
+move.</li>
+</ol>
+<p>(StateTree: run the query from a task that stores the location, then
+transition to your LCM Nav3D move task - see Tutorial 05.)</p>
+<h2 id="the-five-shipped-example-queries">The five shipped example
+queries</h2>
+<p>Recipes you can build now from the catalog above:</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Recipe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EQS_FindSniperPerch</code></td>
+<td>Hemispherical Ring 3D + Cover Score 3D + LOS 3D + Height
+Advantage</td>
+</tr>
+<tr>
+<td><code>EQS_FindFlankingApproach</code></td>
+<td>Points In SVO Volume + Threat Exposure↓ + Path Distance 3D</td>
+</tr>
+<tr>
+<td><code>EQS_FindAmbushCorner</code></td>
+<td>Portal Proximity + LOS 3D (prefer blocked) + Reachability 3D</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related">Related</h2>
+<ul>
+<li>Tutorial 08 - perception-driven threat sources (the auto-populated
+threat context).</li>
+<li>Tutorial 05 - StateTree integration (the move side).</li>
+<li><code>ULcmTacticalQueryLibrary</code> - the same primitives as
+Blueprint nodes (<code>Is Segment LOS Clear</code>,
+<code>Find Best Cover</code>, <code>Find Apex Path Sync</code>,
+...).</li>
+</ul>
+
+  <div class="pager"><a href="mass-entity-crowds.html">&larr; Mass Entity crowds</a><a href="ai-perception.html">AI perception &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

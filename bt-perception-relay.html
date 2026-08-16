@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BT PerceptionRelay - bind `OnTargetPerceptionUpdated` directly | LCM Nav3D</title>
+<meta name="description" content="Unreal Engine's UAIPerceptionComponent already emits perception updates as a delegate. You don't need a custom BT service - just bind the delegate in yo...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/bt-perception-relay.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BT PerceptionRelay - bind `OnTargetPerceptionUpdated` directly | LCM Nav3D">
+<meta property="og:description" content="Unreal Engine's UAIPerceptionComponent already emits perception updates as a delegate. You don't need a custom BT service - just bind the delegate in yo...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay" class="on">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="bt-perceptionrelay---bind-ontargetperceptionupdated-directly">BT
+PerceptionRelay - bind <code>OnTargetPerceptionUpdated</code>
+directly</h1>
+<p><strong>TL;DR:</strong> Unreal Engine's
+<code>UAIPerceptionComponent</code> already emits perception updates as
+a delegate. You don't need a custom BT service - just bind the delegate
+in your AI controller and write to a blackboard key.</p>
+<h2 id="pattern-in-your-aicontroller-subclass">Pattern (in your
+AIController subclass)</h2>
+<pre class="cpp"><code>// In your AIController.h
+UPROPERTY()
+TObjectPtr&lt;UAIPerceptionComponent&gt; PerceptionComp;
+
+UFUNCTION()
+void OnPerceptionUpdate(AActor* Actor, FAIStimulus Stimulus);
+
+// In your AIController.cpp BeginPlay
+PerceptionComp = FindComponentByClass&lt;UAIPerceptionComponent&gt;();
+if (PerceptionComp)
+{
+    PerceptionComp-&gt;OnTargetPerceptionUpdated.AddDynamic(
+        this, &amp;AYourAIController::OnPerceptionUpdate);
+}
+
+void AYourAIController::OnPerceptionUpdate(AActor* Actor, FAIStimulus Stimulus)
+{
+    if (UBlackboardComponent* BB = GetBlackboardComponent())
+    {
+        if (Stimulus.WasSuccessfullySensed())
+        {
+            BB-&gt;SetValueAsObject(&quot;ClosestThreat&quot;, Actor);
+            BB-&gt;SetValueAsBool  (&quot;bHasAnyTarget&quot;, true);
+        }
+        else
+        {
+            // Lost sight - leave ClosestThreat for memory pattern (see below)
+            BB-&gt;SetValueAsBool(&quot;bHasAnyTarget&quot;, false);
+        }
+    }
+}</code></pre>
+<p>That's the canonical UE5 way. Three lines in your AIController + a
+Blackboard decorator in the BT.</p>
+<h2 id="why-we-didnt-ship-lcm_btservice_perceptionrelay">Why we didn't
+ship <code>LCM_BTService_PerceptionRelay</code></h2>
+<p>A custom service that ticks each frame and re-queries
+<code>GetCurrentlyPerceivedActors</code> is less efficient than binding
+the <strong>event-driven</strong> <code>OnTargetPerceptionUpdated</code>
+delegate. The stock pattern is also more idiomatic - every UE5 AI
+tutorial uses this pattern.</p>
+<p>The LCM Nav3D StateTree variant
+<code>FLcmSTEval_PerceptionRelay</code> is kept because StateTree has no
+per-state perception delegate (its evaluators are tick-based by design).
+On the BT side, delegate binding is the standard.</p>
+<h2 id="memory-pattern-last-known-location-with-age">Memory pattern
+(last-known-location with age)</h2>
+<p>UE5's perception component already tracks last-known location + age
+per perceived actor via
+<code>FActorPerceptionInfo::GetLastStimulusLocation(float* OutAge)</code>.
+To use it:</p>
+<pre class="cpp"><code>if (const FActorPerceptionInfo* Info = PerceptionComp-&gt;GetActorInfo(*Actor))
+{
+    float Age = 0.f;
+    FVector LastKnown = Info-&gt;GetLastStimulusLocation(&amp;Age);
+    if (Age &lt; 8.f) // 8 sec memory window
+    {
+        BB-&gt;SetValueAsVector(&quot;LastKnownThreatLoc&quot;, LastKnown);
+    }
+}</code></pre>
+<p>See <code>BT_MemoryDecay_StockPattern.md</code> for the full pattern.
+<strong>Don't</strong> roll your own decay timer - perception's age
+tracking already does it for you.</p>
+<h2 id="related-lcm-nav3d-unique-services">Related LCM Nav3D-unique
+services</h2>
+<p>For perception-aware predicates that need <strong>LCM Nav3D
+LOS</strong> (volumetric, not raycast):</p>
+<ul>
+<li><code>LCM_BTDecorator_ThreatVisibleViaPerception</code> - composite:
+perception sees + LCM Nav3D Lazy Theta* LOS is clear</li>
+<li><code>LCM_BTService_SquadSnapshot</code> - aggregates perceived
+allies into squad centroid / cohesion radius</li>
+</ul>
+
+  <div class="pager"><a href="bt-health-below.html">&larr; Health Below</a><a href="bt-memory-decay.html">Memory Decay &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

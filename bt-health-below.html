@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BT HealthBelow - use the stock blackboard + decorator pattern | LCM Nav3D</title>
+<meta name="description" content="Unreal Engine ships everything you need: a Float blackboard key + a Blackboard-Compare decorator. No LCM Nav3D variant.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/bt-health-below.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BT HealthBelow - use the stock blackboard + decorator pattern | LCM Nav3D">
+<meta property="og:description" content="Unreal Engine ships everything you need: a Float blackboard key + a Blackboard-Compare decorator. No LCM Nav3D variant.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below" class="on">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="bt-healthbelow---use-the-stock-blackboard--decorator-pattern">BT
+HealthBelow - use the stock blackboard + decorator pattern</h1>
+<p><strong>TL;DR:</strong> Unreal Engine ships everything you need: a
+Float blackboard key + a Blackboard-Compare decorator. No LCM Nav3D
+variant.</p>
+<h2 id="pattern">Pattern</h2>
+<ol type="1">
+<li><strong>In your Blackboard asset</strong>: add a Float key
+<code>CurrentHealth</code>.</li>
+<li><strong>In your AI controller / game code</strong>: write
+<code>CurrentHealth</code> whenever damage is applied.</li>
+<li><strong>In your BT graph</strong>: add a <code>Blackboard</code>
+decorator to the "retreat" / "panic" sequence. Set:
+<ul>
+<li>Key: <code>CurrentHealth</code></li>
+<li>Notify Observer: On Value Change (so the decorator re-evaluates
+immediately on damage)</li>
+<li>Operator: <code>Is Less Than</code></li>
+<li>Value: <code>30.0</code> (or whatever threshold)</li>
+</ul></li>
+</ol>
+<p>That's the canonical UE5 way of doing "if health below X, do Y."</p>
+<h2 id="if-you-want-a-gameplaytag-based-pattern">If you want a
+GameplayTag-based pattern</h2>
+<p>For projects using GAS where health states are tags (e.g.
+<code>Status.Bleeding</code>, <code>Status.LowHealth</code>), use the
+stock <code>UBTDecorator_CheckGameplayTagsOnActor</code>. Same
+semantics, tag-driven.</p>
+<h2 id="why-we-didnt-ship-lcm_btdecorator_healthbelow">Why we didn't
+ship <code>LCM_BTDecorator_HealthBelow</code></h2>
+<p>The stock blackboard-compare decorator covers the exact same
+functionality with one extra dropdown (the comparison operator) - which
+actually gives the buyer more flexibility
+(<code>&gt; &lt; &lt;= &gt;= ==</code>) than a fixed "below threshold"
+LCM Nav3D decorator. The audit classified this as a partial overlap; the
+buyer-experience answer is to lean on stock.</p>
+<p>The LCM Nav3D StateTree variant
+<code>FLcmSTCondition_HealthBelow</code> is kept for ergonomic parity
+(named clearly in the StateTree node picker), but its underlying
+behaviour is also "float compare" - stock-equivalent.</p>
+<h2 id="related-lcm-nav3d-unique-decorators">Related LCM Nav3D-unique
+decorators</h2>
+<p>If your "should I retreat" gate isn't health-based but
+<strong>threat-field-based</strong>, the LCM Nav3D-unique surface gives
+you better options:</p>
+<ul>
+<li><code>LCM_BTDecorator_IsInCover</code> - composite SweepPenalty +
+LOS predicate</li>
+<li><code>LCM_BTService_ThreatFieldSampler</code> - writes
+<code>CurrentThreatLevel</code> + <code>bInThreatZone</code> into BB
+every 0.2s; then a stock blackboard decorator can gate on
+<code>bInThreatZone</code></li>
+</ul>
+
+  <div class="pager"><a href="bt-turn-in-place.html">&larr; Turn In Place</a><a href="bt-perception-relay.html">Perception Relay &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

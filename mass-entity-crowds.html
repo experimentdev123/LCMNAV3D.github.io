@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 06 - Mass Entity crowds (10K+ agents) | LCM Nav3D</title>
+<meta name="description" content="Add one trait to a Mass Entity Config and a crowd navigates in full 3D. No per-agent controller, no tick function, no code.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/mass-entity-crowds.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 06 - Mass Entity crowds (10K+ agents) | LCM Nav3D">
+<meta property="og:description" content="Add one trait to a Mass Entity Config and a crowd navigates in full 3D. No per-agent controller, no tick function, no code.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds" class="on">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-06---mass-entity-crowds-10k-agents">Tutorial 06 - Mass
+Entity crowds (10K+ agents)</h1>
+<p>Add one trait to a Mass Entity Config and a crowd navigates in full
+3D. No per-agent controller, no tick function, no code.</p>
+<p><strong>Time:</strong> ~20 minutes. <strong>You'll end with:</strong>
+thousands of agents flying to a goal.</p>
+<blockquote>
+<p>A <code>UActor</code> AI agent costs roughly 50 µs/tick once it has a
+controller, movement component and behaviour tree - a few hundred
+saturate the game thread. Mass represents agents as ECS fragments
+instead, so the same work runs in one processor sweep.</p>
+</blockquote>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>The <code>MassEntity</code> <strong>and</strong>
+<code>MassGameplay</code> plugins enabled. LCM Nav3D enables both; if
+you stripped them, re-enable both or the module fails to load.</li>
+<li>An <code>LcmNavigationManagerSVO</code> in the level with navigation
+built.</li>
+<li>Epic's "MassEntity Quick Start" if you have never used Mass - this
+tutorial only adds a trait on top of the standard flow.</li>
+</ul>
+<hr />
+<h2 id="step-1-create-the-agent-config">Step 1: Create the agent
+config</h2>
+<p><strong>Add → Miscellaneous → Data Asset →
+<code>MassEntityConfigAsset</code></strong>. Name it
+<code>DA_MyCrowd</code>.</p>
+<p>Open it and add three traits - one from each category:</p>
+<table>
+<thead>
+<tr>
+<th>Trait</th>
+<th>Category</th>
+<th>Set</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LCM Nav3D Agent</strong></td>
+<td>Movement - <em><strong>exactly one</strong></em></td>
+<td><code>Nav Mode</code>, <code>Agent Radius</code>,
+<code>Max Speed</code></td>
+</tr>
+<tr>
+<td><strong>LCM Nav3D Goal</strong></td>
+<td>Goal</td>
+<td><code>Goal Mode</code>, and the location or tag</td>
+</tr>
+<tr>
+<td><strong>LCM Nav3D ISM Render</strong></td>
+<td>Rendering</td>
+<td><code>Mesh</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="choosing-a-nav-mode">Choosing a Nav Mode</h3>
+<table>
+<thead>
+<tr>
+<th>Nav Mode</th>
+<th>Use it for</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Path Following</strong></td>
+<td>Agents with <em>different</em> goals, precise routes, infinite
+worlds</td>
+<td>One path per agent</td>
+</tr>
+<tr>
+<td><strong>Flow Field</strong></td>
+<td>A crowd sharing <em>one</em> goal - the 10K-scale option</td>
+<td>One field, shared by everyone</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠ <strong>Add a rendering trait or your agents are
+invisible.</strong> They spawn and navigate correctly, they just draw
+nothing - the navigation trait deliberately owns navigation only. This
+is the most common first-run surprise.</p>
+</blockquote>
+<h3 id="movement-settings-worth-knowing">Movement settings worth
+knowing</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Max Turn Rate Deg</code></td>
+<td><code>360</code></td>
+<td>The knob that turns square corners into arcs. <code>0</code> =
+instant snap</td>
+</tr>
+<tr>
+<td><code>Max Acceleration</code></td>
+<td><code>2000</code></td>
+<td>cm/s². With turn rate, this is what makes movement look
+weighted</td>
+</tr>
+<tr>
+<td><code>Flight Style</code></td>
+<td><code>Physics</code></td>
+<td><code>Physics</code> (inertia) vs <code>Linear</code> (magic /
+biological, instant)</td>
+</tr>
+<tr>
+<td><code>Avoidance Style</code></td>
+<td><code>Reactive</code></td>
+<td><code>Reactive</code> (boids) / <code>Predictive</code> (ORCA,
+smooth mutual passing) / <code>None</code></td>
+</tr>
+<tr>
+<td><code>Lane Bias</code></td>
+<td><code>0.6</code></td>
+<td>Spreads a crowd across a corridor instead of balling up at
+turns</td>
+</tr>
+</tbody>
+</table>
+<p>Defaults give natural movement out of the box.</p>
+<hr />
+<h2 id="step-2-spawn-them">Step 2: Spawn them</h2>
+<ol type="1">
+<li>Place a <strong><code>MassSpawner</code></strong> actor in the
+level.</li>
+<li>In <strong>Entity Types</strong>, reference
+<code>DA_MyCrowd</code>.</li>
+<li>Set <strong>Spawn Count</strong> - start at 100 while you wire it
+up.</li>
+<li>Give it a spawn-distribution asset so agents start at distinct
+positions <strong>inside your navigation volume</strong>.</li>
+</ol>
+<hr />
+<h2 id="step-3-give-them-a-goal">Step 3: Give them a goal</h2>
+<p>The <strong>LCM Nav3D Goal</strong> trait does this with no code:</p>
+<table>
+<thead>
+<tr>
+<th><code>Goal Mode</code></th>
+<th>Set</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fixed Location</strong></td>
+<td><code>Goal Location</code></td>
+<td>Everyone paths to that point</td>
+</tr>
+<tr>
+<td><strong>Tagged Actor</strong></td>
+<td><code>Target Actor Tag</code> (e.g. <code>ApexGoal</code>)</td>
+<td>Everyone paths to the tagged actor, re-pathing if it moves</td>
+</tr>
+</tbody>
+</table>
+<p><code>Repath Tolerance Cm</code> decides how far a moving target
+drifts before agents re-path; <code>Arrival Tolerance Cm</code> is where
+they stop.</p>
+<details>
+<summary>Setting a goal from code instead</summary>
+
+<p>Write the goal and flip the status; the processors own every
+transition from there.</p>
+<pre class="cpp"><code>auto&amp; Req = EntityManager.GetFragmentDataChecked&lt;FLcmMassPathRequestFragment&gt;(Handle);
+Req.Goal   = TargetPos;
+Req.Status = ELcmMassPathStatus::Pending;</code></pre>
+<p><code>Status</code> moves <code>Pending → InFlight → Complete</code>
+(or <code>Failed</code>) and is readable at any time, so your own logic
+can branch on it.</p>
+</details>
+
+<hr />
+<h2 id="step-4-check-it-works">Step 4: Check it works</h2>
+<ol type="1">
+<li>Press <strong>Validate Entity Config</strong> on the asset. It
+catches the trait mistakes that are silent at runtime and all present as
+"my agents don't move".</li>
+<li>Press Play with <code>r.LcmNav.Mass.DebugDraw 1</code> - agents draw
+as status-coloured spheres (grey idle, yellow pending, green complete,
+red failed) with a line to their waypoint.</li>
+<li>Scale up gradually: 100, then 1,000, then 10,000, watching frame
+time.</li>
+</ol>
+<hr />
+<h2 id="if-nothing-moves">If nothing moves</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nothing visible at all</td>
+<td>No rendering trait</td>
+<td>Add <strong>LCM Nav3D ISM Render</strong></td>
+</tr>
+<tr>
+<td>Spheres are red</td>
+<td>No path to the goal</td>
+<td>Goal is outside the navigation volume, or inside geometry</td>
+</tr>
+<tr>
+<td>Spheres stay grey</td>
+<td>No goal set</td>
+<td>Add the <strong>Goal</strong> trait, or write the request
+fragment</td>
+</tr>
+<tr>
+<td>Validation error on save</td>
+<td>Two movement traits, or Goal on a Flow Field agent</td>
+<td>See <a href="mass-traits.html">Mass Trait Reference</a></td>
+</tr>
+<tr>
+<td>Crowd vanishes when you walk away</td>
+<td>World Partition streamed the spawner out</td>
+<td>See the World Partition section of the trait reference</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="tuning">Tuning</h2>
+<p>Kill-switches and global overrides. Production authoring is the
+trait, not the console.</p>
+<table>
+<thead>
+<tr>
+<th>CVar</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>r.LcmNav.Mass.MaxPathsPerTick</code></td>
+<td><code>64</code></td>
+<td>Spreads a large spawn wave's path requests across frames</td>
+</tr>
+<tr>
+<td><code>r.LcmNav.Mass.Avoidance</code></td>
+<td><code>1</code></td>
+<td>Master switch for inter-agent avoidance</td>
+</tr>
+<tr>
+<td><code>r.LcmNav.Mass.DebugDraw</code></td>
+<td><code>0</code></td>
+<td>Status-coloured spheres and waypoint lines</td>
+</tr>
+</tbody>
+</table>
+<h2 id="scope">Scope</h2>
+<p>Mass agents resolve both endpoints <strong>within the agent's own
+chunk</strong>. Keep crowd goals in the same chunk as the crowd, or use
+a Behaviour Tree agent for long cross-chunk routes.</p>
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="mass-traits.html">Mass Trait Reference</a> - every trait,
+the combination matrix, and the World Partition trap.</li>
+<li><a href="statetree-agent.html">Tutorial 04 - StateTree</a>, the
+per-entity AI layer that pairs with Mass.</li>
+</ul>
+
+  <div class="pager"><a href="dynamic-obstacles.html">&larr; Dynamic obstacles</a><a href="tactical-eqs.html">Tactical EQS in true 3D &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

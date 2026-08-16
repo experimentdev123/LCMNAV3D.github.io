@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://uedevlabs.github.io/lcm-nav3d/sitemap.xml

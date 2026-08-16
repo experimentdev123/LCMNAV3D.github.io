@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 02: Core Concepts | LCM Nav3D</title>
+<meta name="description" content="LCM Nav3D carves your level's empty air into a tree of boxes  and paths through the empty ones. You place one LcmNavigationManagerSVO actor per level, t...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/core-concepts.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 02: Core Concepts | LCM Nav3D">
+<meta property="og:description" content="LCM Nav3D carves your level's empty air into a tree of boxes  and paths through the empty ones. You place one LcmNavigationManagerSVO actor per level, t...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts" class="on">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-02-core-concepts">Tutorial 02: Core Concepts</h1>
+<p><strong>TL;DR:</strong> LCM Nav3D carves your level's <strong>empty
+air</strong> into a tree of boxes (a Sparse Voxel Octree) and paths
+through the empty ones. You place one
+<strong><code>LcmNavigationManagerSVO</code></strong> actor per level,
+tell it how big your world is and how small the tightest gap is, and it
+does the rest.</p>
+<p><strong>Time:</strong> ~10 minutes reading. No project changes. This
+is the chapter that makes every later setting make sense.</p>
+<hr />
+<h2 id="1-why-not-just-use-unreals-navmesh">1. Why not just use Unreal's
+navmesh?</h2>
+<p>Unreal's Recast navmesh is a <strong>surface</strong>. It answers
+"where can I stand?" by flattening your level onto walkable polygons.
+That is exactly right for a soldier and completely wrong for a dragon,
+because the interesting space for a flyer is the part with nothing in
+it.</p>
+<p>LCM Nav3D answers a different question: <strong>"where is there empty
+air?"</strong> It represents the volume, not the floor. That's the whole
+idea. Everything else is engineering around making that fast.</p>
+<hr />
+<h2 id="2-the-sparse-voxel-octree-in-one-picture">2. The Sparse Voxel
+Octree, in one picture</h2>
+<p>Imagine a giant cube around your level. Now:</p>
+<ol type="1">
+<li>Is the cube completely empty? <strong>Yes</strong> → done, one big
+box of free space.</li>
+<li><strong>No</strong>, something's in it? → cut it into 8 smaller
+cubes and ask each one the same question.</li>
+<li>Repeat until the cubes reach your minimum size.</li>
+</ol>
+<p>That's it. That's the octree.</p>
+<pre><code>     Big empty region                Region with a wall in it
+  ┌───────────────────┐          ┌─────────┬─────────┐
+  │                   │          │  empty  │  empty  │
+  │                   │          ├────┬────┼─────────┤
+  │     ONE node.     │          │ ▓▓ │ e  │  empty  │   ▓▓ = solid, keeps
+  │       Done.       │          ├────┼────┤         │        subdividing
+  │                   │          │ e  │ ▓▓ │         │    e = empty, stops
+  └───────────────────┘          └────┴────┴─────────┘</code></pre>
+<p><strong>"Sparse" is the important word.</strong> Open sky costs
+almost nothing: one node covers a huge volume. Detail only appears where
+geometry actually is. This is why a 2 km map doesn't cost 2 km worth of
+memory: most of it is air, and air is cheap.</p>
+<p><strong>What this means for you:</strong> the cost of your navigation
+data is driven by <em>how much clutter you have</em>, not by how big
+your level is.</p>
+<hr />
+<h2 id="3-the-one-actor-you-must-place">3. The one actor you must
+place</h2>
+<p><strong><code>LcmNavigationManagerSVO</code></strong>: drop one into
+your level. One per level, that's the rule.</p>
+<p>It owns the octree, runs the pathfinder, and answers every query.
+Every agent talks to it. If it isn't in the level, nothing
+navigates.</p>
+<p>Its Details panel is deliberately organised in the order you should
+think about it:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>What it's for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Setup</strong></td>
+<td>Finite or infinite world, the biggest decision</td>
+</tr>
+<tr>
+<td><strong>2. Voxels</strong></td>
+<td>Size and resolution</td>
+</tr>
+<tr>
+<td><strong>3. Collision</strong></td>
+<td>Which geometry counts as an obstacle</td>
+</tr>
+<tr>
+<td><strong>4. Performance</strong></td>
+<td>Frame-budget knobs</td>
+</tr>
+<tr>
+<td><strong>5. Debug</strong></td>
+<td>Visualisation</td>
+</tr>
+<tr>
+<td><strong>6. Runtime State</strong></td>
+<td>Read-only live info</td>
+</tr>
+</tbody>
+</table>
+<p>Full field-by-field detail is in the <a href="settings.html">Settings
+Reference</a>. Here we only cover the concepts behind them.</p>
+<hr />
+<h2 id="4-finite-vs-infinite-the-decision-that-shapes-everything">4.
+Finite vs Infinite: the decision that shapes everything</h2>
+<p>This is <strong><code>1. Setup → Infinite World</code></strong>, and
+it changes which other settings even appear.</p>
+<h3 id="finite-default-infinite-world-unticked">Finite (default,
+<code>Infinite World</code> unticked)</h3>
+<p>One fixed box of navigation, built once. You set
+<strong><code>WorldExtent</code></strong> (default <strong>10000
+cm</strong> = a 200 m cube, since extent is measured from the centre
+outward).</p>
+<ul>
+<li>Built at <code>BeginPlay</code> if
+<strong><code>Auto Build On Play</code></strong> is on (it is by
+default).</li>
+<li>Simple, fast, completely predictable.</li>
+<li><strong>Use this for:</strong> arenas, levels, dungeons, single
+buildings, anything with a boundary.</li>
+</ul>
+<p><strong>Start here.</strong> Most projects never need anything
+else.</p>
+<h3 id="infinite-infinite-world-ticked">Infinite
+(<code>Infinite World</code> ticked)</h3>
+<p>The world is divided into <strong>chunks</strong> of
+<strong><code>ChunkSize</code></strong> (default <strong>8000
+cm</strong>). Chunks are generated around your agents as they move and
+thrown away behind them.</p>
+<ul>
+<li><strong>Use this for:</strong> open worlds, streaming levels,
+procedural terrain, anything without a boundary.</li>
+<li>Costs more complexity: chunks must generate before an agent can
+route through them.</li>
+</ul>
+<blockquote>
+<p><strong><code>ChunkSize</code> is not a free dial.</strong> It
+decides both memory <em>and</em> whether distant routes can be found at
+all. <strong>8000 is the tested default. Change it only with a reason
+and re-test.</strong> Larger chunks mean fewer, heavier generations;
+smaller means more, lighter ones, and more seams to cross.</p>
+</blockquote>
+<hr />
+<h2 id="5-resolution-the-two-settings-people-get-wrong">5. Resolution:
+the two settings people get wrong</h2>
+<h3 id="minvoxelsize-default-100-cm"><code>MinVoxelSize</code> (default
+<strong>100 cm</strong>)</h3>
+<p>How small the smallest box is allowed to get. <strong>This is the
+single biggest driver of both quality and cost.</strong></p>
+<ul>
+<li><strong>Smaller</strong> → finds tighter gaps, uses more memory,
+takes longer to build.</li>
+<li><strong>Larger</strong> → cheaper and faster, but narrow openings
+vanish and agents route around them.</li>
+</ul>
+<blockquote>
+<p><strong>⚠ It's a floor, not an exact size.</strong> The octree halves
+its way down, so the real leaf size is the world (or chunk) size
+repeatedly divided by two until it's about your
+<code>MinVoxelSize</code>. Two consequences that surprise people:</p>
+<ul>
+<li>Changing <code>MinVoxelSize</code> from 100 to 90 may change
+<strong>nothing</strong> (same number of halvings).</li>
+<li>Changing it from 100 to 60 may cross a threshold and <strong>double
+your memory</strong> in one step.</li>
+</ul>
+<p>Tune it by testing, not by assuming the number is literal.</p>
+</blockquote>
+<p><strong>Rule of thumb:</strong> set <code>MinVoxelSize</code> to
+roughly <strong>half the narrowest gap</strong> your agents must fly
+through. A 3 m window needs about 150 cm or finer.</p>
+<h3 id="clearancepadding-default-100-cm"><code>ClearancePadding</code>
+(default <strong>100 cm</strong>)</h3>
+<p>Inflates obstacles by this much when voxelizing, so agents don't clip
+walls.</p>
+<blockquote>
+<p><strong>⚠ The classic mistake: setting this too high seals your
+level.</strong> If padding approaches the size of your voxels, doorways
+and corridors fill in completely and the pathfinder reports "no route"
+through an opening you can plainly see. <strong>Keep
+<code>ClearancePadding</code> well below
+<code>MinVoxelSize</code>.</strong> If you need more clearance than
+that, lower <code>MinVoxelSize</code> too.</p>
+</blockquote>
+<p>If agents refuse to path through an opening, this setting is the
+first thing to check.</p>
+<hr />
+<h2 id="6-how-a-path-is-actually-found">6. How a path is actually
+found</h2>
+<p>For a short hop, it's a straight search through the octree. For
+anything longer, there are two levels:</p>
+<pre><code>   1. MACRO: &quot;which chunks/regions do I cross?&quot;     (coarse, cheap, long-range)
+                     ↓
+   2. MICRO: &quot;which voxels inside them?&quot;            (fine, detailed, short-range)
+                     ↓
+   3. SMOOTH: turn the blocky voxel path into a nice line</code></pre>
+<p>You don't call these yourself; it's automatic. The reason to know is
+that it explains a common symptom: if a long route fails but a short one
+works, the problem is usually <strong>macro</strong>. Either chunks are
+not generated yet, or <code>ChunkSize</code> is interacting badly with
+your layout.</p>
+<h3 id="choosing-a-solver">Choosing a solver</h3>
+<table>
+<thead>
+<tr>
+<th>Solver</th>
+<th>Character</th>
+<th>Use when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>A*</strong> <em>(Fastest, Grid Locked)</em></td>
+<td>Cheapest; paths follow voxel edges, so turns look square</td>
+<td>You'll smooth the result anyway, or you need max throughput</td>
+</tr>
+<tr>
+<td><strong>Theta*</strong> <em>(Accurate, Any Angle)</em></td>
+<td>Most direct; cuts corners properly</td>
+<td>Quality matters more than cost</td>
+</tr>
+<tr>
+<td><strong>Lazy Theta*</strong> <em>(Balanced)</em></td>
+<td>Nearly Theta* quality, near A* cost</td>
+<td><strong>The sensible default</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="smoothing">Smoothing</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Raw Path</strong></td>
+<td>Straight out of the solver, blocky</td>
+</tr>
+<tr>
+<td><strong>Linear Shortcut</strong></td>
+<td>Removes redundant waypoints; straight segments</td>
+</tr>
+<tr>
+<td><strong>Curved Spline</strong></td>
+<td>Smooth curves: <strong>what you want for flying things</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Smoothing runs <em>after</em> pathfinding and is validated against
+geometry, so a smoothed path won't cut through a wall.</p>
+</blockquote>
+<h3 id="where-the-work-runs">Where the work runs</h3>
+<p><strong>Path solving runs on the CPU</strong>, on a worker pool, off
+the game thread. It is deterministic: same input, same output, every
+time - which is what makes replays, lockstep multiplayer and automated
+tests reproducible.</p>
+<p>The GPU is used for <strong>voxelization</strong>: turning your
+geometry into the octree, where it is substantially faster. If no
+suitable GPU is present it falls back to the CPU automatically, so
+nothing breaks.</p>
+<hr />
+<h2 id="7-things-that-move">7. Things that move</h2>
+<p>Static geometry is baked into the octree. For things that move, add a
+<strong><code>LcmDynamicObstacleComponent</code></strong> to the actor.
+It restamps the octree as the actor moves, and agents reroute around it.
+That's <a href="dynamic-obstacles.html">Tutorial 05</a>.</p>
+<hr />
+<h2 id="8-terms-youll-meet-in-the-rest-of-the-docs">8. Terms you'll meet
+in the rest of the docs</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SVO</strong></td>
+<td>Sparse Voxel Octree, the navigation data</td>
+</tr>
+<tr>
+<td><strong>Voxel / node</strong></td>
+<td>One box in the octree; a <strong>leaf</strong> is a smallest
+one</td>
+</tr>
+<tr>
+<td><strong>Chunk</strong></td>
+<td>One tile of an infinite world</td>
+</tr>
+<tr>
+<td><strong>Portal</strong></td>
+<td>A connection between two chunks: how routes cross a seam</td>
+</tr>
+<tr>
+<td><strong>Macro / micro</strong></td>
+<td>Coarse long-range vs fine short-range pathfinding</td>
+</tr>
+<tr>
+<td><strong>Clearance</strong></td>
+<td>How much room an agent needs to fit</td>
+</tr>
+<tr>
+<td><strong>Flow field</strong></td>
+<td>One shared steering field many agents sample (for crowds)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="recap">Recap</h2>
+<ul>
+<li>The octree stores <strong>empty space</strong>, and empty space is
+cheap.</li>
+<li><strong>One <code>LcmNavigationManagerSVO</code></strong> per
+level.</li>
+<li><strong>Finite</strong> unless you genuinely have an open
+world.</li>
+<li><strong><code>MinVoxelSize</code></strong> ≈ half your tightest gap;
+it snaps to powers of two.</li>
+<li><strong><code>ClearancePadding</code></strong> below
+<code>MinVoxelSize</code>, or you'll seal your own level.</li>
+<li><strong>Lazy Theta* + Curved Spline</strong> is a good default for a
+flyer.</li>
+</ul>
+<hr />
+<p><strong>Next:</strong> <a
+href="your-first-flying-agent.html">Tutorial 03: Your First Flying
+Agent</a>. Build a working agent in your own level.</p>
+
+  <div class="pager"><a href="installation.html">&larr; Installation</a><a href="your-first-flying-agent.html">Your first flying agent &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

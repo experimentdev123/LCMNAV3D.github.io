@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LCM Nav3D - Mass Entity Trait Reference | LCM Nav3D</title>
+<meta name="description" content="How to build a Mass crowd/agent with LCM Nav3D. Add these traits to a Mass Entity Config asset  and use it on an AMassSpawner.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/mass-traits.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LCM Nav3D - Mass Entity Trait Reference | LCM Nav3D">
+<meta property="og:description" content="How to build a Mass crowd/agent with LCM Nav3D. Add these traits to a Mass Entity Config asset  and use it on an AMassSpawner.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits" class="on">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="lcm-nav3d---mass-entity-trait-reference">LCM Nav3D - Mass Entity
+Trait Reference</h1>
+<p>How to build a Mass crowd/agent with LCM Nav3D. Add these traits to a
+<strong>Mass Entity Config asset</strong>
+(<code>Create → Miscellaneous → Mass Entity Config</code>) and use it on
+an <code>AMassSpawner</code>.</p>
+<blockquote>
+<p><strong>One rule:</strong> every agent needs <strong>exactly one
+movement trait</strong>. Everything else is an orthogonal add-on. The
+editor validator (below) enforces this.</p>
+</blockquote>
+<hr />
+<h2 id="the-anatomy-of-a-config">The anatomy of a config</h2>
+<p>A Mass Entity Config is a list of traits. A working Nav3D agent needs
+one from each of three categories, and no more than one from the
+movement category.</p>
+<p><img src="images/mass-entity-config.png"
+alt="A Mass Entity Config asset with three traits: LCM Nav3D Representation, LCM Nav3D Agent in Flow Field mode, and LCM Nav3D Goal in Tagged Actor mode" /></p>
+<p><strong>Figure 1 - A three-trait config, one per
+category.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Trait</th>
+<th>Category</th>
+<th>Why it is here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[0]</code></td>
+<td><strong>LCM Nav3D Representation</strong></td>
+<td>Rendering - <em>pick one</em></td>
+<td>Without a rendering trait your agents move correctly and are
+<strong>invisible</strong></td>
+</tr>
+<tr>
+<td><code>[1]</code></td>
+<td><strong>LCM Nav3D Agent</strong></td>
+<td>Movement - <strong><em>exactly</em> one</strong></td>
+<td>Its <code>Nav Mode</code> picks Path Following or Flow Field</td>
+</tr>
+<tr>
+<td><code>[2]</code></td>
+<td><strong>LCM Nav3D Goal</strong></td>
+<td>Goal</td>
+<td>Here <code>Goal Mode = Tagged Actor</code>, targeting tag
+<code>ApexGoal</code></td>
+</tr>
+</tbody>
+</table>
+<p>Things the screenshot shows that are easy to miss:</p>
+<ul>
+<li><strong><code>Validate Entity Config</code></strong> at the top runs
+the trait-combination check on demand. It also runs on save and on
+cook.</li>
+<li><strong><code>Compute</code></strong> - leave it on
+<code>Auto</code>. This release solves on the CPU, so <code>Auto</code>
+and <code>CPU</code> behave identically; the selector is kept for
+forward compatibility.</li>
+<li><strong>Greyed rows are not disabled features.</strong>
+<code>Goal Location</code> is greyed because <code>Goal Mode</code> is
+<code>Tagged Actor</code>, and <code>Lead Seconds Cap</code> because
+<code>Enable Goal Prediction</code> is off. The panel hides what the
+current configuration will ignore.</li>
+</ul>
+<blockquote>
+<h3
+id="no_entry-this-config-is-also-the-worked-example-of-the-one-rule">⛔
+This config is also the worked example of the one rule</h3>
+<p>Look at <code>[1]</code> and <code>[2]</code> together. The Agent's
+<strong><code>Nav Mode</code> is <code>Flow Field</code></strong>, but
+<strong><code>LCM Nav3D Goal</code> is a Path Following add-on</strong>
+- it drives the <em>path-request</em> fragment, and a Flow Field agent
+never issues one.</p>
+<p>So this combination <strong>fails validation</strong>, with:</p>
+<blockquote>
+<p><em>LCM Nav3D Goal only works with a Path Following agent (it drives
+the path-request fragment). For a Flow Field agent, set the goal on the
+'LCM Nav3D Agent' trait's Goal / Goal Mode properties instead.</em></p>
+</blockquote>
+<p><strong>The fix is one of two things, and which one depends on what
+you want:</strong></p>
+<table>
+<thead>
+<tr>
+<th>You want</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A 10K-scale crowd sharing a goal</td>
+<td><strong>Remove the Goal trait.</strong> Set the goal on the Agent
+trait's own <code>Goal Mode</code> properties.</td>
+</tr>
+<tr>
+<td>Per-agent precise routes</td>
+<td><strong>Set <code>Nav Mode</code> to
+<code>Path Following</code>.</strong> The Goal trait is then correct as
+it stands.</td>
+</tr>
+</tbody>
+</table>
+<p>Press <strong>Validate Entity Config</strong> on any config you
+build. It catches this, the duplicate-movement-trait case, and the mixed
+Path+Flow case - all three of which are silent at runtime and present as
+"my agents do not move".</p>
+</blockquote>
+<hr />
+<h2 id="the-traits">The traits</h2>
+<h3
+id="green_circle-lcm-nav3d-agent---the-one-movement-trait-start-here">🟢
+<code>LCM Nav3D Agent</code> - the one movement trait (start here)</h3>
+<p>The single authoring entry point. Pick a <strong>Navigation
+Mode</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Navigation Mode</th>
+<th>What it does</th>
+<th>Fragments composed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Path Following</strong></td>
+<td>Per-agent A* through the SVO (HPA* across chunks). Best for
+hero/mid-count agents, precise routes, infinite worlds.</td>
+<td><code>NavAgent</code>, <code>PathRequest</code>,
+<code>PathResult</code></td>
+</tr>
+<tr>
+<td><strong>Flow Field</strong></td>
+<td>One shared Dijkstra flow field per goal, O(1)/agent sampling. Best
+for 10K-scale crowds sharing goals (finite worlds).</td>
+<td><code>FlowField</code> (state) + <code>FlowConfigShared</code>
+(const shared config)</td>
+</tr>
+</tbody>
+</table>
+<p>Mode-specific properties hide automatically via
+<code>EditCondition</code>. Common movement knobs (radius, speed, accel,
+turn-rate, avoidance style, flight style, lane bias) apply to both.</p>
+<h3
+id="heavy_plus_sign-lcm-nav3d-goal---auto-pathing-path-following-only">➕
+<code>LCM Nav3D Goal</code> - auto-pathing (Path Following only)</h3>
+<p>Points a <strong>Path Following</strong> agent at a fixed location or
+a tagged actor and keeps it pathed there (re-pathing on drift, optional
+lead-prediction for moving targets). <strong>Not for Flow Field</strong>
+- set the goal on the Agent trait's <em>Goal Mode</em> properties
+instead. The validator warns if you get this wrong.</p>
+<h3
+id="heavy_plus_sign-lcm-nav3d-perception---svo-los-sight-either-mode">➕
+<code>LCM Nav3D Perception</code> - SVO-LOS sight (either mode)</h3>
+<p>Makes an agent both a <em>senser</em> and <em>perceivable</em>
+(faction-based, true-3D SVO line-of-sight). Writes a per-agent "closest
+visible threat" surface read by EQS, StateTree, or steering. Opt-in
+avoidance: <code>r.LcmNav.Mass.PerceptionAvoid 1</code> makes Flow Field
+agents veer from their own perceived threat.</p>
+<h3 id="art-rendering---pick-one">🎨 Rendering - pick ONE</h3>
+<table>
+<thead>
+<tr>
+<th>Trait</th>
+<th>Use when</th>
+<th>LOD?</th>
+<th>Animation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LCM Nav3D ISM Render</strong></td>
+<td>Turnkey, hundreds-low thousands, "just draw a mesh".</td>
+<td>No</td>
+<td>Yes - 2 per-instance custom-data floats: <code>[0]</code> speed01
+(walk/run blend), <code>[1]</code> stable phase (de-sync). Feed a
+VAT/WPO material.</td>
+</tr>
+<tr>
+<td><strong>LCM Nav3D Representation</strong></td>
+<td>LOD-culled crowds; optional hero actor up close. Wraps Epic
+MassRepresentation with sane defaults (draws ISM at all visible LODs,
+culls far). <strong>Needs a viewer/player in the level</strong> for LOD
+distance.</td>
+<td>Yes</td>
+<td>Via the mesh material / actor</td>
+</tr>
+<tr>
+<td><em>(Niagara GPU crowd)</em></td>
+<td>10K+ (deferred / roadmap)</td>
+<td>-</td>
+<td>VAT</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="combination-matrix">Combination matrix</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Agent (Path)</th>
+<th>Agent (Flow)</th>
+<th>Goal</th>
+<th>Perception</th>
+<th>ISM Render</th>
+<th>Representation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Agent (Path)</strong></td>
+<td>-</td>
+<td>❌ conflict</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Agent (Flow)</strong></td>
+<td>❌ conflict</td>
+<td>-</td>
+<td>⚠️ use Agent goal</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Goal</strong></td>
+<td>✅</td>
+<td>⚠️ redundant</td>
+<td>-</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Perception</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>-</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>ISM Render</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>-</td>
+<td>❌ pick one</td>
+</tr>
+<tr>
+<td><strong>Representation</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌ pick one</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>❌ <strong>conflict</strong> - two movement stacks; the editor
+validator errors and (at runtime) the two steerers mutually exclude →
+the entity would not move. Keep one.</li>
+<li>⚠️ - allowed but pointless; the validator explains.</li>
+</ul>
+<hr />
+<h2 id="the-editor-validator">The editor validator</h2>
+<p><code>ULcmMassConfigValidator</code> runs on every
+<code>UMassEntityConfigAsset</code> (right-click → Validate, or on
+save/cook). It errors on:</p>
+<ol type="1">
+<li><strong>Two movement stacks</strong> (Path + Flow, in any mix of
+unified/legacy traits).</li>
+<li><strong>Goal without a Path Following agent</strong>.</li>
+</ol>
+<p>So a broken config can't ship. Requires the <strong>Data
+Validation</strong> plugin (bundled).</p>
+<hr />
+<h2 id="migration-from-the-old-traits">Migration from the old
+traits</h2>
+<p>The pre-2026-07 traits still work (byte-identical archetypes) but are
+marked <strong>(Legacy)</strong> and superseded by the unified
+trait:</p>
+<table>
+<thead>
+<tr>
+<th>Legacy trait</th>
+<th>Replace with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LCM Nav3D Agent (Legacy)</code></td>
+<td><code>LCM Nav3D Agent</code>, NavMode = <strong>Path
+Following</strong></td>
+</tr>
+<tr>
+<td><code>LCM Nav3D Flow Steer (Legacy)</code></td>
+<td><code>LCM Nav3D Agent</code>, NavMode = <strong>Flow
+Field</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Existing content (e.g. <code>DA_MassAgent_Apex</code>) keeps working
+- no forced migration.</p>
+<p><strong>Default-value deltas when migrating</strong> (the unified
+trait has ONE default per property; the two legacy traits differed):
+<code>ArriveRadius</code> is now <strong>100</strong> (legacy path 80 /
+legacy flow 150) and <code>AvoidanceStyle</code> defaults to
+<strong>Reactive</strong> (the legacy Flow Steer defaulted to
+Predictive/ORCA). If your config relied on a legacy default, set the
+value explicitly after switching traits. <code>TargetActorTag</code>
+defaults to <code>ApexGoal</code> (matches legacy).</p>
+<hr />
+<h2
+id="world-partition--large-world-city-sample-scale---required-reading">World
+Partition / large-world (City Sample scale) - REQUIRED READING</h2>
+<h3 id="the-vanishing-crowd-trap-stock-engine-behavior">The
+vanishing-crowd trap (stock engine behavior)</h3>
+<p><code>AMassSpawner::BeginDestroy</code> calls
+<code>DoDespawning</code> - <strong>the spawner destroys every entity it
+spawned when the spawner actor is destroyed</strong> (engine
+<code>MassSpawner.cpp</code>). In a World Partition map a placed spawner
+is <strong>spatially loaded by default</strong>, so when the player
+leaves the spawner's cell, the spawner streams out and <strong>silently
+deletes the entire crowd</strong>. Symptom: agents work near the spawn
+area, then all disappear when the player walks away.</p>
+<p><strong>Fix (pick one):</strong></p>
+<ol type="1">
+<li>Use <strong><code>LCM Nav3D Crowd Spawner</code></strong> instead of
+the stock Mass Spawner - identical (EQS generators etc. all inherited)
+but defaults to <em>not</em> spatially loaded, so its crowd's lifetime
+is never tied to the player's position.</li>
+<li>On a stock <code>AMassSpawner</code>: Details → World Partition →
+<strong>Is Spatially Loaded = false</strong>.</li>
+</ol>
+<p>This follows the AAA rule: <strong>population lifetime must be owned
+by something persistent</strong> (an always-loaded actor/subsystem),
+never by a streamed actor. Distance-based <em>despawning</em> should be
+an explicit population policy (an ambient ring, à la City Sample's
+crowd), not a streaming side effect.</p>
+<h3 id="city-scale-checklist">City-scale checklist</h3>
+<ul>
+<li><strong>Navigation</strong>: a city does not fit the finite default
+(<code>WorldExtent</code> = 100 m). Use the manager's <strong>Infinite
+World</strong> mode (Hierarchical HPA*); the flow crowd keeps its own
+nav chunks resident via crowd-driven streaming
+(<code>r.LcmNav.Mass.CrowdStreaming</code>, default on) - agents don't
+lose nav when the player (the only invoker) leaves.</li>
+<li><strong>Rendering</strong>: <code>LCM Nav3D Representation</code>
+culls agents <em>visually</em> past its LOD distances (defaults: Off at
+200-250 m - deliberately conservative). For city vistas, raise
+<code>LODParams.BaseLODDistance/VisibleLODDistance</code> on the trait.
+This is visual LOD only - entities keep simulating; it is NOT the
+vanishing-crowd trap above.</li>
+<li><strong>Ambient population ring</strong> (constant-density crowds
+around the player with bounded cost, the City Sample pattern) is a
+roadmap feature - until then, crowds are persistent: they exist wherever
+you spawned them.</li>
+</ul>
+<h2 id="useful-cvars">Useful CVars</h2>
+<table>
+<thead>
+<tr>
+<th>CVar</th>
+<th>Default</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>r.LcmNav.Mass.PerceptionAvoid</code></td>
+<td>0</td>
+<td>1 = Flow agents veer from their perceived closest threat.</td>
+</tr>
+<tr>
+<td><code>r.LcmNav.Mass.PerceptionAvoidRadiusCm</code> /
+<code>...Strength</code></td>
+<td>600 / 1.0</td>
+<td>Perception-avoidance range + strength.</td>
+</tr>
+<tr>
+<td><code>r.LcmNav.Mass.ISMAnimRefSpeedCmS</code></td>
+<td>600</td>
+<td>Speed (cm/s) mapping to ISM custom-data
+<code>speed01 = 1</code>.</td>
+</tr>
+<tr>
+<td><code>r.LcmNav.Mass.Anticipatory</code></td>
+<td>−1 (per-trait)</td>
+<td>Route Flow crowds around where obstacles are <em>heading</em>.</td>
+</tr>
+</tbody>
+</table>
+
+  <div class="pager"><a href="flight-locomotion.html">&larr; Flight and locomotion</a><a href="api-reference.html">API reference &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

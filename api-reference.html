@@ -1,0 +1,1454 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LCM Nav3D - API Reference | LCM Nav3D</title>
+<meta name="description" content="The classes, functions and properties you can reach from Blueprint, the Details panel, a Behaviour Tree, a StateTree or a Mass config.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/api-reference.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LCM Nav3D - API Reference | LCM Nav3D">
+<meta property="og:description" content="The classes, functions and properties you can reach from Blueprint, the Details panel, a Behaviour Tree, a StateTree or a Mass config.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference" class="on">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="lcm-nav3d---api-reference">LCM Nav3D - API Reference</h1>
+<p>The classes, functions and properties you can reach from Blueprint,
+the Details panel, a Behaviour Tree, a StateTree or a Mass config.</p>
+<blockquote>
+<p>Internal C++ - solver internals, replication contracts, subsystems
+with no Blueprint surface - is deliberately not listed. If a type is not
+here, you are not expected to call it.</p>
+</blockquote>
+<h2 id="classes">Classes</h2>
+<h3 id="lcmaiperceptionbridge"><code>LcmAIPerceptionBridge</code></h3>
+<p>Mirrors UAIPerceptionComponent-sensed actors into a decaying threat
+tracker for the tactical EQS surface.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>HandleTargetPerceptionUpdated</code> - Bound to the paired
+UAIPerceptionComponent's OnTargetPerceptionUpdated.</li>
+<li><code>GetTrackedThreats</code> - Current tracked-threat actors
+(post-decay).</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>DecayWindowSeconds</code> - Seconds a lost-sight threat stays
+queryable before it decays out.</li>
+<li><code>PerceptionComp</code> - The paired perception component (found
+on the owner at BeginPlay).</li>
+</ul>
+<h3
+id="lcmbtdecorator_chunkloaded"><code>LcmBTDecorator_ChunkLoaded</code></h3>
+<p>Decorator that passes only when the SVO chunk containing the queried
+world position is currently loaded (cheap single-endpoint hash lookup,
+no path probe).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>QueryLocationKey</code> - Blackboard key holding the world
+position to probe. Accepts Vector or Object (Actor location is used in
+the latter case).</li>
+<li><code>bRequireFullResolution</code> - When true (default), only
+fully-resolved chunks (post-T12 promotion) satisfy. When false, any
+loaded chunk does.</li>
+</ul>
+<h3
+id="lcmbtdecorator_haslineofsight"><code>LcmBTDecorator_HasLineOfSight</code></h3>
+<p>Decorator that passes when the agent has volumetric line of sight to
+the target via the Lazy Theta* LOS walker, honouring AgentRadius through
+the JFA clearance gate.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>TargetKey</code> - Blackboard key for the LOS target. Vector =
+world location, Object = AActor (its current location is used).</li>
+<li><code>AgentRadius</code> - Agent collision radius for the JFA
+clearance gate. Higher = more conservative (rejects narrow gaps).</li>
+</ul>
+<h3
+id="lcmbtdecorator_isincover"><code>LcmBTDecorator_IsInCover</code></h3>
+<p>Decorator that passes when the agent is in cover relative to a
+threat: its leaf SweepPenalty is at or below MaxSweepPenalty AND the
+threat's line of sight to it is blocked.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>ThreatKey</code> - Threat key. Vector = world location, Object
+= AActor.</li>
+<li><code>MaxSweepPenalty</code> - Highest SweepPenalty (0.255) the
+agent's leaf may carry to count as safe. Default 32 ≈ "lightly swept,
+mostly safe".</li>
+<li><code>AgentRadius</code> - Agent collision radius for the LOS
+walker's clearance gate.</li>
+</ul>
+<h3
+id="lcmbtdecorator_pathlengthbelow"><code>LcmBTDecorator_PathLengthBelow</code></h3>
+<p>Decorator that passes when the true-3D LCM Nav3D path distance from
+the agent to the goal is below MaxLengthCm (uses the synchronous
+tactical-library path probe; do not run per-frame).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GoalKey</code> - Blackboard key for the goal endpoint. Vector
+= world location, Object = AActor (its current location is used).</li>
+<li><code>MaxLengthCm</code> - Maximum allowed path length, in
+centimetres, for the decorator to pass.</li>
+<li><code>AgentRadius</code> - Agent collision radius (cm) used by the
+path probe's clearance gate.</li>
+</ul>
+<h3
+id="lcmbtdecorator_threatvisibleviaperception"><code>LcmBTDecorator_ThreatVisibleViaPerception</code></h3>
+<p>Decorator that passes when AIPerception currently perceives a hostile
+AND the agent has clear volumetric LOS to it (the "can-shoot-now"
+gate).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>ThreatKey</code> - Optional explicit threat key. When unset
+(NAME_None), the decorator uses AIPerception's closest
+currently-perceived actor.</li>
+<li><code>AgentRadius</code> - Agent collision radius (cm) used by the
+LOS walker's clearance gate.</li>
+</ul>
+<h3
+id="lcmbtservice_navigationload"><code>LcmBTService_NavigationLoad</code></h3>
+<p>Service that each tick writes the navigation manager's SVO streaming
+stats into a blackboard key so designers can gate expensive LCM Nav3D
+queries on idle streaming.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>LoadedChunkCountKey</code> - Int blackboard key receiving the
+count of currently loaded SVO chunks.</li>
+</ul>
+<h3
+id="lcmbtservice_pathprogressmonitor"><code>LcmBTService_PathProgressMonitor</code></h3>
+<p>Service that each tick writes a Euclidean approach-progress fraction
+(1 - dist/initial_dist) and remaining distance to the goal into
+blackboard keys.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GoalKey</code> - Blackboard key for the goal. Vector = world
+location, Object = AActor (its current location is used).</li>
+<li><code>ProgressKey</code> - Float blackboard key receiving the
+progress fraction (0.1) toward the goal.</li>
+<li><code>RemainingCmKey</code> - Float blackboard key receiving the
+remaining straight-line distance (cm) to the goal.</li>
+<li><code>GoalChangeTolerance</code> - Distance (cm) the goal must move
+before the progress baseline is re-anchored.</li>
+</ul>
+<h3
+id="lcmbtservice_squadsnapshot"><code>LcmBTService_SquadSnapshot</code></h3>
+<p>Service that each tick aggregates perceived allies within SquadRadius
+and writes ally count, squad centroid, and cohesion radius into
+blackboard keys.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>AllyTag</code> - Tag filter - only perceived actors with this
+tag count as ally.</li>
+<li><code>SquadRadius</code> - Radius (cm) around the agent within which
+allies are counted.</li>
+<li><code>bIncludeSelf</code> - When true, the agent itself is included
+in the squad aggregate.</li>
+<li><code>NumAlliesKey</code> - Int blackboard key receiving the number
+of allies in the squad.</li>
+<li><code>CentroidKey</code> - Vector blackboard key receiving the
+squad's centroid (average ally position).</li>
+<li><code>CohesionRadiusKey</code> - Float blackboard key receiving the
+cohesion radius (max ally distance from the centroid, cm).</li>
+</ul>
+<h3
+id="lcmbtservice_threatfieldsampler"><code>LcmBTService_ThreatFieldSampler</code></h3>
+<p>Service that each tick samples the SVO SweepPenalty risk field at the
+agent's location, writing the threat level and an "in threat zone" flag
+(level &gt;= AlertThreshold) into blackboard keys.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>ThreatLevelKey</code> - Int blackboard key receiving the
+current SweepPenalty (0.255).</li>
+<li><code>InThreatZoneKey</code> - Bool blackboard key receiving
+<code>Level &gt;= AlertThreshold</code>.</li>
+<li><code>AlertThreshold</code> - SweepPenalty value (0.255) at or above
+which the agent counts as in a threat zone.</li>
+</ul>
+<h3 id="lcmbttask_chunkprewarm"><code>LcmBTTask_ChunkPrewarm</code></h3>
+<p>Task that proactively forces SVO chunk generation at a target
+location and waits (up to TimeoutSeconds) for the chunk to become ready
+before succeeding.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>TargetKey</code> - Blackboard key for the location whose chunk
+to prewarm. Vector = world location, Object = AActor (its current
+location is used).</li>
+<li><code>bRequireFullResolution</code> - When true, the task waits for
+the chunk to be fully resolved (post-promotion); when false, any loaded
+chunk satisfies.</li>
+<li><code>TimeoutSeconds</code> - Maximum time (seconds) to wait for the
+chunk before the task fails.</li>
+</ul>
+<h3
+id="lcmbttask_dynamicobstaclepush"><code>LcmBTTask_DynamicObstaclePush</code></h3>
+<p>Task that steers the agent down the SweepPenalty gradient (away from
+rising threat) until it clears the obstacle or times out.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>PushSpeed</code> - Movement speed (cm/s) while pushing away
+from the obstacle.</li>
+<li><code>ProbeStep</code> - Step distance (cm) used to sample the
+SweepPenalty gradient around the agent.</li>
+<li><code>ExitThreshold</code> - SweepPenalty value (0.255) at or below
+which the agent is considered clear and the task succeeds.</li>
+<li><code>MaxDuration</code> - Maximum time (seconds) to push before the
+task succeeds and yields.</li>
+</ul>
+<h3 id="lcmbttask_evadecbs"><code>LcmBTTask_EvadeCBS</code></h3>
+<p>Task that retreats from the threat gradient using context-based
+steering (CBS) over SVO danger sampling, blending an anti-threat
+direction with ray-evaluated safe headings until clear or timed out.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>EvadeSpeed</code> - Movement speed (cm/s) while evading.</li>
+<li><code>ProbeStep</code> - Step distance (cm) used to sample the
+SweepPenalty gradient around the agent.</li>
+<li><code>ExitThreshold</code> - SweepPenalty value (0.255) at or below
+which the agent is considered safe and the task succeeds.</li>
+<li><code>MaxDuration</code> - Maximum time (seconds) to evade before
+the task succeeds and yields.</li>
+<li><code>AgentRadius</code> - Agent collision radius (cm) used when
+evaluating SVO danger for the CBS rays.</li>
+<li><code>LookAheadDistance</code> - Distance (cm) ahead along each CBS
+ray over which SVO danger is sampled.</li>
+<li><code>NumCBSRays</code> - Number of context-based-steering rays cast
+around the agent to select a safe heading.</li>
+</ul>
+<h3 id="lcmbttask_findcover"><code>LcmBTTask_FindCover</code></h3>
+<p>Behavior Tree task that locates a navigable SVO leaf with
+line-of-sight blocked from the blackboard enemy actor (i.e. cover).
+Returns Succeeded once a valid cover location is written back to the
+blackboard, or Failed if no cover within <code>SearchRadius</code>
+qualifies.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>EnemyKey</code> - The Blackboard Key for the Enemy actor (Who
+are we hiding from?)</li>
+<li><code>SearchRadius</code> - Search Settings (Exposed to Behavior
+Tree)</li>
+<li><code>CoverHeightOffset</code> - Vertical offset (cm) added to
+candidate cover positions so the pawn stands above the cover floor
+rather than embedded in it.</li>
+<li><code>bPrioritizeClosest</code> - When true, the closest qualifying
+cover position wins. When false, the search picks the first qualifying
+candidate (lower latency).</li>
+</ul>
+<h3 id="lcmbttask_flyto"><code>LcmBTTask_FlyTo</code></h3>
+<p>Behavior Tree task that flies an AI pawn from its current position to
+a blackboard target via the LCMNav3D pathfinder. Owns one async path
+request token (re-issued on dynamic replanning), runs per-tick steering
+(configurable flight style + avoidance style + wall avoidance + swarm
+separation), and finishes the task on arrival within
+<code>AcceptanceRadius</code>.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>OnPathFound</code> - The Callback function for Async
+Pathfinding</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>AcceptanceRadius</code> - Settings exposed to the Behavior
+Tree Node</li>
+<li><code>FlightSpeed</code> - Cruise speed of the pawn along the path,
+in cm/s.</li>
+<li><code>QueryOptions</code> - Per-request pathfinding options (solver
+choice, smoothing, heuristic mode). Forwarded as-is into
+<code>FindPathAsync</code>.</li>
+<li><code>SeparationRadius</code> - How close is "too close" to another
+agent? (e.g. 150 units)</li>
+<li><code>SeparationWeight</code> - How hard should we push away from
+neighbors? (0.0 = No push, 2.0 = Strong push)</li>
+<li><code>bUseFlightMovementComponent</code> - [P5] Delegate locomotion
+to a ULcmFlightMovementComponent on the pawn (for ultra-realistic 6-DOF
+drone/bird/fish dynamics). When ON and the pawn has an enabled
+component, this task only produces the guidance velocity (pure-pursuit +
+avoidance + arrival slowdown) and the component owns position +
+orientation. OFF (default) = the built-in kinematic integrator below.
+The kinematic-only knobs below (accel/banking/flight style) hide when
+this is ON - the component owns them via its FlightConfig.</li>
+<li><code>MaxAcceleration</code> - How fast can we accelerate? (Higher =
+Snappier, Lower = Drifty/Heavy) [Kinematic only - owned by the flight
+component when delegating.]</li>
+<li><code>BankingAmount</code> - How much do we bank into turns? (Visual
+only) [Kinematic only.]</li>
+<li><code>MaxBankingAngle</code> - Max banking angle in degrees (e.g.,
+45 degrees) [Kinematic only.]</li>
+<li><code>DecelerationDistance</code> - Distance to start slowing down
+(Arrival behavior). Still used when delegating - it shapes the guidance
+target speed near the goal.</li>
+<li><code>FlightStyle</code> - Choose how this agent moves [Kinematic
+only - the component's FlightConfig has its own model/style when
+delegating.]</li>
+<li><code>AvoidanceTimeHorizon</code> - How many seconds into the future
+do we look? (Standard: 2.0s)</li>
+<li><code>CollisionMargin</code> - Radius multiplier for safety (e.g.
+1.2 = Avoid by 20% extra margin)</li>
+<li><code>AvoidanceStyle</code> - Choose how this agent avoids
+neighbors</li>
+<li><code>WallCheckDistance</code> - WALL AVOIDANCE How far to check for
+walls? (e.g. 150 units)</li>
+<li><code>WallPushForce</code> - How hard to push away from walls? (Must
+be strong!)</li>
+<li><code>PathCenteringForce</code> - PATH CORRECTION How hard to pull
+agents back to the center line? (e.g. 500) 0 = Free drift (current
+behavior) 1000 = Strict line following (Train on tracks)</li>
+<li><code>bEnableGoalPrediction</code> - When true, AND
+r.LcmNav.Chase.Enable != 0, the task resolves moving Object-key goals
+through FLcmGoalProvider and uses constant-velocity lead prediction
+(linear-extrapolation intercept) as the planner goal. When false, the
+legacy snapshot behavior is preserved bit-identically.</li>
+<li><code>LeadSecondsCap</code> - Upper bound on lead time (seconds).
+Forwarded as LeadSecondsCap to FLcmGoalProvider::GetLeadPosition. Clamps
+blow-up when the target is receding faster than the agent can close.
+Override at runtime via r.LcmNav.Chase.LeadSecondsCap (&gt;= 0). Typical
+0.5 to 2.0.</li>
+<li><code>DriftReplanCm</code> - Distance (cm) between the last-planned
+goal and the current lead position that triggers an automatic replan.
+Override at runtime via r.LcmNav.Chase.DriftReplanCm (&gt;= 0).</li>
+<li><code>bForceEnableChase</code> - [Fab marketplace UX, 2026-05-29]
+Per-task override for the <code>r.LcmNav.Chase.Enable</code> CVar gate.
+When true, chase activates from <code>bEnableGoalPrediction</code> alone
+- buyers don't need to know the CVar exists. Default false preserves the
+legacy two-gate behavior (CVar AND bEnableGoalPrediction)
+bit-identically. The CVar is retained as a project-wide kill switch /
+debug toggle.</li>
+</ul>
+<h3
+id="lcmbttask_followflowfield"><code>LcmBTTask_FollowFlowField</code></h3>
+<p>Task that computes an LCM Nav3D path to the goal and follows its
+waypoints (LinearDirect steering) until arrival or timeout.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GoalKey</code> - Blackboard key for the goal. Vector = world
+location, Object = AActor (its current location is used).</li>
+<li><code>MoveSpeed</code> - Movement speed (cm/s) along the followed
+path.</li>
+<li><code>WaypointAdvanceRadius</code> - Distance (cm) within which the
+current waypoint is considered reached and the next is selected.</li>
+<li><code>ArrivalRadius</code> - Distance (cm) from the goal at which
+the task succeeds.</li>
+<li><code>AgentRadius</code> - Agent collision radius (cm) used by the
+path probe's clearance gate.</li>
+<li><code>MaxDuration</code> - Maximum time (seconds) to follow the path
+before the task fails.</li>
+</ul>
+<h3 id="lcmbttask_land"><code>LcmBTTask_Land</code></h3>
+<p>Task that descends the agent vertically at DescentRate until it
+reaches the TouchDownZ world height, then succeeds.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>TouchDownZ</code> - Target world Z height (cm) to descend
+to.</li>
+<li><code>DescentRate</code> - Vertical descent speed in cm/s.</li>
+<li><code>TouchDownTolerance</code> - Distance (cm) above TouchDownZ at
+which the agent counts as landed.</li>
+</ul>
+<h3 id="lcmbttask_orbittarget"><code>LcmBTTask_OrbitTarget</code></h3>
+<p>Task that circles the agent around a target, holding OrbitRadius
+while moving tangentially at OrbitSpeed.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>TargetKey</code> - Blackboard key for the orbit centre. Vector
+= world location, Object = AActor (its current location is used).</li>
+<li><code>OrbitRadius</code> - Distance (cm) the agent maintains from
+the target while orbiting.</li>
+<li><code>OrbitSpeed</code> - Tangential movement speed (cm/s) around
+the orbit.</li>
+<li><code>bClockwise</code> - When true, orbit clockwise (viewed from
+above); when false, counter-clockwise.</li>
+<li><code>bMatchTargetZ</code> - When true, the agent matches the
+target's world Z height while orbiting; when false, it holds its own
+height.</li>
+</ul>
+<h3 id="lcmbttask_patrol"><code>LcmBTTask_Patrol</code></h3>
+<p>Task that moves the agent through a list of waypoints in order,
+pausing at each, optionally looping.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Waypoints</code> - Ordered list of patrol waypoints, in world
+coordinates.</li>
+<li><code>MoveSpeed</code> - Movement speed (cm/s) between
+waypoints.</li>
+<li><code>ArrivalRadius</code> - Distance (cm) within which a waypoint
+counts as reached.</li>
+<li><code>DwellSeconds</code> - Time (seconds) the agent dwells at each
+waypoint before advancing.</li>
+<li><code>bCycle</code> - When true, the patrol loops back to the first
+waypoint after the last; when false, it ends.</li>
+</ul>
+<h3
+id="lcmdynamicobstaclecomponent"><code>LcmDynamicObstacleComponent</code></h3>
+<p>Marks an actor as a dynamic LCMNav3D obstacle.</p>
+<p>Two operating modes, selected by
+<code>r.LcmNav.DynObs.EventDriven</code>:</p>
+<ol type="1">
+<li><p>EVENT-DRIVEN (default, EventDriven=1) -- binds to
+<code>RootComponent-&gt;TransformUpdated</code>. Per-event the component
+unions the new bounding box into a pending dirty region and arms a
+one-shot coalesce timer (<code>r.LcmNav.DynObs.CoalesceMs</code>,
+default 33 ms = one frame at 30 fps). On timer expiry the union of
+old-footprint + all coalesced new-footprints is flushed in a single
+<code>UpdateDynamicObstacle</code> call. Component tick is disabled in
+this mode. Zero CPU cost when the actor is stationary; instant response
+(within one coalesce window) when it moves.</p></li>
+<li><p>POLLING (EventDriven=0) -- legacy behavior: TickComponent at 10
+Hz polls <code>GetActorLocation</code> and fires only when displacement
+exceeds <code>UpdateDistanceThreshold</code> (default 50 cm). Provided
+for ablation / deterministic-test scenarios where event jitter would
+perturb traces.</p></li>
+</ol>
+<p>§P9.6 in</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>RemoveTrackedComponent</code> - Runtime/BP removal of a
+previously added sub-component. Components listed in TrackedComponents
+(the designer list) are not affected.</li>
+<li><code>AddTrackedComponent</code> - Runtime/BP registration of an
+obstacle sub-component (e.g. a child mesh attached after BeginPlay).
+Idempotent; rebinds immediately.</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>UpdateDistanceThreshold</code> - [Polling mode only] How far
+does the object need to move before triggering an SVO rebuild? Keep
+around half your MinVoxelSize (~50 cm). Ignored when
+r.LcmNav.DynObs.EventDriven=1 (event-driven mode uses a coalesce timer
+instead of a distance threshold).</li>
+<li><code>TrackedComponents</code> - Designer-facing list - pick the
+collision/mesh components that actually represent this obstacle. Empty =
+whole actor (legacy).</li>
+</ul>
+<h3
+id="envquerycontext_lcmknownthreats"><code>EnvQueryContext_LcmKnownThreats</code></h3>
+<p>EQS context exposing tag-marked threat actors as query targets for
+tactical tests.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>ThreatTag</code> - Actors carrying this tag are treated as
+threats.</li>
+</ul>
+<h3
+id="envquerycontext_lcmthreatsfromaiperception"><code>EnvQueryContext_LcmThreatsFromAIPerception</code></h3>
+<p>EQS context exposing the querier's AI-perception-tracked threats as
+query targets.</p>
+<h3
+id="envquerygenerator_lcmhemisphericalring3d"><code>EnvQueryGenerator_LcmHemisphericalRing3D</code></h3>
+<p>Hemispherical-ring shell of unblocked 3D points around a context.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GenerateAround</code> - Context the shell is centred on (the
+target; defaults to the querier).</li>
+<li><code>RadiusMin</code> - Inner radius of the sampling shell
+(cm).</li>
+<li><code>RadiusMax</code> - Outer radius of the sampling shell
+(cm).</li>
+<li><code>NumRadialSteps</code> - Number of concentric radial steps
+between RadiusMin and RadiusMax.</li>
+<li><code>NumInclinationRings</code> - Number of inclination
+(polar/elevation) rings from horizon to pole.</li>
+<li><code>NumAzimuthSectors</code> - Number of azimuth (longitudinal)
+sectors around each ring.</li>
+<li><code>bUpperHemisphereOnly</code> - Restrict to the upper hemisphere
+(high-ground / perch queries).</li>
+</ul>
+<h3
+id="envquerygenerator_lcmpointsalongpath"><code>EnvQueryGenerator_LcmPointsAlongPath</code></h3>
+<p>Unblocked points sampled along the LCM Nav3D path from one context to
+another.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>FromContext</code> - Path start (defaults to the
+querier).</li>
+<li><code>ToContext</code> - Path goal (set this to your destination
+context).</li>
+<li><code>AgentRadius</code> - Agent capsule radius used to plan the LCM
+Nav3D path that is sampled (cm).</li>
+<li><code>Spacing</code> - Distance between consecutive sample points
+along the path (cm).</li>
+</ul>
+<h3
+id="envquerygenerator_lcmportalproximity"><code>EnvQueryGenerator_LcmPortalProximity</code></h3>
+<p>Candidate points at macro-graph portal centres near a context
+(chokepoints).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GenerateAround</code> - Context the portal search is centred
+on (defaults to the querier).</li>
+<li><code>Radius</code> - Only portals within this radius of the context
+are emitted (cm).</li>
+</ul>
+<h3
+id="envquerygenerator_lcmpointsinsvovolume"><code>EnvQueryGenerator_LcmPointsInSVOVolume</code></h3>
+<p>Generates uniform-density candidate points in an AABB, filtered to
+unblocked SVO volume leaves.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GenerateAround</code> - Context the sampling volume is centred
+on (defaults to the querier).</li>
+<li><code>HalfExtent</code> - Half-extent of the sampling AABB
+(cm).</li>
+<li><code>Spacing</code> - Grid spacing between candidate points
+(cm).</li>
+</ul>
+<h3
+id="envquerytest_lcmlineofsight3d"><code>EnvQueryTest_LcmLineOfSight3D</code></h3>
+<p>Visible to the context via true-3D SVO line of sight. Boolean.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Context</code> - Context to test visibility against (defaults
+to known threats).</li>
+<li><code>AgentRadius</code> - Agent capsule radius used for the
+volumetric SVO LOS sweep (cm).</li>
+</ul>
+<h3
+id="envquerytest_lcmreachability3d"><code>EnvQueryTest_LcmReachability3D</code></h3>
+<p>An LCM Nav3D path exists from the context to the item. Boolean.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Context</code> - Context the path is planned from (defaults to
+the querier).</li>
+<li><code>AgentRadius</code> - Agent capsule radius used when testing
+for a valid LCM Nav3D path (cm).</li>
+</ul>
+<h3
+id="envquerytest_lcmpathdistance3d"><code>EnvQueryTest_LcmPathDistance3D</code></h3>
+<p>LCM Nav3D path distance (NOT euclidean) from the context to the item.
+Float (cm).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Context</code> - Context the path distance is measured from
+(defaults to the querier).</li>
+<li><code>AgentRadius</code> - Agent capsule radius used to plan the
+path that is measured (cm).</li>
+</ul>
+<h3
+id="envquerytest_lcmthreatexposure"><code>EnvQueryTest_LcmThreatExposure</code></h3>
+<p>Summed §P9.3 SweepPenalty along the item→threat segments. Float
+(lower = safer).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Context</code> - Threat context whose members the exposure is
+summed against (defaults to known threats).</li>
+<li><code>NumSamplesPerSegment</code> - Number of sample points
+evaluated along each item-&gt;threat segment.</li>
+</ul>
+<h3
+id="envquerytest_lcmcoverscore3d"><code>EnvQueryTest_LcmCoverScore3D</code></h3>
+<p>Fraction of context threats the item is occluded from. Float (higher
+= better cover).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Context</code> - Threat context the item must be occluded from
+to count as cover (defaults to known threats).</li>
+<li><code>AgentRadius</code> - Agent capsule radius used for the
+occlusion LOS sweep to each threat (cm).</li>
+</ul>
+<h3
+id="envquerytest_lcmheightadvantage"><code>EnvQueryTest_LcmHeightAdvantage</code></h3>
+<p>Vertical advantage of the item over the context (high ground).
+Float.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Context</code> - Context the item's vertical advantage is
+measured against (defaults to known threats).</li>
+</ul>
+<h3
+id="lcmflightmovementcomponent"><code>LcmFlightMovementComponent</code></h3>
+<p>Opt-in pawn movement component that turns nav guidance velocities
+(RequestVelocity from FlyTo tasks) into realistic 6-DOF flight/swim
+motion via ULcmFlightDynamics, sweeps the transform, and broadcasts the
+anim state. Inert until bEnabled is set.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>RequestVelocity</code> - Feed the guidance command for this
+frame (world-space desired velocity). Persists until replaced or
+cleared, so a slower controller tick still produces continuous
+motion.</li>
+<li><code>GetRigidState</code> - The full 6-DOF integrator state from
+the last step.</li>
+<li><code>GetFlightState</code> - The animation / secondary-motion drive
+signals from the last step.</li>
+<li><code>ClearGuidance</code> - Stop consuming guidance and coast
+(dynamics still decelerate the body).</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>bEnabled</code> - Master opt-in. Default false → the component
+is inert (base behaviour), guaranteeing byte-identical motion to before
+it was added.</li>
+<li><code>FlightConfig</code> - Body/aero/control tuning. The
+LocomotionModel + Archetype selectors live at the top of this struct and
+drive which parameters are shown (only the selected model/archetype's
+fields appear).</li>
+<li><code>bBroadcastAnimState</code> - [P6] Each tick, push the flight
+state to the pawn's AnimInstance (and the owner) if it implements
+ILcmFlightAnimInterface. Default on; costs nothing unless an implementer
+exists.</li>
+<li><code>RigidState</code> - Persistent integrator state, seeded from
+the pawn at BeginPlay and re-synced from the updated component each tick
+(so external teleports and swept-collision corrections are
+respected).</li>
+<li><code>FlightState</code> - Last-step anim outputs.</li>
+<li><code>PendingDesiredVelocity</code> - Latest guidance command and
+whether one is active.</li>
+<li><code>bHasGuidance</code> - True when RequestVelocity was called
+since the last tick - gates the dynamics step so an unfed component
+coasts instead of integrating stale guidance.</li>
+</ul>
+<h3 id="lcmflyingpawn"><code>LcmFlyingPawn</code></h3>
+<p>Note: APawn already inherits from INavAgentInterface - re-listing it
+here triggers C4584 (duplicate base class). We just override the
+virtuals.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>CollisionSphere</code> - Root sphere collision component for
+the flying pawn.</li>
+<li><code>MovementComponent</code> - LCM Nav3D-aware floating movement
+component driving the pawn along nav paths.</li>
+</ul>
+<h3
+id="lcmgameplayability_requestpath"><code>LcmGameplayAbility_RequestPath</code></h3>
+<p>GameplayAbility wrapper around the LCM Nav3D async path request,
+gating it through the standard GAS cost/cooldown/cancellation pipeline
+(budget via ULcmNavAttributeSet) and broadcasting the resulting path on
+completion.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>OnApexPathFound</code> - Async FindPathAsync callback (game
+thread): populates the result, broadcasts OnPathReady, and ends the
+ability.</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>StartLocation</code> - Path-search start.</li>
+<li><code>GoalLocation</code> - Path-search goal.</li>
+<li><code>QueryOptions</code> - Forwarded to FindPathAsync
+verbatim.</li>
+<li><code>BudgetCost</code> - Cost in PathRequestBudget consumed per
+activation. Default 1. Reduce for "cheap" replans (e.g. drift-triggered)
+and raise for expensive cross-chunk queries.</li>
+<li><code>OnPathReady</code> - Fired on completion (success or failure).
+Subscribers should receive PathPoints by-const-ref.</li>
+</ul>
+<h3 id="lcmmasscrowdspawner"><code>LcmMassCrowdSpawner</code></h3>
+<p>World-Partition-safe Mass spawner: never streams out, so its crowd's
+lifetime is not tied to the player's distance from the spawn point
+(fixes the "all agents disappear when the player leaves the area" WP
+trap).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>SpawnBatchPerFrame</code> - [startup smoothing, opt-in] Spawn
+at most N entities per frame instead of the whole crowd in one frame. 0
+(default) = stock engine behaviour. A large one-frame spawn (e.g. 6000
+agents) hitches startup ~70 ms; spreading it (e.g. 500) smooths that
+frame-pacing spike. Only applies when "Auto Spawn On Begin Play" is
+enabled. NOTE: this does NOT fix the editor's "Handled ensure:
+CurrentPhase==." Mass phase-manager spam - that is an engine-level
+startup race (observed on 5.2) (fires with 2 agents, on finite maps,
+independent of spawn load; handled + compiled out of Shipping), not a
+spawn-frame cost.</li>
+</ul>
+<h3 id="lcmmassflowsteertrait"><code>LcmMassFlowSteerTrait</code></h3>
+<p>[DEPRECATED - M3, 2026-07-03] Legacy flow-field crowd trait.
+Superseded by the unified <code>ULcmMassNavAgentTrait</code> ("LCM Nav3D
+Agent") with NavMode=FlowField, which composes a byte-identical
+archetype. Kept fully functional; prefer the unified trait for new
+content. Authoring trait for a flow-field-steered crowd agent.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GoalMode</code> - FixedLocation (use Goal) or TaggedActor
+(chase an actor by tag - the crowd follows it as it moves; the shared
+field re-solves on the move).</li>
+<li><code>Goal</code> - Shared crowd goal (world space, FixedLocation
+mode). All agents with this goal share one field.</li>
+<li><code>TargetActorTag</code> - Tag of the moving target actor
+(TaggedActor mode).</li>
+<li><code>bChaseLead</code> - Lead the moving target by its velocity
+(intercept ahead of it).</li>
+<li><code>LeadSecondsCap</code> - Upper bound on lead time (s).</li>
+<li><code>MaxSpeed</code> - Movement speed (cm/s).</li>
+<li><code>AgentRadius</code> - Collision radius (cm) - also the minimum
+agent size for field generation.</li>
+<li><code>AvoidanceRadius</code> - Neighbours within this distance
+contribute local avoidance steering (cm).</li>
+<li><code>AvoidanceStrength</code> - Weight of avoidance vs
+flow-following (0 = off, 1 = balanced).</li>
+<li><code>MaxAcceleration</code> - Max acceleration (cm/s²). Smooth ease
+in/out; 0 = instant (legacy floaty). Applies only to PhysicsWeighted
+flight (LinearDirect is instant).</li>
+<li><code>MaxTurnRateDeg</code> - Max turn rate (deg/s). The key knob:
+smooth banking turns vs robotic snapping. Applies only to
+PhysicsWeighted flight (LinearDirect is instant).</li>
+<li><code>ArriveRadius</code> - Arrival / slow-down radius around the
+goal (cm).</li>
+<li><code>FlightStyle</code> - LinearDirect (instant) vs PhysicsWeighted
+(turn-rate + acceleration inertia).</li>
+<li><code>AvoidanceStyle</code> - None / Reactive (boids) / Predictive
+(ORCA, smooth mutual passing) / CBS.</li>
+<li><code>AvoidanceTimeHorizon</code> - ORCA time horizon (s) -
+Predictive avoidance only.</li>
+<li><code>LaneBias</code> - Lateral lane-spread strength (0 = off).
+r.LcmNav.Mass.FlowLaneBias (&gt;=0) overrides.</li>
+<li><code>LaneDensityNorm</code> - Neighbour count at which lane
+spreading saturates.</li>
+<li><code>bAnticipatory</code> - ANTICIPATORY navigation: route the
+crowd around where moving obstacles are HEADING (their predicted swept
+path), not just where they are now - so it goes OVER a side gap that is
+about to close instead of squeezing into it. Costs a little more
+(predicted-occupancy stamping + slightly more re-solving) and can detour
+a touch wider. Off = today's reactive field. (r.LcmNav.Mass.Anticipatory
+overrides this: 0 forces off, &gt;=1 forces on.)</li>
+<li><code>AnticipatoryStrength</code> - How wide a berth to give
+predicted obstacle occupancy (higher = earlier / wider detour).</li>
+</ul>
+<h3 id="lcmmassgoaltrait"><code>LcmMassGoalTrait</code></h3>
+<p>Authoring trait: assign a fixed-location or tagged-actor goal to a
+Nav3D Agent so it auto-paths there (requires the "LCM Nav3D Agent" trait
+too).</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GoalMode</code> - FixedLocation (use GoalLocation) or
+TaggedActor (path to an actor by tag).</li>
+<li><code>GoalLocation</code> - World location goal (FixedLocation
+mode).</li>
+<li><code>TargetActorTag</code> - Tag of the target actor (TaggedActor
+mode). First actor with this tag wins.</li>
+<li><code>RepathToleranceCm</code> - Re-issue the path if the resolved
+goal drifts more than this (cm).</li>
+<li><code>ArrivalToleranceCm</code> - Treat the agent as "arrived"
+within this distance; stop re-pathing (cm).</li>
+<li><code>ReissueIntervalSeconds</code> - Minimum seconds between path
+re-issues per agent (anti-flood safety).</li>
+<li><code>bEnableGoalPrediction</code> - [Chase] Lead a moving
+TaggedActor target by its velocity so agents intercept rather than
+trail. TaggedActor mode only. Master kill switch:
+r.LcmNav.Mass.Chase.Enable.</li>
+<li><code>LeadSecondsCap</code> - [Chase] Upper bound on lead time (s).
+Override fleet-wide with r.LcmNav.Mass.Chase.LeadSecondsCap
+(&gt;=0).</li>
+</ul>
+<h3
+id="lcmmassnavismrendertrait"><code>LcmMassNavISMRenderTrait</code></h3>
+<p>Authoring trait: drop on the Mass config, set a mesh, get instanced
+visuals.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>Mesh</code> - Mesh drawn (instanced) at each agent's
+transform.</li>
+<li><code>UniformScale</code> - Uniform scale applied to each
+instance.</li>
+</ul>
+<h3 id="lcmmassnav3dtrait"><code>LcmMassNav3DTrait</code></h3>
+<p>[DEPRECATED - M3, 2026-07-03] Legacy path-based agent trait.
+Superseded by the unified <code>ULcmMassNavAgentTrait</code> ("LCM Nav3D
+Agent") with NavMode=PathFollowing, which composes a byte-identical
+archetype. Kept fully functional so existing configs (DA_MassAgent_Apex)
+keep working; prefer the unified trait for new content.</p>
+<p>Authoring trait: attaches the path nav fragments and exposes
+radius/speed, pathfinding, and natural-movement settings.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>AgentRadius</code> - Collision radius forwarded to the solver
+(cm).</li>
+<li><code>MaxSpeed</code> - Maximum movement speed for the steering
+processor (cm/s).</li>
+<li><code>MobilityClassIndex</code> - Mobility-class index (reserved for
+per-class cost rules; 0 = default).</li>
+<li><code>AvoidanceRadius</code> - Neighbours within this distance
+contribute local avoidance steering (cm).</li>
+<li><code>AvoidanceStrength</code> - Weight of avoidance vs
+path-following (0 = off, 1 = balanced).</li>
+<li><code>PathSolver</code> - Any-angle LazyThetaStar (smooth) vs
+grid-locked AStar (square turns).</li>
+<li><code>SmoothingMode</code> - Curved (CatmullRom) / shortcut (Linear)
+/ raw staircase (None).</li>
+<li><code>MaxAcceleration</code> - Max acceleration (cm/s²). Limits
+speed change so agents ease into motion.</li>
+<li><code>MaxTurnRateDeg</code> - Max turn rate (deg/s). The key knob:
+replaces robotic square turns with smooth arcs. Lower = wider, lazier
+turns; 0 = instant snapping (legacy).</li>
+<li><code>LookAheadDistance</code> - Pure-pursuit look-ahead distance
+(cm). Larger = smoother cornering.</li>
+<li><code>ArriveRadius</code> - Arrival / slow-down radius around the
+goal (cm).</li>
+<li><code>FlightStyle</code> - LinearDirect (magic/biological - instant)
+vs PhysicsWeighted (inertia).</li>
+<li><code>AvoidanceStyle</code> - None / Reactive (boids) / Predictive
+(ORCA, smooth passing) / CBS.</li>
+<li><code>AvoidanceTimeHorizon</code> - ORCA time horizon (s) - used
+only by Predictive avoidance.</li>
+<li><code>LaneBias</code> - Density-aware lateral lane-spread strength
+(0 = off).</li>
+<li><code>LaneDensityNorm</code> - Neighbour count at which lane
+spreading saturates.</li>
+<li><code>bObstacleReactivity</code> - Re-plan when a moving obstacle
+invalidates the route this agent is following. Global kill switch:
+r.LcmNav.Mass.ObstacleReactivity.</li>
+</ul>
+<h3 id="lcmmassnavagenttrait"><code>LcmMassNavAgentTrait</code></h3>
+<p>[M3] Unified authoring trait: one trait, a NavMode selector.
+PathFollowing composes the path archetype (NavAgent + PathRequest +
+PathResult); FlowField composes the flow archetype (FlowField state + a
+const shared config fragment). Mode-specific properties hide via
+EditCondition on NavMode.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>NavMode</code> - Movement policy. PathFollowing = per-agent A*
+path; FlowField = shared crowd steering field. Drives which fragments +
+config + tag the trait adds.</li>
+<li><code>Compute</code> - Compute selector governing both modes. This
+release solves on the CPU, so <code>Auto</code> and <code>CPU</code>
+behave identically; the selector is retained for forward
+compatibility.</li>
+<li><code>AgentRadius</code> - Collision radius (cm).</li>
+<li><code>MaxSpeed</code> - Maximum movement speed (cm/s).</li>
+<li><code>AvoidanceRadius</code> - Neighbours within this distance
+contribute local avoidance steering (cm).</li>
+<li><code>AvoidanceStrength</code> - Weight of avoidance vs path/flow
+following (0 = off, 1 = balanced).</li>
+<li><code>MaxAcceleration</code> - Max acceleration (cm/s²). 0 =
+instant.</li>
+<li><code>MaxTurnRateDeg</code> - Max turn rate (deg/s) - replaces
+robotic square turns with smooth arcs. 0 = instant.</li>
+<li><code>ArriveRadius</code> - Arrival / slow-down radius around the
+goal (cm). NOTE: the legacy traits defaulted differently per mode (path
+80 / flow 150); this unified default is 100 - set explicitly if
+migrating a config that relied on the old default.</li>
+<li><code>FlightStyle</code> - LinearDirect (instant, no inertia) vs
+PhysicsWeighted (turn-rate + accel inertia).</li>
+<li><code>AvoidanceStyle</code> - None / Reactive (boids) / Predictive
+(ORCA) / CBS. NOTE: the legacy Flow Steer trait defaulted to Predictive
+(ORCA); this unified default is Reactive (matching the legacy path
+trait) - pick Predictive explicitly for smooth mutual passing in dense
+flow crowds.</li>
+<li><code>AvoidanceTimeHorizon</code> - ORCA look-ahead horizon (s) -
+Predictive avoidance only.</li>
+<li><code>LaneBias</code> - Density-aware lateral lane-spread strength
+(0 = off).</li>
+<li><code>LaneDensityNorm</code> - Neighbour count at which lane
+spreading saturates.</li>
+<li><code>MobilityClassIndex</code> - Mobility-class index (reserved for
+per-class cost rules; 0 = default).</li>
+<li><code>PathSolver</code> - Any-angle LazyThetaStar (smooth) vs
+grid-locked AStar (square turns).</li>
+<li><code>SmoothingMode</code> - Curved (CatmullRom) / shortcut (Linear)
+/ raw staircase (None).</li>
+<li><code>LookAheadDistance</code> - Pure-pursuit look-ahead distance
+(cm). Larger = smoother cornering.</li>
+<li><code>bObstacleReactivity</code> - Re-plan when a moving obstacle
+invalidates the route being followed.</li>
+<li><code>FlightConfig</code> - Body / aero / control tuning for the
+6-DOF model - the SAME model as the pawn Lcm Flight Movement Component.
+The LocomotionModel + Archetype selectors are at the top of this struct
+and drive which parameters show; default LocomotionModel = Kinematic →
+the crowd moves exactly as before until you opt in.</li>
+<li><code>FlightDynamicsLODDistance</code> - [P8] Dynamics LOD distance
+(cm): beyond this from the viewer, agents use the cheap kinematic
+integrator (full 6-DOF only near camera) - the scale knob for large
+crowds. 0 = always full. Kill switch: r.LcmNav.Mass.FlightLOD.</li>
+<li><code>bAnticipatory</code> - Route around where moving obstacles are
+HEADING (predicted swept volume).</li>
+<li><code>AnticipatoryStrength</code> - Detour strength around predicted
+occupancy (higher = wider berth).</li>
+<li><code>bAvoidThreats</code> - Route the crowd AROUND actors tagged
+"ApexThreat" (danger zones). NOTE: agents DETOUR around threats, which
+can slow arrival - measured -30% threat crossings but 13-25% fewer
+arrivals on tight corridors. Enable for threat/danger gameplay.</li>
+<li><code>ThreatDetourStrength</code> - Threat detour strength (higher =
+wider berth around danger zones).</li>
+<li><code>bIncrementalField</code> - [Perf] D* Lite INCREMENTAL corridor
+field for large / churn-heavy crowds (re-cost only changed cells; safe
+full-rebuild fallback). Shared per goal.</li>
+<li><code>bAsyncFlowSolve</code> - [Perf P2] Solve the flow field on a
+WORKER thread (removes solve spikes from the frame; the field publishes
+a frame later). Recommended for large crowds.</li>
+</ul>
+<h3 id="lcmmassperceptiontrait"><code>LcmMassPerceptionTrait</code></h3>
+<p>Authoring trait: makes an LCM Nav3D Mass agent both a senser and a
+perceivable (faction-based SVO-LOS perception), exposing
+sight/FOV/eye-height settings.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>FactionId</code> - Faction id (different factions are mutually
+hostile / perceivable).</li>
+<li><code>SightRadius</code> - Maximum sight distance (cm).</li>
+<li><code>FOVDegrees</code> - Full field-of-view angle (degrees).</li>
+<li><code>EyeHeightOffset</code> - Eye height offset from the agent
+origin (cm).</li>
+<li><code>AgentRadius</code> - Agent radius for the SVO LOS walk
+(cm).</li>
+<li><code>PerceptionIntervalFrames</code> - Perceive once every N frames
+(LOD throttle).</li>
+</ul>
+<h3
+id="lcmmassrepresentationtrait"><code>LcmMassRepresentationTrait</code></h3>
+<p>Preconfigured UMassVisualizationTrait: LOD-switched crowd rendering
+that draws the instanced static mesh at all visible LODs by default (no
+"see nothing" trap), and self-provides the LOD-collector + actor
+fragments so it works as one trait.</p>
+<h3 id="lcmnavareamodifier"><code>LcmNavAreaModifier</code></h3>
+<p>Designer-placed 3D volumetric cost-overlay actor; applies a cost
+multiplier to LCM Nav3D pathfinding wherever the agent's leaf is inside
+its box (water, storm, danger, or preferred-lane volumes that stack
+multiplicatively).</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>GetCostMultiplier</code> - Returns this volume's cost
+multiplier applied to agents inside the box.</li>
+<li><code>GetBounds</code> - World-space FBox covering the modifier
+volume.</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>BoundsBox</code> - Box bounds - extents around the actor's
+location. Use the editor gizmo to size the volume.</li>
+<li><code>CostMultiplier</code> - Cost multiplier applied to LCM Nav3D
+pathfinding when the agent is inside the box. 1.0 = no effect; 2.0 =
+costs twice as much; 0.5 = preferred lane. Default 2.0.</li>
+<li><code>bAutoRegisterWithApex</code> - Auto-register with the LCM
+Nav3D extension registry on BeginPlay.</li>
+<li><code>AreaTag</code> - Optional gameplay tag for designer
+categorisation (e.g. "Water", "Storm", "Danger" - not used by solver in
+v1).</li>
+</ul>
+<h3 id="lcmnavareaquerylibrary"><code>LcmNavAreaQueryLibrary</code></h3>
+<p>Blueprint function library exposing the LCM Nav3D nav-extension
+registry so designers can query cost overlays and registered NavLinks
+from BP graphs.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>GetRegisteredLinkCount</code> - Count of currently-registered
+NavLinks.</li>
+<li><code>GetRegisteredAreaCount</code> - Count of currently-registered
+NavArea modifiers.</li>
+<li><code>GetCostMultiplierAt</code> - Cost multiplier at the given
+world position. Returns 1.0 when no modifier applies; multiplies when
+overlapping modifiers stack.</li>
+<li><code>GetCostMultiplierAlongPath</code> - Returns the sum of per-leg
+cost multipliers along the waypoint chain, weighted by leg length.
+Useful for "is this path expensive" predicates without rerunning the
+solver.</li>
+<li><code>GetAllLinkEndpoints</code> - All registered link endpoints as
+FVector pairs (Start, End). Useful for debug visualisation.</li>
+<li><code>FindNearestNavLink</code> - Finds the nearest registered
+NavLink to <code>WorldPos</code> within <code>MaxDistanceCm</code>.
+Returns nullptr if none.</li>
+</ul>
+<h3 id="lcmnavarmtaglibrary"><code>LcmNavArmTagLibrary</code></h3>
+<p>Blueprint-callable wrapper around the
+<code>r.LcmAblation.ArmTag</code> CVar so designers can stamp per-task
+arm tags on telemetry rows for in-game A/B analysis without using the
+console.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>SetArmTag</code> - Sets the current
+<code>r.LcmAblation.ArmTag</code> value. Empty FName clears it.</li>
+<li><code>PushArmTag</code> - Atomically swap the arm tag to
+<code>NewArmTag</code>, returning the previous value. Caller pairs with
+PopArmTag to restore on task exit.</li>
+<li><code>PopArmTag</code> - Restore a previously-pushed arm tag.</li>
+<li><code>GetCurrentArmTag</code> - Reads the current
+<code>r.LcmAblation.ArmTag</code> value. Empty FName when unset.</li>
+</ul>
+<h3 id="lcmnavattributeset"><code>LcmNavAttributeSet</code></h3>
+<p>GAS attribute set surfacing per-agent path-request budgets so
+projects can throttle expensive LCM Nav3D queries through the standard
+GameplayEffect pipeline.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>OnRep_PathRequestBudget</code> - RepNotify for
+PathRequestBudget; mirrors the replicated change to GAS.</li>
+<li><code>OnRep_MaxPathRequestBudget</code> - RepNotify for
+MaxPathRequestBudget; mirrors the replicated change to GAS.</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>PathRequestBudget</code> - Current path-request budget.
+Consumed by 1 per successful ULcmGameplayAbility_RequestPath activation.
+Default 5.</li>
+<li><code>MaxPathRequestBudget</code> - Hard cap clamp for regen.
+Default 5.</li>
+</ul>
+<h3
+id="lcmnavigationinvokercomponent"><code>LcmNavigationInvokerComponent</code></h3>
+<p>Attach this to the Player or VIPs. The SVO Manager will only generate
+voxel data for chunks within this radius.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>GenerationRadius</code> - How far around this actor should we
+build navigation data? E.g., 10000 = Build chunks within a 100m
+radius.</li>
+</ul>
+<h3
+id="lcmnavigationmanagersvo"><code>LcmNavigationManagerSVO</code></h3>
+<p>LCMNav3D world singleton - the central navigation manager actor.
+Spawns the four subsystem components
+(<code>ULcmSVOStreamingComponent</code>,
+<code>ULcmSVOGenerationComponent</code>,
+<code>ULcmPathfindingComponent</code>,
+<code>ULcmSVORenderComponent</code>); owns the SVO data containers
+(<code>FiniteData</code> for finite worlds,
+<code>ActiveVirtualChunks</code> for infinite worlds); owns
+<code>FLcmMacroGraph</code> + <code>FLcmPortalBuilder</code>; hosts the
+multicast RPCs for dynamic-obstacle invalidation and flow-field-ready
+notifications. Exactly one instance per UWorld; auto-discovered via
+<code>UGameplayStatics:: GetActorOfClass</code>. Full responsibility
+list in §P2.2 of <code>Docs/SYSTEM_ARCHITECTURE.md</code>.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>UpdateDynamicObstacleReplicated</code>
+------------------------------------------------------------------------
+Server-authoritative entry: applies the dynamic-obstacle update locally
+AND multicasts it to all connected peers (clients + listen-server). Safe
+to call from any context -- becomes a no-op + warning when called on a
+client (clients route writes through the server). The flow-field-ready
+signal is a multicast-only callback path. The flow-field buffers are NOT
+replicated -- this RPC informs peers that a goal at (GoalLocation,
+ChunkKey) is reachable on the server, so they can prewarm their own
+local generation or trigger gameplay.</li>
+<li><code>UpdateDynamicObstacle</code> - Call this when a large object
+moves to update the nav graph locally.</li>
+<li><code>ToggleDrawDebugVolumes</code> - Flips bDrawDebugVolumes via
+SetDrawDebugVolumes. Convenience entry for a single-key toggle
+binding.</li>
+<li><code>SetMacroTopologyCell</code> - [Procedural Topology] Called by
+your procedural-generation system (or World Partition minimap scanner)
+to mark a coarse cell blocked/unblocked.</li>
+<li><code>SetDrawDebugVolumes</code> - Runtime show/hide for the SVO
+debug voxel volumes. Sets bDrawDebugVolumes and ALWAYS rebuilds the
+render proxy. The scene proxy captures the flag at build time
+(FLcmSVOSceneProxy::bForceDraw), so a rebuild is required for BOTH show
+and hide - toggling the bool alone does nothing. Bind to a key for
+in-game/PIE show/hide.</li>
+<li><code>Multicast_UpdateDynamicObstacle</code> - Server-only entry:
+multicasts a dynamic-obstacle update to every connected client so each
+peer's <code>ALcmNavigationManagerSVO</code> replays
+<code>UpdateDynamicObstacle(Bounds)</code> locally (RCU clone is
+identical on every host). Clients that fire this directly are
+warn-and-ignored.</li>
+<li><code>Multicast_FlowFieldReady</code> - Server-only entry:
+multicasts a "flow-field finished generating" notification to clients so
+they can prewarm a local sample for the given goal + chunk. The
+flow-field buffers are NOT replicated; clients regenerate on demand
+using shared cache keys.</li>
+<li><code>ForceRedrawSVO</code> - Keep the core function so Blueprints
+can still call it at runtime if needed</li>
+<li><code>FindPath</code> - Calculates a path from Start to End using
+the SVO.</li>
+<li><code>FindCover</code> - Find a hidden spot safe from the
+Enemy.</li>
+<li><code>DrawDebugSVO</code> - Visualizes the octree in the viewport
+(Green = Free, Red = Blocked). One-shot manual call: flushes prior
+persistent lines and draws with a 10 s lifetime. The per-frame Tick path
+uses DrawDebugSVOTick instead.</li>
+<li><code>DrawDebugNeighborsAt</code> - Visualizes neighbors of the node
+at the specific location (for debugging connectivity).</li>
+<li><code>DrawDebugInfiniteWorld</code> - Renders the real-time state of
+the infinite world systems.</li>
+<li><code>DebugDrawFlowField</code> - Flow Field Debug Visualization
+Generates a temporary Flow Field to the TargetLocation and draws it as a
+3D Vector Heatmap. Green = Low Cost (Near Target), Red = High Cost (Far
+from Target).</li>
+<li><code>BuildSVOInEditor</code> - Editor-time SVO build (button in the
+Details panel). Populates FiniteData from live collision geometry
+WITHOUT entering PIE, so the stock UE EQS Testing Pawn - and any LCM
+Nav3D EQS query built from the generators &amp; tests - resolves the SVO
+and renders true-3D candidate points in the editor viewport, exactly the
+in-editor workflow Recast navmesh gives for 2.5D EQS. Finite mode only;
+warns + no-ops while playing (the SVO already bakes on BeginPlay) and in
+infinite-world mode (which streams chunks at runtime). Press once, then
+drop an EQSTestingPawn. // Editor-time SVO build. Surfaced as the
+prominent "Build SVO" button in the // editor module's banner
+(FLcmNavManagerDetails); BlueprintCallable so it can // also be
+triggered from script. Intentionally NOT a CallInEditor button - that //
+rendered a detached row below the property sections instead of in
+place.</li>
+<li><code>BuildSVO</code> - Clears old data and builds a new SVO from
+scratch (Finite Mode only).</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>bIsInfiniteWorld</code> - World Type. OFF = a single
+fixed-bounds SVO built for the whole level (best for arenas / linear
+levels). ON = a streamed, unbounded world using Hierarchical HPA*
+(chunks generate on-demand around invokers). Drives the Generation
+Strategy below.</li>
+<li><code>GenerationMode</code> - Auto-derived from the World Type - NOT
+set by hand. An infinite world always uses the Hierarchical HPA*
+strategy (macro routing + on-demand chunk streaming), the only infinite
+mode; a finite world is always Static Finite. Shown read-only so it can
+never be set to a value that contradicts the World Type (e.g. infinite +
+Fixed Bounds, which would silently break streaming). Tick "Infinite
+World" above to switch strategy.</li>
+<li><code>bAutoBuildOnPlay</code> - Should the SVO automatically build
+itself when the game starts? (Finite mode only)</li>
+<li><code>WorldExtent</code> - The total size of the navigable world
+(Cube width). Only used for Finite worlds.</li>
+<li><code>ChunkSize</code> - Size of each chunk in World Units (e.g.,
+50,000 for 500m chunks). Must match World Partition Grid.</li>
+<li><code>MinVoxelSize</code> - The smallest possible voxel size.
+Recursion stops here. (e.g., 100 = 1 meter)</li>
+<li><code>ClearancePadding</code> - The padding added to voxel collision
+checks. Set this to your largest agent's radius.</li>
+<li><code>ObstacleQueryChannels</code> - Physics collision channels to
+treat as solid walls.</li>
+<li><code>AllowedObstacleClasses</code> - If empty, ALL overlapping
+geometry is voxelized. If populated, ONLY these actor classes are
+voxelized.</li>
+<li><code>CoarseCellSize</code> - The size of a single topological
+macro-cell. 2500 units (25 meters) is the AAA standard for coarse LOD
+pathfinding.</li>
+<li><code>bUseFlowFields</code> - When true, the request classifier can
+elect the flow-field path instead of per-agent A* for swarms of ≥
+<code>FlowFieldThreshold</code> agents sharing a goal. Off by default;
+opt-in for swarm gameplay.</li>
+<li><code>FiniteObstacleUpdateInterval</code> - [Perf fix, 2026-06-07]
+FINITE mode: minimum seconds between dynamic- obstacle SVO applications.
+In finite mode every UpdateDynamicObstacle deep-clones the ENTIRE world
+SVO (RCU copy-on-write) - with event-driven obstacle components flushing
+every ~33 ms per moving actor, that was a clone storm ("massive fps drop
+while anything moves"). Updates arriving inside the window are UNIONED
+and applied as ONE clone+swap at the trailing edge, so the final state
+always lands. 0 = legacy immediate behaviour. Infinite mode is
+unaffected (per-chunk updates are cheap by construction).</li>
+<li><code>FlowFieldThreshold</code> - Minimum number of agents sharing a
+goal before the classifier elects the flow-field path instead of
+per-agent A* (requires bUseFlowFields).</li>
+<li><code>FlowFieldClusterCellSize</code> - Voxel-quantization grid size
+(cm) used to bucket flow-field goal positions into cache keys. Two
+requests whose goals fall into the same cell share a cached flow field.
+Larger values → more sharing (cheaper) but coarser direction
+snapping.</li>
+<li><code>bUseGPUVoxelization</code> - Uses Compute Shaders for
+lightning-fast voxelization. Disable only if targeting low-end
+mobile.</li>
+<li><code>MaxGenerationsPerFrame</code> - How many chunks can we
+voxelize per frame? (1 is usually best to avoid Game Thread
+stutters).</li>
+<li><code>MaxFlowSolvesPerFrame</code> - [Perf P3a] Cap goal-anchored
+flow-field solves STARTED per frame (spreads the GT cost so a burst
+cannot spike the frame). 0 = unlimited.
+r.LcmNav.Mass.MaxCorridorSolvesPerFrame overrides (&gt;=0).</li>
+<li><code>MaxPathRequestsPerFrame</code> - [Perf] Max PathFollowing path
+requests dispatched per frame (spreads a spawn burst across frames;
+requests are async). r.LcmNav.Mass.MaxPathsPerTick overrides
+(&gt;=0).</li>
+<li><code>MaxRequestsPerFrame</code> - How many paths can we calculate
+per frame? (50 is a safe number to keep FPS high).</li>
+<li><code>bChunkQuantizedMacroCache</code> - Share one cross-chunk macro
+route across a crowd heading to the same goal, instead of recomputing
+the identical chunk-level route per agent. This is the big win for LARGE
+Mass/AI crowds in infinite/hierarchical worlds: it removes the per-agent
+macro-pathfinding cost that otherwise spikes the game thread when many
+agents spawn or replan at once (measured ~30x cheaper request
+processing, worst-frame 97ms -&gt; 12ms at 2000 agents). The macro route
+is chunk-level; each agent's exact start/end are still applied per
+agent, so paths stay correct. Leave OFF to reproduce legacy bit-exact
+pathfinding (e.g. for deterministic benchmarking). Runtime override:
+r.LcmNav.MacroCache.ChunkQuantized (force-on). Infinite/hierarchical
+only.</li>
+<li><code>bDrawDebugVolumes</code> - If true, automatically renders the
+voxel grid when generation finishes.</li>
+<li><code>bDrawInfiniteWorldDebug</code> - If true, draws Invoker
+Bubbles, the Generation Queue, and loaded chunks in real-time.</li>
+<li><code>bDrawPathfindingDebug</code> - Master switch for Agent Flight
+Paths and Waypoints.</li>
+<li><code>DebugRedrawCoalesceSeconds</code> - Minimum time between
+debug-mesh redraws (coalesce cadence). Forwarded to the SVO debug
+renderer; higher = fewer rebuilds when many obstacles move at once.</li>
+<li><code>MacroGraph</code> - A lightweight map of every chunk in the
+world (HPA*).</li>
+<li><code>RenderComponent</code> - The Central Renderer used to draw the
+SVO via the GPU Render Thread.</li>
+<li><code>DynamicMacroTopology</code> - [Procedural Topology]
+Thread-safe map of the global layout of massive blocking geometry
+(coarse-grid coordinate -&gt; blocked). Populated by
+SetMacroTopologyCell.</li>
+<li><code>StreamingComponent</code> - SUBSYSTEM COMPONENTS</li>
+<li><code>GenerationComponent</code> - SVO voxelization scheduler
+subsystem. Pulls pending chunk-generation requests off the manager's
+queue and dispatches CPU/GPU voxelization.</li>
+<li><code>PathfindingComponent</code> - Pathfinding request queue +
+dispatcher subsystem. Routes async <code>FindPathAsync</code> calls to
+the CPU worker pool, per the request options.</li>
+</ul>
+<h3 id="lcmnavlinkcomponent"><code>LcmNavLinkComponent</code></h3>
+<p>3D vertical NavLink component (subclass of UNavLinkCustomComponent)
+with designer-set world-space LinkStart/LinkEnd for ladders, shafts, and
+teleporters that Recast's surface-projected links cannot represent.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>IsVerticalLink</code> - True iff this link spans more than
+<code>MinVerticalCm</code> along Z - the 3D-advantage case (ladders,
+jump shafts).</li>
+<li><code>GetLinkSpanCm</code> - Convenience: distance(LinkStart,
+LinkEnd) - useful for designers comparing the link's geometric length vs
+its travel cost.</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>LinkStart</code> - World-space start point. For
+ladders/teleporters this is the bottom (or originating end if not
+vertical).</li>
+<li><code>LinkEnd</code> - World-space end point. For vertical ladders
+this is the top.</li>
+<li><code>bBidirectional</code> - When true (default), the link can be
+traversed Start→End AND End→Start. Set false for one-way patterns
+(teleporter, drop-down, etc.).</li>
+<li><code>bAutoRegisterWithApex</code> - Auto-register with the LCM
+Nav3D link registry on BeginPlay so v2 solver integration discovers the
+link without buyer code.</li>
+<li><code>TraversalCostCm</code> - Traversal cost (cm-equivalent) added
+to the path through this link. Default 0 = no penalty (geometric
+distance counts as-is).</li>
+</ul>
+<h3 id="lcmnavvolume"><code>LcmNavVolume</code></h3>
+<p>Defines the playable area for offline SVO generation. Acts as the
+master bounds for slicing and baking ALcmNavigationChunk actors.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>BakeNavigationData</code> - Editor-only one-shot bake. Slices
+the volume bounds into the configured chunk grid, voxelizes each chunk
+on the game thread, and writes a <code>ULcmSVODataAsset</code> per chunk
+into <code>OutputAssetPath</code>. Pairs with the runtime
+<code>ALcmSVOStreamingProxy</code> actor that loads each asset on level
+streaming.</li>
+</ul>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>ChunkSize</code> - Edge length (cm) of a single bake chunk.
+Must match the runtime manager's <code>ChunkSize</code> when
+<code>bSnapToGlobalGrid</code> is true.</li>
+<li><code>MinVoxelSize</code> - Smallest voxel produced by SVO
+subdivision (cm). Tighter values produce finer paths but inflate the SVO
+node count cubically.</li>
+<li><code>ClearancePadding</code> - Inflation (cm) applied to obstacle
+SAT collision checks at bake time. Set to the radius of your largest
+agent so the SVO carves out enough clearance for them.</li>
+<li><code>bSnapToGlobalGrid</code> - If true, forces chunks to align to
+a global 3D grid (Required for World Partition). If false, spawns
+exactly ONE chunk that perfectly matches this volume's bounds (Best for
+Arena/Linear games).</li>
+<li><code>BakeObstacleChannels</code> - Physics collision channels
+treated as solid obstacles at bake time. Empty means "all overlapping
+geometry".</li>
+<li><code>BakeAllowedClasses</code> - Whitelist of actor classes to
+voxelize. If empty, all overlapping geometry on the configured channels
+is included.</li>
+<li><code>OutputAssetPath</code> - Content path under which
+<code>ULcmSVODataAsset</code> outputs are written by
+<code>BakeNavigationData</code>. Per-chunk assets get a
+<code>_X_Y_Z</code> suffix.</li>
+</ul>
+<h3
+id="lcmsmartobjectbehaviordef_coverpocket"><code>LcmSmartObjectBehaviorDef_CoverPocket</code></h3>
+<p>SmartObject behaviour definition for a designer-placed cover pocket,
+validated at claim time by SweepPenalty + threat-hint LOS with a
+FindBestCover fallback when the placed pocket has gone hot.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>DwellSeconds</code> - Time the pawn stays in cover before
+considering the state complete. 0 = stay forever (use a parent
+transition condition to exit).</li>
+<li><code>MaxAcceptableSweepPenalty</code> - Highest SweepPenalty
+(0.255) the slot leaf may carry to count as safe. Above this the
+StateTree task triggers the FindBestCover fallback. Default 32 =
+"lightly swept, mostly safe".</li>
+<li><code>bUseThreatHint</code> - Direction hint (world-space) to
+validate cover against. The pocket is only valid if LCM Nav3D LOS from
+this point to the slot is blocked AND SweepPenalty is below the
+cap.</li>
+<li><code>ThreatHintLocation</code> - World-space point the cover is
+validated against; the pocket is valid only if LCM Nav3D LOS from here
+to the slot is blocked.</li>
+<li><code>FallbackSearchRadiusCm</code> - When the placed pocket fails
+validation, the task searches within this radius for a procedural cover
+via FindBestCover. 0 disables fallback (failure makes the task return
+Failed).</li>
+<li><code>AgentRadius</code> - Agent radius for the LOS walker's
+clearance gate.</li>
+</ul>
+<h3
+id="lcmsmartobjectbehaviordef_patrolwaypoint"><code>LcmSmartObjectBehaviorDef_PatrolWaypoint</code></h3>
+<p>SmartObject behaviour definition for one patrol waypoint; designers
+chain placed waypoints via NextWaypointTag to author a patrol route as
+content.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>DwellSeconds</code> - Dwell time at this waypoint before
+moving to the next.</li>
+<li><code>NextWaypointTag</code> - GameplayTag of the next smart object
+in the chain. Empty = end-of- chain; the parent state machine drops out
+of patrol on Empty.</li>
+<li><code>bChainCycles</code> - When true, the patrol restarts at the
+chain's head when the chain ends. When false, the pawn lingers at the
+final waypoint.</li>
+<li><code>bUseFacingHint</code> - Optional facing yaw to assume at this
+waypoint (degrees). When unset (kept default), keeps the inbound flight
+rotation.</li>
+<li><code>FacingYawDeg</code> - Yaw (degrees, world-space) the pawn
+faces at this waypoint when bUseFacingHint is set.</li>
+</ul>
+<h3
+id="lcmsmartobjectbehaviordef_perch"><code>LcmSmartObjectBehaviorDef_Perch</code></h3>
+<p>SmartObject behaviour definition for a volumetric perch: fly here,
+hover or stand, and dwell - a 3D-only smart-object pattern LCM Nav3D's
+free-space SVO supports where surface-projected Recast navmesh
+cannot.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>DwellSeconds</code> - How long the pawn dwells at the perch
+after arrival.</li>
+<li><code>RequiredClearanceCm</code> - Agent collision radius the perch
+must accommodate. Used at claim time by
+<code>FLcmSTTask_UseSmartObject</code> to reject perches whose voxel
+clearance is below this threshold. Pass-through to the JFA clearance
+gate (same byte the Lazy Theta* LOS walker consumes).</li>
+<li><code>bUseFacingHint</code> - When true, the pawn rotates to face
+<code>FacingHint</code> after arrival. When false, the pawn keeps its
+inbound flight rotation.</li>
+<li><code>FacingYawDeg</code> - Yaw the perched pawn should face
+(degrees, world-space). Bound only when <code>bUseFacingHint</code> is
+true.</li>
+<li><code>FacingInterpSpeed</code> - Per-tick speed at which the pawn
+aligns to FacingYawDeg during dwell.</li>
+</ul>
+<h3 id="lcmsvodataasset"><code>LcmSVODataAsset</code></h3>
+<p>A lightweight, streamable asset that holds pre-calculated SVO
+navigation data. Designed to be loaded asynchronously by World
+Partition.</p>
+<p><strong>Properties</strong></p>
+<ul>
+<li><code>ChunkCoordinate</code> - The mathematical grid coordinate this
+chunk belongs to</li>
+<li><code>ChunkBounds</code> - The physical world bounds of this
+chunk</li>
+<li><code>SerializedSVOData</code> - The raw, compressed binary data of
+the SVO tree</li>
+<li><code>SerializedMacroNode</code>
+------------------------------------------------------------------------
+Optional macro-graph slice for this chunk: the just-finalized
+FLcmMacroNode (PortalEdges + InternalEdges + WorldCenter) captured after
+BuildTruePortals + PrecomputeIntraChunkEdges complete during the bake.
+Serialized via FLcmMacroNodeArchive (magic 'LCMN', V1). Empty array =
+legacy bake - streaming proxy falls back to UpdateMacroNode +
+GeneratePortalsForChunk (fallback portals only; the runtime
+BuildTruePortals + intra-chunk-edge precompute still runs separately
+when neighbors load). Non-empty = the cold-build work is skipped and the
+precomputed macro node is injected directly into
+Manager-&gt;MacroGraph.Nodes[ChunkCoordinate]. Independent from
+SerializedSVOData - backward-compatible addition; older baked assets
+deserialize with this field empty.</li>
+</ul>
+<h3
+id="lcmtacticalquerylibrary"><code>LcmTacticalQueryLibrary</code></h3>
+<p>Static Blueprint-callable wrappers for LCMNav3D tactical
+primitives.</p>
+<p>All functions are pure CPU and synchronous - they execute on the
+calling thread (Blueprint VM thread, BT service tick, EQS test
+evaluation, etc.) and return immediately. None of them dispatch GPU work
+or async jobs. Designed to be called at EQS-test frequency (tens to
+hundreds per query per frame) without budget concerns.</p>
+<p><strong>Functions</strong></p>
+<ul>
+<li><code>IsSegmentLOSClear</code> - Tests whether a straight line from
+Start to End is clear of unblocked SVO leaves for an agent of the given
+radius. Wraps the same Lazy Theta* neighbour-graph LOS walker used by
+any-angle pathfinding. Returns false if the SVO at Start cannot be
+resolved (out of bounds or unloaded chunk).</li>
+<li><code>IsReachableSync</code> - Cheap reachability test - returns
+true iff a path from Start to Goal exists. Implemented by calling the
+underlying A* with early-out; faster than FindApexPathSync when you
+don't need the waypoint list.</li>
+<li><code>IsPositionBlocked</code> - Returns true iff WorldPos resolves
+to a blocked SVO leaf (or to no leaf at all - out-of-bounds and unloaded
+chunks both report blocked by default for tactical-query safety). Pair
+with GetSweepPenaltyAt when you need to distinguish "blocked" from
+"merely risky".</li>
+<li><code>GetSweepPenaltyAt</code> - Reads the §P9.3 SweepPenalty byte
+at WorldPos. Higher values indicate the voxel was recently swept by a
+dynamic obstacle's predicted hull - a heuristic measure of "how
+dangerous is this position right now?". Returns 0 when the position
+resolves to a chunk that hasn't been loaded, when the voxel itself is
+blocked (treated as max danger by default in path costing - caller may
+want to treat blocked separately via Is Position Blocked), or when no
+dynamic obstacle has touched it. Value range: 0 (clear). 255 (maximum
+recent threat).</li>
+<li><code>FindBestCover</code> - Wraps LcmSVOPathSolver::FindBestCover.
+Finds the best cover position for AgentLocation against ThreatLocation
+within SearchRadius (cm), preferring positions with line-of-sight broken
+to the threat. @param OutCoverLocation receives the best cover position
+when the function returns true. When the function returns false, this is
+left at ZeroVector.</li>
+<li><code>FindApexPathSync</code> - Synchronous "is there a path from
+Start to Goal" probe. Wraps the same A* core that FindPathAsync uses but
+runs on the calling thread for use inside EQS tests that need to score
+candidates by LCM Nav3D-path distance (NOT euclidean) before the agent
+commits. Returns true when a path was found; OutPath receives the
+waypoint sequence. Returns false when start or goal don't resolve to a
+loaded chunk, when their containing voxels are blocked, or when no path
+exists between them. Pay-as-you-call cost - typical short-range paths
+complete in &lt;0.1 ms, long-range cross-chunk paths in 1-5 ms. If you
+only need the boolean "is reachable?" answer without the waypoint
+sequence, prefer IsReachableSync (cheaper - bails as soon as goal is
+popped).</li>
+</ul>
+
+  <div class="pager"><a href="mass-traits.html">&larr; Mass traits reference</a><span></span></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

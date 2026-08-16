@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 04: The Same Agent in StateTree | LCM Nav3D</title>
+<meta name="description" content="Identical flight behaviour to Tutorial 03, authored in StateTree instead of a Behavior Tree. Swap the AIController's RunBehaviorTree for a StateTreeAICo...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/statetree-agent.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 04: The Same Agent in StateTree | LCM Nav3D">
+<meta property="og:description" content="Identical flight behaviour to Tutorial 03, authored in StateTree instead of a Behavior Tree. Swap the AIController's RunBehaviorTree for a StateTreeAICo...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent" class="on">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-04-the-same-agent-in-statetree">Tutorial 04: The Same
+Agent in StateTree</h1>
+<p><strong>TL;DR:</strong> Identical flight behaviour to <a
+href="your-first-flying-agent.html">Tutorial 03</a>, authored in
+StateTree instead of a Behavior Tree. Swap the AIController's
+<code>RunBehaviorTree</code> for a
+<strong><code>StateTreeAIComponent</code></strong>, and bind the
+<strong>Fly To</strong> task's <code>TargetLocation</code> instead of a
+blackboard key.</p>
+<p><strong>Time:</strong> ~15 minutes. <strong>Do <a
+href="your-first-flying-agent.html">Tutorial 03</a> first</strong>. This
+chapter only covers the differences.</p>
+<hr />
+<h2 id="should-you-use-statetree-or-behavior-tree">Should you use
+StateTree or Behavior Tree?</h2>
+<p>Both are fully supported and produce the same flight. Pick on
+authoring preference, not capability.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Behavior Tree</th>
+<th>StateTree</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Goal comes from</strong></td>
+<td>A <strong>blackboard key</strong></td>
+<td><strong>Bound instance data</strong> on the task</td>
+</tr>
+<tr>
+<td><strong>Best at</strong></td>
+<td>Reactive priority ordering</td>
+<td>Explicit states and transitions</td>
+</tr>
+<tr>
+<td><strong>Maturity</strong></td>
+<td>Stable</td>
+<td>Epic's StateTree plugin is <strong>experimental</strong> on 5.2,
+stable from 5.3</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>The 5.2 caveat.</strong> The plugin is flagged beta on 5.2
+<em>only</em> because Epic's StateTree plugin is experimental there. If
+you're shipping on 5.2 and want the most conservative option, use the
+Behavior Tree path. On 5.3+ this distinction disappears.</p>
+</blockquote>
+<hr />
+<h2 id="step-1-the-pawn">Step 1: The pawn</h2>
+<p>Exactly as <a
+href="your-first-flying-agent.html#step-2-make-the-pawn">Tutorial 03
+Step 2</a>: a Pawn with <strong>Floating Pawn Movement</strong>, a
+visible mesh, and <strong>Auto Possess AI = Placed in World or
+Spawned</strong>.</p>
+<p>Nothing StateTree-specific here.</p>
+<hr />
+<h2 id="step-2-create-the-statetree-asset">Step 2: Create the StateTree
+asset</h2>
+<ol type="1">
+<li><strong>Content Browser → Add → Artificial Intelligence →
+StateTree</strong>.</li>
+<li>When it asks for a <strong>schema</strong>, choose <strong>StateTree
+AI Component Schema</strong>. This matters: the AI schema is what
+exposes the AI context (controller and pawn) the Fly To task needs.</li>
+<li>Name it <strong><code>ST_MyFlyer</code></strong>.</li>
+</ol>
+<hr />
+<h2 id="step-3-add-the-fly-to-task">Step 3: Add the Fly To task</h2>
+<ol type="1">
+<li>Open <code>ST_MyFlyer</code>. You'll have a <strong>Root</strong>
+state.</li>
+<li>Add a child state and name it
+<strong><code>FlyToGoal</code></strong>.</li>
+<li>With that state selected, in the <strong>Tasks</strong> section
+click <strong>+</strong> and choose <strong>Fly To</strong> (listed
+under the <strong>LCM Nav3D</strong> category).</li>
+<li>Set the task's properties:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Target Location</strong></td>
+<td>your goal</td>
+<td>See binding below</td>
+</tr>
+<tr>
+<td><strong>Acceptance Radius</strong></td>
+<td><code>100</code></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Flight Speed</strong></td>
+<td><code>600</code></td>
+<td>Match your Floating Pawn Movement <code>Max Speed</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="binding-the-goal">Binding the goal</h3>
+<p>This is <em>the</em> structural difference from Behavior Trees.
+There's no blackboard; you bind the task's <code>Target Location</code>
+to a value.</p>
+<p>The simplest approach is a <strong>StateTree parameter</strong>:</p>
+<ol type="1">
+<li>Select the <strong>Root</strong> state → in
+<strong>Parameters</strong>, add a parameter: <strong>Name
+<code>GoalLocation</code>, Type <code>Vector</code></strong>.</li>
+<li>Select the <strong>Fly To</strong> task → click the bind icon next
+to <strong>Target Location</strong> → choose
+<strong><code>GoalLocation</code></strong>.</li>
+</ol>
+<p>Now anything that sets that parameter drives the agent.</p>
+<blockquote>
+<p><strong>Chasing instead.</strong> The task also has a
+<strong><code>Target Actor</code></strong> field. Set or bind that and
+the agent chases the actor, using the same prediction logic as the BT
+version. Note the ST chase path requires <code>Target Actor</code> to be
+non-null. If you want a fixed point, use
+<code>Target Location</code>.</p>
+</blockquote>
+<h3 id="why-fly-to-has-its-own-target-actor-field">Why
+<code>Fly To</code> has its own <code>Target Actor</code> field</h3>
+<p>This trips up everyone arriving from Behavior Trees, so it is worth
+stating plainly: <strong>that field is not an alternative to
+<code>Find Actor By Tag</code> - it is what
+<code>Find Actor By Tag</code> plugs into.</strong></p>
+<p>A Behavior Tree has a blackboard, so a BT task can name a key and
+read whatever wrote it. StateTree has no blackboard. Data moves by
+<strong>property binding</strong> from one node's output to another
+node's input, which means the <em>consuming</em> node must declare a
+field to receive the value. Delete <code>Target Actor</code> and there
+is nothing left to bind to.</p>
+<p>This is the engine's own convention, not a plugin invention. Epic's
+<code>Move To</code> task carries exactly the same pair - a
+<code>Destination</code> vector plus an optional
+<code>Target Actor</code>, with the actor winning when both are set.</p>
+<p><code>Fly To</code> needs the live actor rather than a resolved
+position because it re-samples the target's location <em>and
+velocity</em> every tick to fly a lead intercept. A one-shot position
+would send the agent to where the target was when the state began.</p>
+<h3 id="resolve-the-actor-with-the-evaluator-not-the-task">Resolve the
+actor with the evaluator, not the task</h3>
+<p>Two nodes resolve a tag. Pick by whether you want a snapshot or a
+live reference:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Find Actor By Tag</strong> (task)</th>
+<th><strong>Find Actor By Tag</strong> (evaluator)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resolves</td>
+<td>Once, on state entry</td>
+<td>Continuously, on <code>Refresh Interval</code></td>
+</tr>
+<tr>
+<td><code>Found Actor Location</code></td>
+<td>Frozen at entry</td>
+<td>Refreshed <strong>every tick</strong></td>
+</tr>
+<tr>
+<td>Target destroyed / respawns</td>
+<td>Stays stale until re-entry</td>
+<td>Re-resolves immediately</td>
+</tr>
+<tr>
+<td>Costs a state</td>
+<td>Yes - unless <code>Stay Running After Resolve</code> lets it share
+one</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Visible to</td>
+<td>Nodes ordered after it</td>
+<td>The whole subtree of the state it sits on</td>
+</tr>
+<tr>
+<td>Can fail a state</td>
+<td>Yes (returns <code>Failed</code>)</td>
+<td>No - gate on its <code>b Found Actor</code> output</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prefer the evaluator for goal sources.</strong> Put it on the
+parent state, set <code>Tag</code> to <code>Player</code>, and bind
+<code>Fly To</code>'s <code>Target Actor</code> to its
+<code>Found Actor</code>. One resolver then feeds <code>Fly To</code>,
+<code>Look At</code>, conditions and transitions at once, and it stays
+correct when the target dies or streams in late.</p>
+<p>Only the <em>search</em> is throttled by
+<code>Refresh Interval</code> (0.5 s by default); the location output
+refreshes every tick off the cached pointer, so a moving target is never
+stale. Reach for the task form when a frozen-on-entry snapshot is the
+point - picking a patrol anchor and committing to it - or when you
+specifically want the state to <em>fail</em> if nothing carries the
+tag.</p>
+<blockquote>
+<p><strong>Roaming between tagged goals.</strong> The task form also has
+<strong><code>Pick Random Match</code></strong>: tag every goal actor in
+the level (say, <code>Goal</code>), put the task ahead of <strong>Fly
+To</strong> in one state, and tick
+<strong><code>Stay Running After Resolve</code></strong> - this switch
+is what lets the two tasks share a state. Off, the resolve <em>finishes
+on entry</em>, and a task that finishes finishes its <strong>whole
+state</strong>: Fly To is entered but never ticked, and the agent stands
+still. Bind Fly To's <code>Target Location</code> to
+<code>Found Actor Location</code>, then add an <strong>On State
+Completed</strong> transition back into the same state - as a <strong>Go
+to State</strong> transition targeting the state itself, <em>not</em>
+<strong>Tree Succeeded</strong>, which would end the whole run after the
+first leg. Each re-entry draws a fresh random goal -
+<code>Avoid Repeat Pick</code> (on by default) guarantees it is never
+the goal the agent is already sitting on - and every agent runs its own
+tree instance, so a crowd sharing one StateTree asset spreads across the
+goal set by itself. This is the tagged-actor twin of the <strong>Pick
+Random Goal</strong> task, which does the same loop with random
+<em>points</em> instead of placed actors and carries the same
+<code>Stay Running After Resolve</code> switch for the same reason.</p>
+</blockquote>
+<p><img src="images/statetree-example.png"
+alt="A StateTree with GoToA, FlyToA, GoToB and FlyToB states, evaluators in the left panel, and the LCM Fly To task&#39;s Details on the right" /></p>
+<p><strong>Figure 04.1 - A two-goal patrol, the StateTree way.</strong>
+This is the shipped <code>STS_FlightBehavior</code>. Each
+<code>FlyTo*</code> state runs one <strong>LCM Fly To</strong> task and
+transitions <strong>On State Completed</strong> to the next, so the
+patrol loop is expressed as states and transitions rather than as a
+Behavior Tree Loop decorator. The <code>Find Actor By Tag</code> states
+in between are what fill in each goal at runtime.</p>
+<p>Note the <strong>Evaluators</strong> in the left panel -
+<code>E State GoalA</code> and <code>E State GoalB</code>. That is the
+StateTree replacement for a blackboard: an evaluator produces a value,
+and the task binds to it.</p>
+<p><img src="images/statetree-flyto-settings.png"
+alt="The LCM Fly To StateTree task Details panel, every row carrying a Bind control on the right" /></p>
+<p><strong>Figure 04.2 - The same task, in StateTree form.</strong> The
+properties are the ones you already met in <a
+href="your-first-flying-agent.html">Tutorial 03</a> - the difference is
+the <strong>Bind</strong> column down the right-hand edge. In StateTree
+<em>every</em> field can be driven by an evaluator, a parameter or
+another state's output, not just the goal.</p>
+<p>In this shot <code>Target Actor</code> is bound to
+<code>E State GoalA.Goal</code> while everything else holds a literal,
+which is the normal arrangement: bind what changes, type what does
+not.</p>
+<blockquote>
+<p><strong><code>Frontier Stall Recovery</code> reads
+<code>Inherit (project default)</code> here, and the task cannot tell
+you what that resolves to.</strong> A StateTree asset is not owned by a
+level, so it does not know which manager it will run under. The
+manager's <strong>7. Runtime State ▸ Frontier Stall Recovery
+(auto)</strong> row is the one place that answer exists.</p>
+</blockquote>
+<hr />
+<h2 id="step-4-the-ai-controller">Step 4: The AI Controller</h2>
+<ol type="1">
+<li><p>Create an <strong>AIController</strong> Blueprint,
+<strong><code>BP_MyFlyerAI_ST</code></strong>.</p></li>
+<li><p>Add a <strong>StateTree AI Component</strong>.</p></li>
+<li><p>Select it and set <strong>State Tree</strong> to
+<code>ST_MyFlyer</code>.</p></li>
+<li><p>Set the goal parameter on BeginPlay. On the component, use
+<strong>Set Parameter</strong> (or set the value before the tree starts)
+with:</p>
+<ul>
+<li><strong>Name:</strong> <code>GoalLocation</code></li>
+<li><strong>Value:</strong> e.g.
+<code>GetActorOfClass(TargetPoint) → GetActorLocation</code></li>
+</ul></li>
+<li><p>On <strong><code>BP_MyFlyer</code></strong> → Class Defaults →
+<strong>AI Controller Class</strong> =
+<code>BP_MyFlyerAI_ST</code>.</p></li>
+</ol>
+<blockquote>
+<p>Unlike the BT path there is no <code>Run Behavior Tree</code> call:
+the <code>StateTreeAIComponent</code> starts the tree itself.</p>
+</blockquote>
+<hr />
+<h2 id="step-5-fly">Step 5: Fly</h2>
+<p>Place a <strong>TargetPoint</strong> and your pawn, press
+<strong>Play</strong>. Same result as Tutorial 03: the pawn routes
+through 3D space to the goal.</p>
+<hr />
+<h2 id="the-rest-of-the-statetree-surface">The rest of the StateTree
+surface</h2>
+<p>The plugin ships a full StateTree task set, all under the <strong>LCM
+Nav3D</strong> category:</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fly To</strong></td>
+<td>The flagship: 3D navigation to a point or actor</td>
+</tr>
+<tr>
+<td><strong>Patrol</strong></td>
+<td>Cycle through a set of points</td>
+</tr>
+<tr>
+<td><strong>Orbit Target</strong></td>
+<td>Circle a target at a radius</td>
+</tr>
+<tr>
+<td><strong>Land</strong></td>
+<td>Descend and touch down</td>
+</tr>
+<tr>
+<td><strong>Look At</strong> / <strong>Turn In Place</strong></td>
+<td>Orientation without translation</td>
+</tr>
+<tr>
+<td><strong>Find Cover</strong></td>
+<td>Move to tactical cover</td>
+</tr>
+<tr>
+<td><strong>Evade CBS</strong></td>
+<td>Avoidance-driven evasion</td>
+</tr>
+<tr>
+<td><strong>Follow Flow Field</strong></td>
+<td>Follow a shared crowd steering field</td>
+</tr>
+<tr>
+<td><strong>Chunk Prewarm</strong> / <strong>Streaming
+Aware</strong></td>
+<td>Infinite-world streaming helpers</td>
+</tr>
+<tr>
+<td><strong>Find Actor By Tag</strong> / <strong>Pick Random
+Goal</strong> / <strong>Wait</strong></td>
+<td>Utility</td>
+</tr>
+<tr>
+<td><strong>Use Smart Object</strong></td>
+<td>Smart Object interaction</td>
+</tr>
+</tbody>
+</table>
+<p>Plus conditions (<code>Path Exists</code>,
+<code>Is At Location</code>, <code>Chunk Loaded</code>,
+<code>Has Line Of Sight</code>, <code>Is In Cover</code>,
+<code>Health Below</code>, <code>Path Length Below</code>,
+<code>Threat Visible Via Perception</code>) and evaluators
+(<code>Path Status</code>, <code>Path Progress</code>,
+<code>Navigation Load</code>, <code>Threat Field</code>,
+<code>Squad</code>, <code>Memory</code>, <code>Perception Relay</code>,
+<code>Find Actor By Tag</code>).</p>
+<blockquote>
+<p><strong>Reading a node's outputs.</strong> Fields a node
+<em>produces</em> are grouped under an <strong>Output</strong> section
+and drawn as read-only <code>OUT</code> pins - those are the ones you
+bind <em>from</em>. Everything else is a parameter you either type a
+value into or bind <em>to</em>.</p>
+</blockquote>
+<p>Every one is listed with its full property set in the <a
+href="api-reference.html">API Reference</a>.</p>
+<hr />
+<h2 id="behaviour-differences-worth-knowing">Behaviour differences worth
+knowing</h2>
+<p>The BT and ST Fly To tasks are built for parity, but a few things
+genuinely differ:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Behavior Tree</th>
+<th>StateTree</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Goal source</strong></td>
+<td>Blackboard key (Vector <strong>or</strong> Actor)</td>
+<td><code>Target Location</code> <strong>or</strong>
+<code>Target Actor</code> instance data</td>
+</tr>
+<tr>
+<td><strong>Chase</strong></td>
+<td>Works with a Vector or Actor key</td>
+<td>Requires a non-null <code>Target Actor</code></td>
+</tr>
+<tr>
+<td><strong>Arrival reported</strong></td>
+<td>Against the pre-move location that frame</td>
+<td>Against the post-move location</td>
+</tr>
+</tbody>
+</table>
+<p>The arrival difference is a sub-frame detail: it only matters if
+you're comparing the two side-by-side with a very small
+<code>Acceptance Radius</code>.</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fly To isn't in the task list</td>
+<td>Asset wasn't created with the <strong>StateTree AI Component
+Schema</strong></td>
+</tr>
+<tr>
+<td>Task fails immediately</td>
+<td>No <code>LcmNavigationManagerSVO</code> in the level, or the goal is
+outside/inside geometry</td>
+</tr>
+<tr>
+<td>Agent never starts</td>
+<td><code>StateTreeAIComponent</code> has no <strong>State Tree</strong>
+assigned, or <code>Auto Possess AI</code> is off</td>
+</tr>
+<tr>
+<td>Goal is always (0,0,0)</td>
+<td>The parameter isn't bound, or is set after the tree already ran</td>
+</tr>
+</tbody>
+</table>
+<p>More: <a href="troubleshooting.html">Troubleshooting</a>.</p>
+<hr />
+<p><strong>Next:</strong> <a href="dynamic-obstacles.html">Tutorial 05:
+Dynamic Obstacles</a>. Make the world move and watch agents reroute.</p>
+
+  <div class="pager"><a href="your-first-flying-agent.html">&larr; Your first flying agent</a><a href="dynamic-obstacles.html">Dynamic obstacles &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 05: Dynamic Obstacles | LCM Nav3D</title>
+<meta name="description" content="Add an LCM Nav3D Dynamic Obstacle component to any actor that moves. It restamps the octree as the actor moves and agents reroute around it: closing doo...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/dynamic-obstacles.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 05: Dynamic Obstacles | LCM Nav3D">
+<meta property="og:description" content="Add an LCM Nav3D Dynamic Obstacle component to any actor that moves. It restamps the octree as the actor moves and agents reroute around it: closing doo...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles" class="on">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-05-dynamic-obstacles">Tutorial 05: Dynamic
+Obstacles</h1>
+<p><strong>TL;DR:</strong> Add an
+<strong><code>LCM Nav3D Dynamic Obstacle</code></strong> component to
+any actor that moves. It restamps the octree as the actor moves and
+agents reroute around it: closing doors, rising platforms, patrolling
+hazards, destructible cover.</p>
+<p><strong>Time:</strong> ~15 minutes. Assumes <a
+href="your-first-flying-agent.html">Tutorial 03</a>.</p>
+<hr />
+<h2 id="static-vs-dynamic">Static vs dynamic</h2>
+<p>When the navigation volume is built, all static geometry is baked in.
+That bake is what makes queries fast, but it's a snapshot.</p>
+<ul>
+<li><strong>Never moves?</strong> Do nothing. It's already in the
+octree.</li>
+<li><strong>Moves?</strong> It needs a <strong>Dynamic Obstacle</strong>
+component, or the octree will keep believing the space is empty and
+agents will fly straight through it.</li>
+</ul>
+<blockquote>
+<p><strong>The common mistake:</strong> moving a static-mesh actor at
+runtime <em>without</em> the component. Nothing errors: agents ignore
+it, because as far as the navigation data is concerned it never
+moved.</p>
+</blockquote>
+<hr />
+<h2 id="step-1-make-a-moving-obstacle">Step 1: Make a moving
+obstacle</h2>
+<ol type="1">
+<li>Create a Blueprint Actor,
+<strong><code>BP_MovingWall</code></strong>.</li>
+<li>Add a <strong>Static Mesh</strong> component: a Cube, scaled to
+something that genuinely blocks a route (say 400 × 100 × 400).</li>
+<li>Make sure the mesh <strong>has collision enabled</strong>. The
+voxelizer finds obstacles via collision, so a mesh set to <em>No
+Collision</em> is invisible to navigation.</li>
+</ol>
+<hr />
+<h2 id="step-2-add-the-dynamic-obstacle-component">Step 2: Add the
+Dynamic Obstacle component</h2>
+<ol type="1">
+<li>In <code>BP_MovingWall</code>, <strong>Add Component → search "LCM
+Nav3D Dynamic Obstacle"</strong>.</li>
+<li>That's the whole setup. It auto-registers with the navigation
+manager at <code>BeginPlay</code> and tracks its owner from then
+on.</li>
+</ol>
+<h3 id="the-settings">The settings</h3>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Update Distance Threshold</strong></td>
+<td><code>50</code> cm</td>
+<td>How far the actor must move before the octree is restamped. Larger =
+cheaper, but navigation lags reality.</td>
+</tr>
+<tr>
+<td><strong>Tracked Components</strong></td>
+<td><em>(empty)</em></td>
+<td>Empty means <strong>the whole actor</strong>. Pick specific
+components to track only part of it.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>Tracked Components</code> is worth knowing
+about.</strong> On an actor where only one part obstructs (a gate inside
+a decorative frame, a swinging arm on a fixed base), pick just that
+component. Only its movement restamps the octree, and only its bounds
+block agents.</p>
+<p>You can also manage this at runtime from Blueprint with
+<strong><code>Add Tracked Component</code></strong> and
+<strong><code>Remove Tracked Component</code></strong>.</p>
+<hr />
+<h2 id="step-3-move-it">Step 3: Move it</h2>
+<p>Give it motion. The simplest version, in the Event Graph:</p>
+<pre><code>Event Tick ─→ SetActorLocation( StartLocation + (0, sin(GameTime) * 700, 0) )</code></pre>
+<p>Or use a Timeline, a matinee/sequencer track, physics; it doesn't
+matter. The component watches the transform, however it changes.</p>
+<hr />
+<h2 id="step-4-see-it-work">Step 4: See it work</h2>
+<ol type="1">
+<li>Place <code>BP_MovingWall</code> so it periodically <strong>seals
+the only route</strong> between your flyer and its goal.</li>
+<li>Press <strong>Play</strong>.</li>
+</ol>
+<p>The agent should path around the wall, and when the wall closes the
+route, re-plan and take a different way.</p>
+<p><strong>To watch it happen:</strong> tick
+<strong><code>Draw Debug Volumes</code></strong> on the navigation
+manager. You'll see the voxels under the wall flip to blocked as it
+moves. That's the restamp.</p>
+<hr />
+<h2 id="how-agents-notice">How agents notice</h2>
+<p>Agents re-plan automatically. The relevant setting is on the
+<strong>navigation manager</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>4. Performance →
+<code>Finite Obstacle Update Interval</code></strong></td>
+<td><code>0.1</code> s</td>
+<td>How often obstacle changes are folded into the finite-world
+octree</td>
+</tr>
+</tbody>
+</table>
+<p>Lower = more reactive, more CPU. <code>0.1</code> is a good balance.
+For fast-moving hazards where agents must react instantly, try
+<code>0.05</code>.</p>
+<hr />
+<h2 id="ready-made-examples">Ready-made examples</h2>
+<p>These demo maps show this working. Open any of them and read the
+setup:</p>
+<table>
+<thead>
+<tr>
+<th>Map</th>
+<th>Shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Demo/BehaviourTree/PreBaked_FiniteMaps/DynObs_BT</code></td>
+<td>Obstacles sealing routes in a finite world</td>
+</tr>
+<tr>
+<td><code>Demo/BehaviourTree/InfniteMaps/DynObs_BT</code></td>
+<td>The same rig in a streaming infinite world</td>
+</tr>
+<tr>
+<td><code>Demo/BehaviourTree/InfniteMaps/DynObsTunnel_BT</code></td>
+<td>Movers sweeping a sealed tunnel: the wall-integrity test</td>
+</tr>
+<tr>
+<td><code>Demo/StateTree/InfniteMaps/DynObs_ST</code> ·
+<code>DynObsTunnel_ST</code></td>
+<td>The StateTree equivalents</td>
+</tr>
+<tr>
+<td><code>Demo/MassEntity/PreBaked_FiniteMaps/DynObs_Mass</code></td>
+<td>Dynamic obstacles against a Mass crowd</td>
+</tr>
+<tr>
+<td><code>Demo/MassEntity/InfniteMaps/DynObs_Tunnel_MassEntity</code></td>
+<td>A crowd flowing through a tunnel as movers sweep it</td>
+</tr>
+</tbody>
+</table>
+<p>The obstacles in these maps are driven along splines by the bundled
+<strong><code>BP_SplineMove</code></strong> Blueprint
+(<code>Content/Blueprints/</code>), so you can see a complete working
+rig rather than assembling one. For a simpler ping-pong mover the plugin
+also ships the <strong><code>LCM Nav3D Obstacle Mover</code></strong>
+component, below.</p>
+<hr />
+<h2 id="the-bundled-obstacle-mover">The bundled Obstacle Mover</h2>
+<p>The plugin ships a small helper so the demo maps move without
+Blueprint wiring, and it's useful in your own prototypes.</p>
+<p><strong><code>LCM Nav3D Obstacle Mover</code></strong> ping-pongs its
+owner between its start pose and an offset.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Seal Offset</strong></td>
+<td><code>(400, 0, 0)</code></td>
+<td>Vector from the open pose to the sealed pose</td>
+</tr>
+<tr>
+<td><strong>Period</strong></td>
+<td><code>4.0</code> s</td>
+<td>Time for a full open → sealed → open cycle</td>
+</tr>
+<tr>
+<td><strong>Phase</strong></td>
+<td><code>0.0</code> s</td>
+<td>Offset so several obstacles don't move in lockstep</td>
+</tr>
+</tbody>
+</table>
+<p>Pair it with a Dynamic Obstacle component on the same actor and you
+have a moving obstacle with zero scripting. It moves the actor
+kinematically, which is exactly what the obstacle tracker expects.</p>
+<blockquote>
+<p>There's a companion
+<strong><code>LCM Nav3D Agent Driver</code></strong> used by the demo
+maps to loop a pawn between two tagged points (<code>LcmGoalA</code> /
+<code>LcmGoalB</code>) using the real async navigation stack, handy for
+testing a level without authoring a full BT.</p>
+</blockquote>
+<hr />
+<h2 id="performance-notes">Performance notes</h2>
+<p>Dynamic obstacles are not free: each restamp re-voxelizes a
+region.</p>
+<p><strong>Keep it cheap:</strong></p>
+<ul>
+<li>Prefer <strong>fewer, larger</strong> dynamic obstacles over many
+small ones.</li>
+<li>Raise <strong><code>Update Distance Threshold</code></strong> for
+things that move constantly but don't need precision.</li>
+<li>Use <strong><code>Tracked Components</code></strong> so only the
+genuinely blocking part is considered.</li>
+<li>If something moves but can never block a route (debris, VFX props,
+decoration), <strong>don't give it the component at all</strong>.</li>
+</ul>
+<p><strong>Don't</strong> put a Dynamic Obstacle component on your
+navigating agents. Agents avoid each other through the avoidance system
+(<a
+href="your-first-flying-agent.html#step-7-several-agents-at-once">Tutorial
+03 Step 7</a>); making them obstacles too means each one is constantly
+re-voxelizing the world around itself.</p>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Agents fly straight through the obstacle</td>
+<td>No Dynamic Obstacle component, or the mesh has collision
+disabled</td>
+</tr>
+<tr>
+<td>Reaction is sluggish</td>
+<td><code>Update Distance Threshold</code> too high, or
+<code>Finite Obstacle Update Interval</code> too long</td>
+</tr>
+<tr>
+<td>Frame rate drops when things move</td>
+<td>Too many dynamic obstacles, or they're too finely voxelized: raise
+<code>Min Voxel Size</code> or reduce obstacle count</td>
+</tr>
+<tr>
+<td>Agent gets trapped when a route seals</td>
+<td>Expected if there's genuinely no other route. Give the level a
+second path, or handle the failure in your BT/StateTree</td>
+</tr>
+</tbody>
+</table>
+<p>More: <a href="troubleshooting.html">Troubleshooting</a>.</p>
+<hr />
+<h2 id="where-to-go-next">Where to go next</h2>
+<p>You now have the whole core loop: a navigation volume, agents that
+fly through it, and a world that can change underneath them. From here,
+pick what your project needs:</p>
+<table>
+<thead>
+<tr>
+<th>If you need...</th>
+<th>Go to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thousands of agents</td>
+<td><a href="mass-entity-crowds.html">Tutorial 06: Mass Entity</a></td>
+</tr>
+<tr>
+<td>AI that picks tactical positions</td>
+<td><a href="tactical-eqs.html">Tutorial 07: Tactical EQS</a></td>
+</tr>
+<tr>
+<td>Sight and awareness</td>
+<td><a href="ai-perception.html">Tutorial 08: Perception</a></td>
+</tr>
+<tr>
+<td>Ground and flying AI together</td>
+<td><a href="hybrid-recast.html">Tutorial 09: Hybrid with
+Recast</a></td>
+</tr>
+<tr>
+<td>Custom traversal or cost zones</td>
+<td><a href="nav-links-and-areas.html">Tutorial 10: Nav Links &amp; Area
+Modifiers</a></td>
+</tr>
+<tr>
+<td>To inspect it live in-game</td>
+<td><a href="gameplay-debugger.html">Tutorial 11: Gameplay
+Debugger</a></td>
+</tr>
+<tr>
+<td>To tune every setting</td>
+<td><a href="settings.html">Settings Reference</a></td>
+</tr>
+</tbody>
+</table>
+
+  <div class="pager"><a href="statetree-agent.html">&larr; The same agent in StateTree</a><a href="mass-entity-crowds.html">Mass Entity crowds &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

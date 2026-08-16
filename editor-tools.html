@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LCM Nav3D - Editor Tools | LCM Nav3D</title>
+<meta name="description" content="Everything here lives behind the Nav3D button in the Level Editor toolbar. The panels are also under Window ▸ Level Editor.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/editor-tools.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LCM Nav3D - Editor Tools | LCM Nav3D">
+<meta property="og:description" content="Everything here lives behind the Nav3D button in the Level Editor toolbar. The panels are also under Window ▸ Level Editor.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools" class="on">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="lcm-nav3d---editor-tools">LCM Nav3D - Editor Tools</h1>
+<p>Everything here lives behind the <strong>Nav3D</strong> button in the
+Level Editor toolbar. The panels are also under <strong>Window ▸ Level
+Editor</strong>.</p>
+<img src="images/toolbar-menu.png" alt="The Nav3D toolbar menu, grouped into Set Up, Build, View and Help" width="300">
+
+<p><strong>Figure 1 - The Nav3D toolbar menu.</strong> Four groups, in
+the order you need them. Greyed entries are not broken: <strong>Build
+Octree</strong> is finite-only and <strong>Bake Skeleton</strong>
+appears only when something will actually read a bake, so the menu never
+offers you an action that would be an expensive no-op.</p>
+<hr />
+<h2 id="quick-start">Quick start</h2>
+<ol type="1">
+<li><strong>Nav3D ▸ Set Up Level...</strong> - creates and configures
+the manager, picks finite or streamed navigation to match your map,
+attaches navigation invokers, and builds.</li>
+<li><strong>Nav3D ▸ Health Check</strong> - dock it and leave it open
+while you work.</li>
+<li>Add the <strong>LCM Nav3D FlyTo</strong> task to a Behavior Tree or
+StateTree, or drop the Mass crowd traits on a spawner.</li>
+</ol>
+<p>Nav3D actors are also in the <strong>Place Actors</strong> panel
+under <strong>LCM Nav3D</strong>.</p>
+<h3 id="keyboard-shortcuts">Keyboard shortcuts</h3>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+Alt+N</code></td>
+<td>Health Check</td>
+</tr>
+<tr>
+<td><code>Ctrl+Alt+B</code></td>
+<td>Build Octree</td>
+</tr>
+<tr>
+<td><code>Ctrl+Alt+V</code></td>
+<td>Show Voxels</td>
+</tr>
+</tbody>
+</table>
+<p>Rebind or clear them under <strong>Editor Preferences ▸ Keyboard
+Shortcuts</strong>.</p>
+<hr />
+<h2 id="the-welcome-screen">The Welcome screen</h2>
+<p>Opens once per plugin version, and any time from <strong>Nav3D ▸
+Welcome / Getting Started</strong>.</p>
+<p><img src="images/welcome-screen.png"
+alt="The LCM Nav3D welcome screen: brand header, three getting-started steps, required plugin checklist, and help links" /></p>
+<p><strong>Figure 2 - Welcome screen.</strong> The part worth reading is
+<strong>REQUIRED PLUGINS</strong>: it checks the dependencies declared
+in <code>LCMNav3D.uplugin</code> against what your project actually has
+enabled, and offers an <strong>Enable</strong> button on any that are
+off. If one is missing, the plugin's modules will fail to load - this
+panel is where you find that out, rather than from a startup error.</p>
+<blockquote>
+<p>Links under <strong>HELP &amp; COMMUNITY</strong> are read from the
+<code>.uplugin</code> descriptor, so the UI and the store listing cannot
+drift apart. A greyed link means that field is empty in the descriptor,
+not that the link is broken.</p>
+</blockquote>
+<hr />
+<h2 id="the-manager-panel">The Manager panel</h2>
+<p>Select the <strong>LCM Nav3D Manager</strong> in your level. Above
+the numbered settings sections you get a header card with live state
+pills (world model, residency, voxelizer), the context-appropriate build
+actions, and two readouts worth knowing about.</p>
+<p><img src="images/manager-details-top.png"
+alt="The manager Details panel: header card with state pills, Configuration Health, What You Get, and sections 1 Setup and 2 Voxels" /></p>
+<p><strong>Figure 3 - Manager Details, top half.</strong> Read it
+downwards:</p>
+<ul>
+<li><strong>The pills</strong> - world model, chunks resident,
+voxelizer. Three facts at a glance.</li>
+<li><strong>Configuration Health</strong> - expands only while something
+is wrong. In this shot it is reporting that the authored invoker radius
+of 1,000 cm was <em>raised to 8,000</em> by the Streaming Profile,
+because a radius below one Chunk Size leaves an agent with no
+neighbouring chunk and therefore no route at all.</li>
+<li><strong>What You Get</strong> - the derived numbers you would
+otherwise have to know a rule to predict. <strong>Finest leaf edge 250
+cm</strong> with <code>Min Voxel Size</code> at 100 is not a bug: the
+octree halves a chunk until the child drops below your voxel size, so
+the leaf is <code>ChunkSize / 2^k</code> and lands between 2× and 4× the
+value you typed.</li>
+</ul>
+<h3 id="the-build-actions">The build actions</h3>
+<p>Only the buttons that mean something in your world model are shown -
+a finite world has no chunks to skeletonize, and a streamed world has no
+single SVO to save.</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>World</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Build SVO (Editor Preview)</strong></td>
+<td>Finite</td>
+<td>Voxelizes now, into memory. EQS queries and the debug draw resolve
+without entering Play. <strong>Thrown away when you close the
+editor</strong> - it is a preview, not a build product</td>
+</tr>
+<tr>
+<td><strong>Bake to Asset</strong></td>
+<td>Finite</td>
+<td>Writes the SVO to a <code>ULcmSVODataAsset</code> and attaches a
+streaming proxy that loads it. The shipped game stops voxelizing the
+world at every launch</td>
+</tr>
+<tr>
+<td><strong>Bake Skeleton</strong></td>
+<td>Infinite, and only when <code>Use Baked Skeleton</code> is on</td>
+<td>Whole-map coarse connectivity, so long-range routing is complete
+from frame 0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Bake to Asset</strong> uses the manager's own
+<code>World Extent</code>, <code>Min Voxel Size</code>,
+<code>Clearance Padding</code> and collision filters, so the bake cannot
+describe a different world than the runtime expects. It records what it
+was baked <em>against</em>, which is what lets the health section tell
+you later that the bake has gone out of date. On success it also turns
+<strong>Auto Build On Play</strong> off: leaving both on is not
+belt-and-braces, because the proxy and the manager each write the
+navigation data during <code>BeginPlay</code> with no ordering guarantee
+between actors - which one wins is undefined, and when the rebuild wins
+you pay the full load-time stall the bake exists to remove.</p>
+<p>Re-bake after moving level geometry or changing the voxel
+settings.</p>
+<blockquote>
+<p><strong>Save the level after baking.</strong> The asset is written to
+disk immediately, but the streaming proxy that <em>loads</em> it is a
+level actor. Close without saving and you are left with a bake nothing
+reads - and <code>Auto Build On Play</code> cleared on an actor that was
+discarded, so the level has no navigation at all.</p>
+</blockquote>
+<blockquote>
+<p><strong>The <code>LCM Nav3D Bake Volume</code> actor is the other way
+to bake</strong>, and it is for a different job - see <a
+href="#bake-volumes">Bake Volumes</a> below. For a single finite world,
+the manager button is simpler and cannot disagree with the runtime
+settings. Both write the same asset format through the same code
+path.</p>
+</blockquote>
+<h3 id="configuration-health">Configuration Health</h3>
+<p>Setting <em>combinations</em> that no per-property clamp can express,
+checked live and shown where the settings are. Rows come in three tiers:
+<strong>⚠</strong> a real hazard, <strong>i</strong> a property worth
+knowing, <strong>✓</strong> an all-clear.</p>
+<table>
+<thead>
+<tr>
+<th>⚠ Warning</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Voxel budget</td>
+<td>Exceeding it does <strong>not</strong> fail - generation silently
+coarsens <code>Min Voxel Size</code> until it fits, so you get less
+precision than you configured</td>
+</tr>
+<tr>
+<td>Clearance Padding vs Min Voxel Size</td>
+<td>Padding inflates every solid surface, so padding ≥ 2× voxel size
+seals narrow openings. The right value is your agent
+<strong>radius</strong>, which only you know</td>
+</tr>
+<tr>
+<td>Invoker radius vs Chunk Size</td>
+<td>A radius under one <code>Chunk Size</code> leaves an agent with no
+neighbouring chunks, so no route can be planned and nothing further
+streams</td>
+</tr>
+<tr>
+<td>Residency demand</td>
+<td>An invoker bubble is a cube: chunks scale as
+<code>(2R / ChunkSize)³</code>, so halving <code>Chunk Size</code> costs
+8× the chunks</td>
+</tr>
+<tr>
+<td>Baked asset out of date</td>
+<td>A bake is a frozen snapshot and nothing at runtime can tell it
+stopped matching the level. It still loads - you just get agents
+avoiding open space or routing through geometry, with nothing
+logged</td>
+</tr>
+<tr>
+<td>Auto Build On Play overrides the bake</td>
+<td>Both write the navigation data during <code>BeginPlay</code> with no
+ordering guarantee, so which one the level uses is undefined</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>i Information</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Finest leaf vs the floor</td>
+<td>The finest leaf is <code>ChunkSize / 2ᵏ</code>, landing anywhere in
+[2×, 4×] <code>Min Voxel Size</code> <strong>non-monotonically</strong>.
+Not a defect - see below</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Why the leaf ratio is information, not a warning.</strong> It
+depends only on <code>Chunk Size</code> (it is identical at every
+<code>Min Voxel Size</code>), so it really asks "is Chunk Size a
+power-of-two multiple of the voxel floor" - and the Auto-Tuner's own
+candidate grid fails that test on most of its entries. Whether a coarse
+leaf actually <em>hurts</em> - a sealed opening, an unroutable pair -
+cannot be decided from the settings, and is exactly what the tuner
+measures. So the panel states the fact and lets the measurement carry
+the verdict.</p>
+</blockquote>
+<blockquote>
+<p><strong>What the staleness check can and cannot see.</strong> It
+compares the voxel settings the bake ran with, and an order-independent
+hash of every collidable actor inside the baked bounds - identity,
+transform, scale and local bounds. So it catches geometry <strong>moved,
+added, removed or rescaled</strong>, which is nearly always what "the
+level changed" means. It does <strong>not</strong> walk source
+triangles, so a mesh edited in place - same actor, same transform, new
+geometry - hashes identically. Re-bake after editing a mesh. Assets
+baked before this signature existed report as unverifiable rather than
+stale.</p>
+</blockquote>
+<p>When a <strong>⚠</strong> row is present the section offers one
+action: <strong>Tune Settings...</strong>, which opens the <a
+href="#auto-tuner">Auto-Tuner</a>. There are deliberately no per-warning
+"apply this value" buttons - such a value would be <em>derived</em>, and
+this system's search space is non-monotonic, so only measurement can
+answer it.</p>
+<p>These are the same checks that have always been written to the Output
+Log - the log is now a consumer of the same rules, so the two can never
+disagree.</p>
+<h3 id="what-you-get">What You Get</h3>
+<p>The values your settings actually resolve to, rather than the ones
+you typed:</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Navigable volume</code></td>
+<td><strong>Finite only.</strong> The real world-space bounds - see the
+note below</td>
+</tr>
+<tr>
+<td><code>Finest leaf edge</code></td>
+<td>The real smallest voxel, with its ratio to the achievable floor
+(<code>2 × Min Voxel Size</code>)</td>
+</tr>
+<tr>
+<td><code>Voxels / chunk</code> (or <code>/ world</code>)</td>
+<td>Against the hard budget</td>
+</tr>
+<tr>
+<td><code>Chunk builds / frame</code></td>
+<td>Derived from the Streaming Profile</td>
+</tr>
+<tr>
+<td><code>Invoker radius floor</code></td>
+<td>What the profile raises an invoker's radius to, if anything</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>The finite volume is centred on the world origin, not on the
+manager actor.</strong> <code>World Extent</code> is a half-extent, so
+the volume spans <code>[-WorldExtent, +WorldExtent]</code> on each axis
+around <code>(0,0,0)</code>. The manager is a logical singleton with no
+root component, so <strong>moving it does not move the navigable
+volume</strong>. Build your playable space around the origin, or use an
+infinite world.</p>
+</blockquote>
+<h3 id="why-the-panel-is-short">Why the panel is short</h3>
+<p>The manager has no geometry, no collision and no transform, so the
+inherited Actor sections that cannot apply - Rendering, Collision,
+Physics, LOD, Cooking, Input, HLOD, Mobile, Ray Tracing, Texture
+Streaming, Virtual Texture - are hidden from this panel. They still
+exist on the class; they are just noise here.</p>
+<p><strong>Replication</strong>, <strong>Actor</strong> (tags) and
+<strong>World Partition</strong> are deliberately kept: the manager
+hosts multicast RPCs, tags are a legitimate way to find it from
+gameplay, and <code>Is Spatially Loaded</code> genuinely matters for a
+singleton that must not stream out.</p>
+<hr />
+<h2 id="bake-volumes">Bake Volumes</h2>
+<p>Drop an <strong>LCM Nav3D Bake Volume</strong> from the Place Actors
+panel and resize the brush to cover the area you want baked. Its panel
+uses the same language as the manager's - header pills, one action,
+Configuration Health, What You Get.</p>
+<h3 id="i-want-two-separate-areas-navigable-which-setup">I want two
+separate areas navigable. Which setup?</h3>
+<p><strong>Grid mode + Infinite World. Nothing else does it.</strong>
+This is the single most common wrong turn, so it is worth being blunt
+about why:</p>
+<p>A <strong>finite</strong> world has exactly <strong>one</strong>
+navigation volume - one slot, in memory. A single-volume Bake Volume
+writes it. The manager's <strong>Bake to Asset</strong> writes it. Both
+write it at the same chunk coordinate, so whichever ran
+<strong>last</strong> wins and the other area has no navigation at all.
+<strong>Overlapping the two does not join them</strong> - there is
+nothing in a finite world that could hold both. Baking area A, then
+baking area B, and finding only B navigable is the system working
+exactly as a finite world is defined, not a bug in the bake.</p>
+<table>
+<thead>
+<tr>
+<th>What you want</th>
+<th>Setup</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One area</td>
+<td>Either producer - a single-volume Bake Volume <strong>or</strong>
+the manager's Bake to Asset. <strong>Not both</strong></td>
+</tr>
+<tr>
+<td>One bigger area</td>
+<td>Enlarge the volume, or raise the manager's
+<code>World Extent</code></td>
+</tr>
+<tr>
+<td>Two or more separate areas</td>
+<td><code>Snap To Global Grid</code> <strong>on</strong> each volume +
+<code>Infinite World</code> <strong>on</strong> the manager</td>
+</tr>
+</tbody>
+</table>
+<p>The manager's Bake to Asset now <strong>refuses</strong> to run while
+a single-volume Bake Volume is in the level, rather than silently
+replacing its output, and both Details panels flag the pair.</p>
+<h3 id="one-volume-or-many">One volume or many?</h3>
+<p>This is the <code>Snap To Global Grid</code> switch, and the answer
+differs because the two settings feed <strong>different runtime
+containers</strong>:</p>
+<table>
+<thead>
+<tr>
+<th><code>Snap To Global Grid</code></th>
+<th>Produces</th>
+<th>Manager must be</th>
+<th>How many volumes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Off</strong></td>
+<td>One chunk, sized to this volume</td>
+<td><strong>Finite</strong> world</td>
+<td><strong>Exactly one</strong></td>
+</tr>
+<tr>
+<td><strong>On</strong></td>
+<td>One chunk per grid cell</td>
+<td><strong>Infinite</strong> world</td>
+<td>As many as you like</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Off</strong> feeds the manager's single navigation slot, so a
+second single-volume bake has nowhere to go: both write the same asset
+name at the same chunk coordinate, and only the last one baked survives.
+To cover more ground with one volume, enlarge it - or raise the
+manager's <code>World Extent</code>.</p>
+<p><strong>On</strong> feeds a coordinate-keyed container that holds any
+number of chunks. This is the multi-region workflow, and it needs
+<code>Infinite World</code> on the manager. With a <em>finite</em>
+manager every proxy is routed into the one slot instead, so each chunk
+silently overwrites the last. The header pill turns amber when the two
+disagree, and Configuration Health says which way to resolve it.</p>
+<blockquote>
+<p>"Infinite World" names how navigation is <em>stored and
+streamed</em>, not whether the data is generated at runtime. A fully
+baked, grid-aligned world is still an infinite-mode world - the chunks
+just arrive from disk instead of the voxelizer.</p>
+</blockquote>
+<h3 id="do-several-connected-volumes-route-across-their-seams">Do
+several connected volumes route across their seams?</h3>
+<p><strong>Yes.</strong> Chunks are keyed by grid coordinate, so which
+volume produced a chunk does not matter; adjacent chunks connect the
+same way whether they came from one volume or four. What matters is that
+every volume uses the <strong>same</strong> <code>Chunk Size</code>,
+<code>Min Voxel Size</code> and <code>Clearance Padding</code> (the
+panel checks all three), and that they are grid-aligned, which
+<code>Snap To Global Grid</code> guarantees.</p>
+<p>Seams are <strong>scanned at bake time</strong> and shipped with each
+chunk, so long-range routing across a chunk boundary is correct from the
+first frame.</p>
+<blockquote>
+<p><strong>Assets baked before 2026-08-03 are different, and the panel
+will tell you.</strong> They carry no seam data, so each boundary loaded
+as <em>one full-face portal</em> - a portal asserting the whole shared
+face was passable without checking the voxels, corrected only once an
+agent physically entered the chunk. A walled seam therefore looked
+<em>open</em> to long-range routing. The failure was a route that exists
+on the macro graph but not in the world, which is why it survived casual
+testing. <strong>Re-bake to fix it</strong>; Configuration Health
+reports how many chunks are still in that state.</p>
+</blockquote>
+<p>Very large grids are the one exception. Scanning seams needs the
+whole grid resident at once (a portal is a property of the boundary
+<em>between</em> two chunks), so past
+<code>r.LcmNav.Bake.MaxMacroChunks</code> (default 1024) the bake falls
+back to writing chunks one at a time with no seam data. That is logged,
+and the completion dialog says so. Raise the cap if you have the memory,
+or bake in smaller volumes.</p>
+<h3 id="what-the-volume-panel-checks">What the volume panel checks</h3>
+<p>Every rule here is about <strong>two actors disagreeing</strong>. The
+bake volume carries its own copy of the voxel settings and nothing
+reconciles them at runtime, so a mismatch does not fail - it bakes, it
+loads, and navigation is computed against a world that is not there.</p>
+<table>
+<thead>
+<tr>
+<th>⚠ Warning</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bake mode vs manager world model</td>
+<td>Decides whether the chunks land in the single slot or the keyed
+container - the table above</td>
+</tr>
+<tr>
+<td><code>Chunk Size</code> ≠ the manager's</td>
+<td>Baked chunks are placed at
+<code>coordinate × the runtime Chunk Size</code>, so a mismatch puts
+every chunk in the wrong place <em>and</em> makes the streamer
+regenerate the map at load</td>
+</tr>
+<tr>
+<td><code>Min Voxel Size</code> / <code>Clearance Padding</code> ≠ the
+manager's</td>
+<td>The bake describes a differently-shaped world, and the staleness
+check compares against the <em>manager's</em> values - so the bake reads
+as out of date the moment it is written</td>
+</tr>
+<tr>
+<td>Two single-volume bake volumes</td>
+<td>Same asset name, same coordinate: silent overwrite</td>
+</tr>
+<tr>
+<td>Voxel budget per chunk</td>
+<td>Exceeding it coarsens <code>Min Voxel Size</code> silently, which is
+what voxelizes narrow openings shut</td>
+</tr>
+<tr>
+<td>More than 512 chunks</td>
+<td>The bake is synchronous on the game thread with no cancel, and
+writes one asset each</td>
+</tr>
+</tbody>
+</table>
+<p>| Baked chunks without precomputed seams | Assets from before
+2026-08-03, or past the macro-bake cap - see the seam section above.
+Re-bake | | The manager also bakes this volume | Two producers, one
+finite slot - see the top of this section | | Oblong brush in
+single-volume mode | An octree root is a <strong>cube</strong>, so the
+bake inflates to the largest axis on all three and pays voxels for the
+remainder |</p>
+<h3 id="sizing-the-brush-and-why-the-numbers-dont-match-it">Sizing the
+brush, and why the numbers don't match it</h3>
+<p>Three things surprise people here, so the panel states all three
+under <strong>What You Get</strong>:</p>
+<ul>
+<li><strong><code>Brush Settings</code> size × <code>Transform</code>
+scale.</strong> Both scale the volume, and the readout shows the
+product. It is one box, controlled from two places.</li>
+<li><strong>Single-volume mode bakes a cube.</strong> An octree root
+cannot be oblong, so the bake uses the <strong>largest</strong>
+half-extent on every axis: a 100 × 100 × 10 m brush bakes a 100 m cube,
+and the voxel budget is charged for all of it. That is why the budget
+row can dwarf the box you drew. Keep the brush roughly cubic, or switch
+to grid mode.</li>
+<li><strong>Grid mode snaps outward.</strong> The brush is sliced on the
+<em>global</em> chunk lattice, so the baked region grows to whole chunk
+boundaries - straddling one by a centimetre costs an entire extra row of
+chunks. The <strong>Actually voxelized</strong> row shows the real
+region and count.</li>
+</ul>
+<p><code>Chunk Size</code> is hidden unless
+<code>Snap To Global Grid</code> is on, because it is not read otherwise
+- resolution comes from <code>Min Voxel Size</code> in both modes. When
+it <em>is</em> shown, it is snapped to a whole multiple of
+<code>Min Voxel Size</code> as you type (chunk edges must land on voxel
+boundaries), so the panel reports the value actually in use, and flags
+it if the manager disagrees.</p>
+<table>
+<thead>
+<tr>
+<th>i Information</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No obstacle channels set</td>
+<td>Empty falls back to <code>WorldStatic</code> <strong>only</strong>;
+anything solid on another channel bakes as open air</td>
+</tr>
+</tbody>
+</table>
+<p>There is deliberately <strong>no fix button</strong> here. Every
+warning is two settings disagreeing, and either side may be the one that
+is wrong - that is a choice only you can make.</p>
+<h3 id="after-baking-the-debug-view-shows-the-result">After baking, the
+debug view shows the result</h3>
+<p>Baking from a volume used to draw nothing while the manager's own
+build drew immediately, which looked like the bake had failed. It had
+not - the debug renderer reads the manager's <em>in-memory</em>
+navigation, and a bake writes assets and spawns proxies that inject
+nothing until <code>BeginPlay</code>. The bake now loads its own output
+back into the editor manager, so both paths look the same. Tick
+<code>Draw Debug Volumes</code> on the manager to see it.</p>
+<hr />
+<h2 id="setup-wizard">Setup Wizard</h2>
+<p>One page, because every control feeds the same live readout.</p>
+<p><img src="images/setup-wizard.png"
+alt="The Setup Wizard: five numbered sections from What&#39;s in this level through to Configuration check" /></p>
+<p><strong>Figure 4 - Setup Wizard.</strong> Note what section 1 has
+already worked out on its own: this is a World Partition map, so section
+2 tells you Infinite is the only correct choice and says <em>why</em> -
+a finite octree would be built over cells that are not loaded. Section 4
+is an explicit checklist, so nothing happens that is not written on
+screen, and section 5 re-runs the configuration check against the
+settings you are <em>proposing</em> rather than the ones currently
+saved.</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What's in this level</td>
+<td>World Partition, geometry size, manager count, pawns, the GameMode's
+default pawn</td>
+</tr>
+<tr>
+<td>Navigation mode</td>
+<td>Finite vs Infinite, plus the Streaming Profile</td>
+</tr>
+<tr>
+<td>Resolution</td>
+<td>Chunk Size / World Extent, Min Voxel Size, Clearance Padding</td>
+</tr>
+<tr>
+<td>What will be done</td>
+<td>An explicit checklist - nothing happens that isn't listed</td>
+</tr>
+<tr>
+<td>Configuration check</td>
+<td>Live problems, updating as you change settings</td>
+</tr>
+</tbody>
+</table>
+<p>Under <strong>What will be done</strong>,
+<code>Build the octree now</code> has a companion: <strong>...and save
+it to an asset</strong>. That is the same voxelization with its result
+<em>saved</em> rather than discarded - the wizard's route to the <a
+href="#the-build-actions">Bake to Asset</a> flow. It is off by default,
+unlike the other actions: those are reversible edits to settings, while
+this one writes content to <code>/Game/LcmNavigation/BakedData</code>
+and adds an actor to your level. Save the level afterwards.</p>
+<h3 id="the-resolution-readout">The resolution readout</h3>
+<blockquote>
+<p><code>Finest voxel you actually get: 250 cm (best possible here: 200 cm - 1.25x)</code></p>
+</blockquote>
+<p><strong>This is the most important line in the wizard.</strong> The
+finest leaf is <code>ChunkSize / 2^k</code>, so it lands between
+<strong>2x and 4x</strong> your Min Voxel Size and moves
+<strong>non-monotonically</strong> with Chunk Size. Measured at Min
+Voxel Size 100:</p>
+<table>
+<thead>
+<tr>
+<th>Chunk Size</th>
+<th>Finest leaf</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3000</td>
+<td>375 cm</td>
+</tr>
+<tr>
+<td>5000</td>
+<td>312 cm</td>
+</tr>
+<tr>
+<td>7000</td>
+<td>219 cm</td>
+</tr>
+<tr>
+<td>8000</td>
+<td>250 cm</td>
+</tr>
+</tbody>
+</table>
+<p>A smaller chunk can give you a <strong>coarser</strong> voxel.
+Openings narrower than the leaf voxelize shut, which is why "it works at
+one Chunk Size and not another" is a real effect and not a bug in your
+level.</p>
+<p>Everything the wizard does is one undo step. Nothing is saved for
+you.</p>
+<hr />
+<h2 id="health-check">Health Check</h2>
+<p>A dockable panel that reports anything which would stop agents
+moving, with a <strong>Fix</strong> button on each row.</p>
+<p><img src="images/health-check.png"
+alt="The Health Check panel showing READY, with Set Up Level, Fix All, Show In Viewport and Refresh" /></p>
+<p><strong>Figure 5 - Health Check, on a level that passes.</strong> The
+verdict is one word - <strong>READY</strong>, <strong>WORKS, WITH
+WARNINGS</strong> or <strong>NOT READY</strong> - coloured and sized so
+it reads from across the room. <code>Fix All</code> greys out when there
+is nothing to bulk-fix, which is the state you want to end up in and
+then stop thinking about. Dock this panel and leave it open; it
+re-inspects itself whenever the map, its actors or any Nav3D setting
+changes.</p>
+<ul>
+<li><strong>Fix All</strong> applies every automatic repair,
+<em>except</em> ones that edit a Blueprint asset - those keep their own
+button, so changing your content is always a deliberate click.</li>
+<li><strong>Show In Viewport</strong> draws the findings that have a
+<em>position</em>, for 30 seconds: the finite navigable volume in blue,
+your level's geometry bounds in red when they extend past it, and a
+marker over every pawn missing a Navigation Invoker. Read-only; it
+changes nothing.</li>
+<li>Refresh is automatic on map open, actor add/delete, and Nav3D
+setting changes.</li>
+</ul>
+<blockquote>
+<p>⭐ <strong>The volume box is worth looking at once.</strong>
+<code>World Extent</code> is a <em>half</em> extent and the box is
+centred on the <strong>world origin</strong>, not on the Manager actor -
+the Manager has no root component, so dragging it 500 m away moves
+nothing. Everyone reads that in the tooltip; nobody believes it until
+they see the box sitting somewhere other than around their level.</p>
+</blockquote>
+<p>Typical findings: no manager, more than one manager, a World
+Partition map set to Finite, no navigation invoker anywhere, over the
+voxel budget, Clearance Padding wide enough to seal openings.</p>
+<blockquote>
+<p><strong>Invoker radius below one Chunk Size</strong> is the classic
+one. The agent has no neighbouring chunks, so no route can be planned,
+so nothing further streams - and it looks exactly like "the AI refuses
+to move". The Automatic, Quality and Performance streaming profiles
+floor it for you; Manual does not.</p>
+</blockquote>
+<hr />
+<h2 id="auto-tuner">Auto-Tuner</h2>
+<p>Builds the octree at each candidate setting, runs
+<strong>your</strong> routes through the real planner, and ranks what it
+measured.</p>
+<p>It runs as three steps, shown as a rail across the top:</p>
+<p><strong>1 Routes to test → 2 What to measure → 3 Measured
+results</strong></p>
+<ul>
+<li><strong>Back is always available.</strong> The loop is measure →
+look → adjust → measure again, so going back to fix a route is never
+punished.</li>
+<li><strong>Forward is gated</strong>, and a disabled
+<strong>Next</strong> always states why in the footer: no routes yet, no
+Nav3D Manager in the level, or Play is running.</li>
+<li>A step is <strong>ticked</strong> in the rail once it is done. Step
+3 only ticks when a configuration was actually <em>recommended</em> - a
+sweep where nothing completed every route is a finished run and an
+unfinished job.</li>
+<li>On step 2 the footer button <em>is</em> the run: <strong>Run
+Measurement</strong>, which advances to the results when it finishes. On
+step 3 it becomes <strong>Measure Again</strong>.</li>
+</ul>
+<p><img src="images/tuner-1-routes-empty.png"
+alt="Auto-Tuner step 1 with no routes: the toolbar, and a panel listing the three ways to add one" /></p>
+<p><strong>Figure 6 - Step 1, before you have added anything.</strong>
+The empty state is the screen every user sees first, so it does the
+teaching: three numbered ways in, each naming <em>what must already be
+in your level</em> for it to work. Note the footer - the
+<strong>Next</strong> button is disabled and the reason is printed
+beside it in amber rather than hidden in a tooltip.</p>
+<h3 id="choosing-routes">Choosing routes</h3>
+<p>A route is a journey your agents actually make. <strong>Every one
+must complete</strong> for a configuration to be considered, so use the
+journeys your game depends on - a setting that routes the open sky but
+not your stairwell will pass a convenient route and fail in play.</p>
+<p>Start with <strong>Detect From Level</strong>. The toolbar above the
+list is grouped by intent, left to right:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Buttons</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Find them for me</td>
+<td><strong>Detect From Level</strong></td>
+<td>Always try this first. Appends; never replaces hand-built routes,
+and skips duplicates.</td>
+</tr>
+<tr>
+<td>Build from selection</td>
+<td><strong>Set Start</strong>, <strong>Add Goal(s)</strong>,
+<strong>Add Pair</strong></td>
+<td>You can see the endpoints in the level.</td>
+</tr>
+<tr>
+<td>Place by hand</td>
+<td><strong>Place Start</strong>, <strong>Place Goal</strong></td>
+<td>Agents or goals only exist at runtime.</td>
+</tr>
+<tr>
+<td>View</td>
+<td><strong>Show All</strong>, <strong>Clear Viewport</strong></td>
+<td>Check the endpoints before spending minutes on a sweep.</td>
+</tr>
+<tr>
+<td>Discard</td>
+<td><strong>Remove All</strong></td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<h3 id="what-detect-from-level-needs">What "Detect From Level"
+needs</h3>
+<p>Detection reads specific things out of the level. If none of them are
+there it correctly finds nothing - so this is the checklist for making
+it work, in descending order of confidence:</p>
+<table>
+<thead>
+<tr>
+<th>It looks for</th>
+<th>You get</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A pair of <strong>LCM Nav Probe Markers</strong> sharing a Route
+Name</td>
+<td>The most reliable result - you stated the route explicitly</td>
+</tr>
+<tr>
+<td>Actors carrying a <strong>Navigation Invoker</strong> component
+(instance <em>or</em> Blueprint)</td>
+<td>Start points, from the actual Nav3D agent signal</td>
+</tr>
+<tr>
+<td>An <strong>AMassSpawner</strong></td>
+<td>A start at the spawner's location</td>
+</tr>
+<tr>
+<td>Plain placed <strong>Pawns</strong></td>
+<td>Starts, flagged as a <em>weak</em> guess</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⭐ <strong>Goals are never guessed, and this is the usual reason
+detection "does nothing".</strong> On most projects a goal comes from a
+blackboard key, a StateTree binding or a runtime tag - none of which
+exist at edit time. So a level full of pawns can detect plenty of
+<em>agents</em> and still produce zero complete routes. That is exactly
+what the <strong>Goal marker</strong> is for.</p>
+</blockquote>
+<p>When detection adds nothing, the panel says which of those cases you
+are in and what to do about it, rather than reporting "0 routes
+added".</p>
+<p>Detection <strong>appends</strong> - it never replaces routes you
+built by hand, and it skips duplicates by endpoint.</p>
+<h3 id="building-routes-by-hand">Building routes by hand</h3>
+<ul>
+<li><strong>Add Pair</strong> - select exactly two actors; the first
+becomes the start, the second the goal. The fastest option when you can
+already see both ends.</li>
+<li><strong>Set Start / Add Goal(s)</strong> - pin one start, then add
+many goals against it. While a start is pinned the panel shows a chip
+naming it, with an <strong>Unpin</strong> button;
+<code>Add Goal(s)</code> is disabled until one is pinned.</li>
+<li><strong>Probe markers</strong> - place a <strong>Start</strong> and
+a <strong>Goal</strong> marker and give both the same <strong>Route
+Name</strong>, then press Detect. This is how you tune projects whose
+agents and goals only exist at runtime. An unpaired Goal marker pairs
+with every detected agent.</li>
+</ul>
+<p>Each route carries its <strong>own agent width</strong> (diameter,
+cm), editable on its row - a gap a drone fits through may be unusable
+for a gunship, so one sweep can answer for a mixed fleet. <code>0</code>
+applies no size filtering.</p>
+<p>Press <strong>Show</strong> on any route to highlight it in the
+viewport with the others drawn faintly for context.</p>
+<p><img src="images/tuner-1-routes-added.png"
+alt="Auto-Tuner step 1 with one route listed, showing the # / Route / Distance / Agent width columns and Show and Remove buttons" /></p>
+<p><strong>Figure 7 - Step 1, with a route added.</strong>
+<code>Add Pair</code> named it after the two actors it came from, in
+order, so a reversed route is obvious rather than something you debug
+later. Two things changed in the chrome the moment the route existed:
+step 1 in the rail gained a <strong>tick</strong>, and the footer's
+<strong>Next</strong> turned live.</p>
+<hr />
+<h3 id="step-2---what-to-measure">Step 2 - What to measure</h3>
+<p><img src="images/tuner-2-what-to-measure.png"
+alt="Auto-Tuner step 2: Quick / Standard / Thorough presets, the exact values each will try, and the cost estimate" /></p>
+<p><strong>Figure 8 - Step 2.</strong> A preset never leaves you
+guessing what it means: the exact Chunk Size, Min Voxel and Padding
+values it will try are printed underneath it. The amber line is the
+honest cost estimate - configuration count, worst-case chunk count and
+<em>which</em> Chunk Size produces that worst case, because a smaller
+chunk needs more of them for the same route.</p>
+<p>Leave <strong>Also verify Mass FlowField can traverse the
+route</strong> off unless you ship a FlowField crowd. Behaviour Tree,
+StateTree and Mass <em>PathFollowing</em> all dispatch through the same
+planner the tuner already queries, so they are covered either way;
+FlowField is a different solver and costs an extra field solve per chunk
+per route.</p>
+<hr />
+<h3 id="how-it-ranks">How it ranks</h3>
+<ol type="1">
+<li><strong>Completeness is a hard gate.</strong> A configuration that
+cannot plan a route is rejected however fast it is. "Complete" means the
+path <em>reaches the goal</em>, not merely that the query returned
+success.</li>
+<li>Among the survivors you get three picks - <strong>Best
+Quality</strong> (finest measured voxel), <strong>Fastest</strong>
+(cheapest to build and hold) and <strong>Recommended</strong> (the
+finest voxel within twice the cheapest one's memory).</li>
+</ol>
+<p>The full matrix is always shown, so you can disagree on the merits.
+Click any column header to sort by it - the three picks keep their
+badges wherever they land, and sorting back to no column restores the
+ranked order. <strong>Copy Table</strong> puts every measured row on the
+clipboard as tab-separated text, which is a far better thing to attach
+to a support thread than a screenshot.</p>
+<p><img src="images/tuner-3-measured-results.png"
+alt="Auto-Tuner step 3: the measured results table with Chunk, Voxel, Pad, Leaf, Routes, Flow, Ratio, Build and Memory columns" /></p>
+<p><strong>Figure 9 - Step 3, measured results.</strong> How to read a
+row:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Read it as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Routes</strong></td>
+<td>The hard gate. Green <code>1/1</code> survived; red <code>0/1</code>
+is out no matter how good the rest of the row looks.</td>
+</tr>
+<tr>
+<td><strong>Leaf</strong></td>
+<td>The measured finest voxel - the number that decides what fits
+through a gap. Sort by it to rank quality.</td>
+</tr>
+<tr>
+<td><strong>Ratio</strong></td>
+<td>Path length ÷ straight-line distance. <code>1.00</code> is a
+straight line; nothing can be lower.</td>
+</tr>
+<tr>
+<td><strong>Build / Memory</strong></td>
+<td>What the configuration costs to produce and to hold. Sort by Memory
+to rank cost.</td>
+</tr>
+<tr>
+<td>⚠ icon</td>
+<td>This row could not route, or its build hit the chunk budget. Hover
+the row for the reason.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Show</strong> is enabled on failed rows too, where
+<strong>Apply</strong> is not. That asymmetry is deliberate: applying a
+broken configuration would be wrong, but <em>looking</em> at one is the
+whole point - the red rings it draws mark where each route gave up, and
+that position is usually the answer.</p>
+<h3 id="seeing-the-routes">Seeing the routes</h3>
+<p>A route you cannot see is a route you cannot check, and the single
+mistake that invalidates a whole sweep - an endpoint sitting inside a
+building or under the terrain - measures as <em>"no configuration can
+route this level"</em>, which looks exactly like a real finding.</p>
+<ul>
+<li><strong>Show In Viewport</strong> (routes card) draws every route
+for 30 seconds: <strong>sphere = start</strong>, <strong>box =
+goal</strong>, thin grey line between them. The line is the straight
+line, not a path - it makes no claim that a route exists.</li>
+<li><strong>Show</strong> (on any measured row) draws the waypoints that
+configuration <em>actually</em> produced. Completed routes are
+green.</li>
+<li>A route that stopped short is marked with <strong>red rings at the
+last waypoint</strong>, and a thin line to the goal it never
+reached.</li>
+</ul>
+<blockquote>
+<p>⭐ <strong>The red rings are usually the whole answer.</strong> A
+route that gives up against a doorway, vent or stairwell was not blocked
+by your level - it was blocked by <strong>Clearance Padding</strong>,
+which inflates every solid surface and seals openings narrower than the
+leaf voxel. Lower the padding and re-measure before concluding the level
+cannot be navigated.</p>
+</blockquote>
+<p><code>Show</code> is deliberately enabled on failed rows too, where
+<code>Apply</code> is not: applying a broken configuration would be
+wrong, but <em>looking</em> at why it broke is the point.</p>
+<h3 id="what-it-does-and-does-not-cover">What it does and does not
+cover</h3>
+<table>
+<tbody>
+<tr>
+<td>Behavior Tree, StateTree, Mass <strong>PathFollowing</strong></td>
+<td>Covered - all use the same planner</td>
+</tr>
+<tr>
+<td>Mass <strong>FlowField</strong></td>
+<td>Covered only with <em>"Also verify Mass FlowField..."</em> ticked -
+it is a different solver</td>
+</tr>
+<tr>
+<td>Streaming (invoker radius, builds per frame)</td>
+<td><strong>Not tuned</strong> - that is the Streaming Profile's
+job</td>
+</tr>
+<tr>
+<td>Dynamic obstacles</td>
+<td>Voxelized where they currently sit; their motion is
+<strong>not</strong> simulated</td>
+</tr>
+</tbody>
+</table>
+<p>Park moving obstacles in the positions that most constrain navigation
+before tuning, and set each route's <strong>agent diameter</strong> to
+whatever actually flies it.</p>
+<blockquote>
+<p>A sweep voxelizes the level once per configuration. Expect minutes,
+not seconds. The progress dialog can be cancelled, and your settings are
+restored either way - nothing changes until you press
+<strong>Apply</strong> on a row.</p>
+</blockquote>
+<hr />
+<h2 id="project-settings">Project Settings</h2>
+<p><strong>Project Settings ▸ Plugins ▸ LCM Nav3D.</strong> Project-wide
+only - anything that can differ between two levels lives on the Manager
+actor, where it is saved with the level.</p>
+<h3 id="content-locations">Content Locations</h3>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baked Navigation Path</td>
+<td><code>/Game/LcmNavigation/BakedData</code></td>
+</tr>
+<tr>
+<td>Baked Skeleton Path</td>
+<td><code>/Game/LcmNavSkeletons</code></td>
+</tr>
+</tbody>
+</table>
+<p>Changing a path does <strong>not</strong> move an existing bake, but
+it does not orphan one either: the loaders probe the configured path
+first and the shipped default after, so an already-baked level keeps
+loading. Re-bake to migrate it properly.</p>
+<h3 id="new-level-defaults">New Level Defaults</h3>
+<p>What the <strong>Setup Wizard proposes</strong> for a level with no
+manager yet - Chunk Size, World Extent, Min Voxel Size, Clearance
+Padding, Streaming Profile and the obstacle collision channels. Set
+these once and "the way we set up a level here" stops being a convention
+someone has to remember.</p>
+<p>They are <em>proposals</em>. Measured level geometry still overrides
+the world extent, an existing manager's authored values still win, and
+nothing here rewrites a level that is already configured.</p>
+<blockquote>
+<p>If your project puts level geometry on a <strong>custom collision
+channel</strong>, adding it here is the difference between a one-time
+setup step and a bug on every new level. An empty channel list voxelizes
+the world as open air, and that failure is silent - open air passes
+every clearance filter and every quality metric.</p>
+</blockquote>
+<h3 id="console-variable-overrides">Console Variable Overrides</h3>
+<p>A map of <code>r.LcmNav.*</code> / <code>r.LcmGPU.*</code> names to
+values, applied at startup. This is the escape hatch for the ~345
+console variables the page deliberately does <em>not</em> curate:
+pinning one here puts it in <code>DefaultGame.ini</code>, so it is
+version-controlled, survives a restart, and is visible to the whole
+team.</p>
+<ul>
+<li>Applied at <strong>project-setting priority</strong> - they beat a
+variable's built-in default and <em>lose</em> to the command line or
+anything typed into the console, so a local debug override is never
+stamped back over.</li>
+<li>A name that is not a registered variable is <strong>warned
+about</strong> in the log, not silently ignored.</li>
+</ul>
+<blockquote>
+<p>Most of these variables exist to A/B a research question and their
+correct shipping value is the default. Check first whether the behaviour
+you want is already a real property on the Manager or on the FlyTo task
+- it usually is, and a property is saved with the asset that needs it
+instead of applied to everything.</p>
+</blockquote>
+<hr />
+<h2 id="keyboard-shortcuts-1">Keyboard shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th>Shortcut</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ctrl+Alt+N</code></td>
+<td>Health Check</td>
+</tr>
+<tr>
+<td><code>Ctrl+Alt+B</code></td>
+<td>Build Octree</td>
+</tr>
+<tr>
+<td><code>Ctrl+Alt+V</code></td>
+<td>Show Voxels</td>
+</tr>
+</tbody>
+</table>
+<p>Rebind or clear them under <strong>Editor Preferences ▸ Keyboard
+Shortcuts</strong>.</p>
+<hr />
+<h2 id="where-things-are-configured">Where things are configured</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>World type, voxel sizes, collision channels</td>
+<td>Nav3D Manager, Details panel</td>
+</tr>
+<tr>
+<td>Streaming aggressiveness</td>
+<td>Manager ▸ Streaming Profile</td>
+</tr>
+<tr>
+<td>Per-agent size, smoothing, solver</td>
+<td>The FlyTo task / Mass trait</td>
+</tr>
+<tr>
+<td>Output paths, new-level defaults, pinned CVars</td>
+<td>Project Settings ▸ Plugins ▸ LCM Nav3D</td>
+</tr>
+<tr>
+<td>Everything else</td>
+<td><code>r.LcmNav.*</code> console variables</td>
+</tr>
+</tbody>
+</table>
+
+  <div class="pager"><a href="bt-memory-decay.html">&larr; Memory Decay</a><a href="settings.html">Settings reference &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

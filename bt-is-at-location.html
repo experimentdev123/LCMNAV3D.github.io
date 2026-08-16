@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BT IsAtLocation - use the stock UE5 decorator | LCM Nav3D</title>
+<meta name="description" content="Unreal Engine already ships UBTDecoratorIsAtLocation. Use it directly on LCM Nav3D pawns. No LCM Nav3D-specific variant exists or is needed.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/bt-is-at-location.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BT IsAtLocation - use the stock UE5 decorator | LCM Nav3D">
+<meta property="og:description" content="Unreal Engine already ships UBTDecoratorIsAtLocation. Use it directly on LCM Nav3D pawns. No LCM Nav3D-specific variant exists or is needed.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location" class="on">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="bt-isatlocation---use-the-stock-ue5-decorator">BT IsAtLocation -
+use the stock UE5 decorator</h1>
+<p><strong>TL;DR:</strong> Unreal Engine already ships
+<code>UBTDecorator_IsAtLocation</code>. Use it directly on LCM Nav3D
+pawns. No LCM Nav3D-specific variant exists or is needed.</p>
+<h2 id="why-we-didnt-ship-lcm_btdecorator_isatlocation">Why we didn't
+ship <code>LCM_BTDecorator_IsAtLocation</code></h2>
+<p>This audit found that <code>UBTDecorator_IsAtLocation</code> already
+does what an LCM Nav3D-side variant would do:</p>
+<ul>
+<li>Reads a <code>Vector</code> or <code>Object</code> blackboard
+key</li>
+<li>Computes distance from the pawn to the key</li>
+<li>Returns true if within <code>AcceptableRadius</code></li>
+<li>Optional <code>bPathFindingBasedTest</code> reuses the active
+path-following result</li>
+</ul>
+<p>This is the canonical "did the AI reach the location" predicate.
+Re-shipping it on the LCM Nav3D side would be redundant and force buyers
+to pick between two identical nodes.</p>
+<h2 id="three-step-usage-on-an-lcm-nav3d-pawn">Three-step usage on an
+LCM Nav3D pawn</h2>
+<ol type="1">
+<li><p><strong>Drop the stock decorator on a Sequence / Selector
+node</strong> in your BT graph. Right-click → Add Decorator → "Is At
+Location".</p></li>
+<li><p><strong>Set the blackboard key.</strong> Vector key (a goal
+position) or Object key (an AActor whose location is the goal -
+<code>bUseNavAgentGoalLocation</code> projects to nav-agent location).
+For LCM Nav3D flying pawns where you want the literal world position,
+use Vector.</p></li>
+<li><p><strong>Set <code>AcceptableRadius</code></strong> to your "we
+count this as arrived" distance in cm. Typical: 50-150 cm.</p></li>
+</ol>
+<p>That's it. The decorator works on every LCM Nav3D pawn that has an
+AIController - no LCM Nav3D-specific configuration needed.</p>
+<h2 id="when-to-use-the-path-finding-variant">When to use the
+path-finding variant</h2>
+<p><code>UBTDecorator_IsAtLocation::bPathFindingBasedTest</code> makes
+the decorator consistent with whatever was used to reach the location -
+useful when the move was via <code>UBTTask_MoveTo</code> (Recast) so the
+"arrived" check matches.</p>
+<p><strong>For LCM Nav3D moves</strong>, this option will fall through
+to Recast even if your goal was inside an LCM Nav3D volume - leave it
+OFF and use straight geometric distance until <strong>T37 NavSystem
+bridge</strong> lands. After T37, the stock
+<code>bPathFindingBasedTest</code> will route through LCM Nav3D
+automatically when the goal is in an LCM Nav3D-managed region.</p>
+<h2 id="related-lcm-nav3d-unique-decorators">Related LCM Nav3D-unique
+decorators</h2>
+<p>For predicates that <strong>don't</strong> have a stock equivalent,
+see the LCM Nav3D-unique decorators we did ship:</p>
+<ul>
+<li><code>LCM_BTDecorator_PathLengthBelow</code> - true-3D LCM Nav3D
+path-length check (stock <code>DoesPathExist</code> is binary +
+Recast)</li>
+<li><code>LCM_BTDecorator_HasLineOfSight</code> - voxel-aware Lazy
+Theta* LOS (stock uses raycasts only)</li>
+<li><code>LCM_BTDecorator_IsInCover</code> - composite SweepPenalty +
+LOS predicate</li>
+<li><code>LCM_BTDecorator_ChunkLoaded</code> - SVO streaming probe</li>
+<li><code>LCM_BTDecorator_ThreatVisibleViaPerception</code> -
+AIPerception + LCM Nav3D LOS composite</li>
+</ul>
+<p>These are genuinely additive surfaces; "IsAtLocation" is not - use
+stock.</p>
+
+  <div class="pager"><a href="bt-wait.html">&larr; Wait</a><a href="bt-look-at.html">Look At &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 03: Your First Flying Agent | LCM Nav3D</title>
+<meta name="description" content="Three ingredients: an LcmNavigationManagerSVO in the level, a pawn with an AIController, and a Behavior Tree whose only task is LCM Fly To  pointed at a...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/your-first-flying-agent.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 03: Your First Flying Agent | LCM Nav3D">
+<meta property="og:description" content="Three ingredients: an LcmNavigationManagerSVO in the level, a pawn with an AIController, and a Behavior Tree whose only task is LCM Fly To  pointed at a...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent" class="on">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-03-your-first-flying-agent">Tutorial 03: Your First
+Flying Agent</h1>
+<p><strong>TL;DR:</strong> Three ingredients: an
+<strong><code>LcmNavigationManagerSVO</code></strong> in the level, a
+<strong>pawn with an AIController</strong>, and a Behavior Tree whose
+only task is <strong><code>LCM Fly To (SVO)</code></strong> pointed at a
+blackboard key. No C++.</p>
+<p><strong>Time:</strong> ~20 minutes. <strong>You'll end with:</strong>
+a pawn that flies through 3D space to a goal in your own level.</p>
+<hr />
+<h2 id="what-were-building">What we're building</h2>
+<pre><code>   Level
+     ├── LcmNavigationManagerSVO        ← the brain (one per level)
+     ├── BP_MyFlyer  (Pawn)             ← the body
+     │     └── AIController: BP_MyFlyerAI
+     │             └── runs BT_MyFlyer
+     │                     └── Blackboard: BB_MyFlyer  (Vector key &quot;GoalLocation&quot;)
+     └── TargetPoint                    ← where we want it to go</code></pre>
+<hr />
+<h2 id="step-1-add-the-navigation-manager">Step 1: Add the navigation
+manager</h2>
+<ol type="1">
+<li>In the <strong>Place Actors</strong> panel, search
+<strong><code>LcmNavigationManagerSVO</code></strong>.</li>
+<li>Drag one into your level. Position doesn't matter much. It uses its
+own location as the centre of the navigation volume, so put it roughly
+in the middle of your playable space.</li>
+<li>Select it and set, in the Details panel:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Setup</strong></td>
+<td><code>Infinite World</code></td>
+<td><strong>unticked</strong> (finite, see <a
+href="core-concepts.html">Tutorial 02</a>)</td>
+</tr>
+<tr>
+<td><strong>1. Setup</strong></td>
+<td><code>Auto Build On Play</code></td>
+<td><strong>ticked</strong></td>
+</tr>
+<tr>
+<td><strong>2. Voxels</strong></td>
+<td><code>World Extent</code></td>
+<td>large enough to cover your play space (default
+<strong>10000</strong> = 200 m cube)</td>
+</tr>
+<tr>
+<td><strong>2. Voxels</strong></td>
+<td><code>Min Voxel Size</code></td>
+<td><strong>100</strong> to start</td>
+</tr>
+<tr>
+<td><strong>2. Voxels</strong></td>
+<td><code>Clearance Padding</code></td>
+<td><strong>100</strong> to start</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>World Extent</code> measures <strong>outward from the
+actor</strong>, so 10000 gives you a 200 m cube centred on the manager.
+If your agents will fly outside that box, increase it: outside the
+volume there is no navigation data and paths will fail.</p>
+</blockquote>
+<h3 id="see-what-it-built">See what it built</h3>
+<p>Tick <strong>5. Debug → <code>Draw Debug Volumes</code></strong> and
+press Play. You'll see the octree drawn over your level: lots of big
+boxes in open air, small ones packed around geometry. <strong>This is
+the single most useful thing you can do while tuning.</strong> If a
+doorway you care about shows no small voxels, the pathfinder can't see
+it either.</p>
+<p>Turn it back off when you're done; it's expensive to draw.</p>
+<hr />
+<h2 id="step-2-make-the-pawn">Step 2: Make the pawn</h2>
+<p>You need something that can move in 3D without gravity.</p>
+<ol type="1">
+<li><strong>Content Browser → Add → Blueprint Class → Pawn</strong>.
+Name it <strong><code>BP_MyFlyer</code></strong>.</li>
+<li>Open it and add a <strong>Floating Pawn Movement</strong> component.
+(Add Component → search "Floating Pawn Movement".) This is what makes it
+fly rather than fall.</li>
+<li>Select <code>FloatingPawnMovement</code> and set <strong>Max
+Speed</strong> to <strong>600</strong>. Match this to the task's
+<code>Flight Speed</code> later.</li>
+<li>Add a <strong>Static Mesh</strong> component so you can see it. A
+cone or sphere is fine. Scale it down to something sensible.</li>
+<li>In <strong>Class Defaults</strong>, set
+<strong><code>Auto Possess AI</code></strong> to
+<strong><code>Placed in World or Spawned</code></strong>.</li>
+</ol>
+<blockquote>
+<p><strong>Collision tip.</strong> For your first test, set the mesh's
+collision to <strong>No Collision</strong>. Physics fighting the
+navigation is a very common source of "my agent jitters / gets stuck",
+and you want a clean first result. Add collision back once flying
+works.</p>
+</blockquote>
+<hr />
+<h2 id="step-3-blackboard-and-behavior-tree">Step 3: Blackboard and
+Behavior Tree</h2>
+<h3 id="the-blackboard">The blackboard</h3>
+<ol type="1">
+<li><strong>Add → Artificial Intelligence → Blackboard</strong>. Name it
+<strong><code>BB_MyFlyer</code></strong>.</li>
+<li>Add one key:
+<ul>
+<li><strong>Type: <code>Vector</code></strong>, <strong>Name:
+<code>GoalLocation</code></strong></li>
+</ul></li>
+</ol>
+<blockquote>
+<p>The Fly To task also accepts an <strong>Object</strong> key holding
+an Actor. Use a Vector for now; the Actor form is what you'd use for
+chasing, covered at the end.</p>
+</blockquote>
+<h3 id="the-behavior-tree">The behavior tree</h3>
+<ol type="1">
+<li><strong>Add → Artificial Intelligence → Behavior Tree</strong>. Name
+it <strong><code>BT_MyFlyer</code></strong>.</li>
+<li>Open it, and in the Details panel set <strong>Blackboard
+Asset</strong> to <code>BB_MyFlyer</code>.</li>
+<li>Drag from <strong>ROOT</strong> and add a
+<strong>Sequence</strong>.</li>
+<li>Drag from the Sequence and add the task named
+<strong><code>Fly To</code></strong>; it appears in the tree as
+<strong><code>LCM Fly To (SVO)</code></strong>.</li>
+<li>Select that task and set:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Blackboard Key</strong></td>
+<td><code>GoalLocation</code></td>
+</tr>
+<tr>
+<td><strong>Acceptance Radius</strong></td>
+<td><code>100</code></td>
+</tr>
+<tr>
+<td><strong>Flight Speed</strong></td>
+<td><code>600</code></td>
+</tr>
+</tbody>
+</table>
+<p>Leave everything else at defaults for now.</p>
+<p><img src="images/behavior-tree-example.png"
+alt="A Behavior Tree with Sequence, Pick Goal, LCM Fly To (SVO), Fail Delay, Goal Reached and a Loop, with the FlyTo task&#39;s Details panel open" /></p>
+<p><strong>Figure 03.1 - Where <code>LCM Fly To (SVO)</code>
+sits.</strong> This is the shipped <code>BT_FlightBehavior</code> demo,
+one step past what you have just built: the same <code>Fly To</code>
+task, with a goal picker in front of it and a retry-with-delay branch
+beside it so a failed plan does not kill the tree. Yours needs only the
+highlighted node to start flying.</p>
+<h3 id="the-flyto-settings-in-full">The FlyTo settings, in full</h3>
+<p>You will not need most of these on day one, but it is worth knowing
+the shape of the surface before you go looking for a specific knob.</p>
+<p><img src="images/behavior-tree-flyto-settings.png"
+alt="The LCM Fly To task Details panel, showing sections 1 Goal, 2 Movement, 3 Pathfinding, 4 Avoidance, 5 Moving Goal and 6 Streaming" /></p>
+<p><strong>Figure 03.2 - The <code>LCM Fly To</code> task, all six
+sections.</strong> Read it as a pipeline: <strong>1 Goal</strong> is
+where you are going, <strong>2 Movement</strong> is what flies you
+there, <strong>3 Pathfinding</strong> is how the route is computed,
+<strong>4 Avoidance</strong> is how you get past other agents and walls,
+<strong>5 Moving Goal</strong> is only for chasing something that moves,
+and <strong>6 Streaming</strong> matters only in an infinite world.</p>
+<p>Two fields decide the shape of everything below them:</p>
+<ul>
+<li><strong><code>Use Flight Movement Component</code></strong> -
+ticked, the whole of section 2 collapses, because the movement component
+owns speed and dynamics instead of the task.</li>
+<li><strong><code>Avoidance Style</code></strong> - set to
+<code>CBS</code>, the seven tuning fields under it hide; CBS is a
+planner-level solver and does not use them.</li>
+</ul>
+<p>Sections you have not configured are not silently active. The panel
+hides any property the current configuration will ignore, so what you
+can see is what will run.</p>
+<hr />
+<h2 id="step-4-the-ai-controller">Step 4: The AI Controller</h2>
+<ol type="1">
+<li><p><strong>Add → Blueprint Class → AIController</strong>. Name it
+<strong><code>BP_MyFlyerAI</code></strong>.</p></li>
+<li><p>Open it. On the <strong>Event BeginPlay</strong> node:</p>
+<ul>
+<li>Add <strong>Run Behavior Tree</strong>, set <strong>BTAsset</strong>
+to <code>BT_MyFlyer</code>.</li>
+</ul></li>
+<li><p>We need to put a goal in the blackboard. Still on BeginPlay,
+<strong>after</strong> Run Behavior Tree:</p>
+<ul>
+<li>Add <strong>Get Blackboard</strong> → <strong>Set Value as
+Vector</strong>.</li>
+<li><strong>Key Name:</strong> <code>GoalLocation</code></li>
+<li><strong>Value:</strong> for a first test, drag in a <strong>Get
+Actor Of Class</strong> node with <strong>Actor Class =
+<code>TargetPoint</code></strong>, then
+<strong>GetActorLocation</strong> from it.</li>
+</ul>
+<pre><code>BeginPlay ─→ Run Behavior Tree (BT_MyFlyer)
+          └→ Set Value as Vector (Key: GoalLocation,
+                                  Value: GetActorOfClass(TargetPoint).GetActorLocation)</code></pre></li>
+<li><p>Compile and save.</p></li>
+<li><p>Go back to <strong><code>BP_MyFlyer</code></strong> → Class
+Defaults → set <strong>AI Controller Class</strong> to
+<code>BP_MyFlyerAI</code>.</p></li>
+</ol>
+<hr />
+<h2 id="step-5-fly">Step 5: Fly</h2>
+<ol type="1">
+<li>Drag a <strong>TargetPoint</strong> into your level, somewhere your
+flyer has to climb or route around geometry to reach. Put it up high:
+that's the whole point.</li>
+<li>Drag <strong><code>BP_MyFlyer</code></strong> into the level,
+somewhere with open air around it.</li>
+<li>Press <strong>Play</strong>.</li>
+</ol>
+<p>Your pawn should take off and fly to the target point, routing around
+geometry in full 3D.</p>
+<hr />
+<h2 id="if-it-doesnt-move">If it doesn't move</h2>
+<p>Work down this list in order. These are the actual causes, in the
+order they occur.</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Output Log: <strong>"No SVO Manager found in the
+level!"</strong></td>
+<td>No manager actor</td>
+<td>Step 1</td>
+</tr>
+<tr>
+<td>Nothing happens, no log errors</td>
+<td>AI never possessed the pawn</td>
+<td><code>Auto Possess AI</code> = <em>Placed in World or Spawned</em>,
+and <code>AI Controller Class</code> is set</td>
+</tr>
+<tr>
+<td>Task fails instantly</td>
+<td>Goal is outside the navigation volume</td>
+<td>Increase <code>World Extent</code>, or move the target inside
+it</td>
+</tr>
+<tr>
+<td>Task fails instantly</td>
+<td>Goal (or start) is <strong>inside</strong> geometry</td>
+<td>Move them into open air</td>
+</tr>
+<tr>
+<td>Agent flies but ignores walls</td>
+<td>Draw Debug Volumes shows no detail</td>
+<td><code>Min Voxel Size</code> too large</td>
+</tr>
+<tr>
+<td>Agent refuses an obvious doorway</td>
+<td>Opening sealed by padding</td>
+<td>Lower <code>Clearance Padding</code> (see <a
+href="core-concepts.html#5-resolution-the-two-settings-people-get-wrong">Tutorial
+02 §5</a>)</td>
+</tr>
+<tr>
+<td>Agent jitters or sticks</td>
+<td>Physics fighting navigation</td>
+<td>Set mesh collision to No Collision for the test</td>
+</tr>
+</tbody>
+</table>
+<p>Full list: <a href="troubleshooting.html">Troubleshooting</a>.</p>
+<hr />
+<h2 id="step-6-make-it-look-good">Step 6: Make it look good</h2>
+<p>Defaults are functional, not beautiful. Two changes transform the
+motion:</p>
+<p><strong>On the <code>LCM Fly To (SVO)</code> task:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Try</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Flight Style</code></td>
+<td><strong>Physics (Drones/Ships)</strong></td>
+<td>Momentum and inertia instead of instant direction changes. <em>(This
+is already the default.)</em></td>
+</tr>
+<tr>
+<td><code>Flight Style</code></td>
+<td><strong>Linear (Biological/Magic)</strong></td>
+<td>Instant, weightless. Good for spirits, insects, magic</td>
+</tr>
+<tr>
+<td><code>Banking Amount</code></td>
+<td><code>4.0</code></td>
+<td>Rolls into turns like an aircraft</td>
+</tr>
+<tr>
+<td><code>Max Banking Angle</code></td>
+<td><code>45</code></td>
+<td>How far it's allowed to roll</td>
+</tr>
+<tr>
+<td><code>Deceleration Distance</code></td>
+<td><code>800</code></td>
+<td>Starts slowing this far out instead of stopping dead</td>
+</tr>
+<tr>
+<td><code>Max Acceleration</code></td>
+<td><code>2000</code></td>
+<td>Lower = heavier, more sluggish feel</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Path shape:</strong> a raw path is blocky. In <a
+href="core-concepts.html">Tutorial 02</a> we met the smoothing modes;
+<strong>Curved Spline</strong> is what makes flight look natural rather
+than like a series of ruler lines.</p>
+<hr />
+<h2 id="step-7-several-agents-at-once">Step 7: Several agents at
+once</h2>
+<p>Duplicate <code>BP_MyFlyer</code> a few times and press Play. They'll
+fly the same route and crowd each other. Two settings fix that, both on
+the Fly To task:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Separation Radius</code></td>
+<td><code>150</code></td>
+<td>How close before they push apart</td>
+</tr>
+<tr>
+<td><code>Separation Weight</code></td>
+<td><code>2.0</code></td>
+<td>How hard they push</td>
+</tr>
+</tbody>
+</table>
+<p>And <strong><code>Avoidance Style</code></strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Style</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>None (Ghost/Ignore)</strong></td>
+<td>They fly through each other</td>
+</tr>
+<tr>
+<td><strong>Reactive (Boids/Push)</strong></td>
+<td>Push apart on contact: cheap, and the default</td>
+</tr>
+<tr>
+<td><strong>Predictive (ORCA/Steer)</strong></td>
+<td>Anticipate and steer around <em>before</em> colliding: smoother,
+costlier</td>
+</tr>
+<tr>
+<td><strong>Context-Based Steering (SVO)</strong></td>
+<td>Geometry-aware steering</td>
+</tr>
+</tbody>
+</table>
+<p>For a handful of agents, <strong>Reactive</strong> is fine. For
+dozens sharing a corridor, <strong>Predictive</strong> looks markedly
+better.</p>
+<blockquote>
+<p>Past a few hundred agents, stop adding pawns and move to <a
+href="mass-entity-crowds.html">Tutorial 06: Mass Entity</a>.</p>
+</blockquote>
+<hr />
+<h2 id="step-8-chasing-a-moving-target">Step 8: Chasing a moving
+target</h2>
+<p>To chase something instead of flying to a fixed point:</p>
+<ol type="1">
+<li>Change the blackboard key <code>GoalLocation</code> to type
+<strong>Object</strong>, with <strong>Base Class =
+<code>Actor</code></strong>.</li>
+<li>Set it to the actor you want chased.</li>
+<li>On the Fly To task, tick
+<strong><code>Enable Goal Prediction</code></strong>.</li>
+</ol>
+<p>With prediction on, the agent aims where the target <em>will be</em>
+rather than where it is, so it intercepts instead of trailing.
+<code>Lead Seconds Cap</code> (default <code>2.0</code>) limits how far
+ahead it will extrapolate, and <code>Drift Replan Cm</code> (default
+<code>400</code>) controls how far the target must move before the path
+is recomputed.</p>
+<hr />
+<h2 id="recap">Recap</h2>
+<ul>
+<li><strong>One manager</strong>, finite world, sensible
+<code>World Extent</code>.</li>
+<li><strong>Pawn + Floating Pawn Movement + Auto Possess
+AI</strong>.</li>
+<li><strong>Blackboard key → <code>LCM Fly To (SVO)</code> →
+done.</strong></li>
+<li><strong><code>Draw Debug Volumes</code> is your best debugging
+tool.</strong></li>
+<li>Tune feel with <code>Flight Style</code>, banking and deceleration;
+tune crowds with avoidance and separation.</li>
+</ul>
+<hr />
+<p><strong>Next:</strong> <a href="statetree-agent.html">Tutorial 04:
+The Same Agent in StateTree</a>, or jump to <a
+href="dynamic-obstacles.html">Tutorial 05: Dynamic Obstacles</a> to make
+the world move.</p>
+
+  <div class="pager"><a href="core-concepts.html">&larr; Core concepts</a><a href="statetree-agent.html">The same agent in StateTree &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

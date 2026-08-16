@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 08 - Perception-driven tactical AI | LCM Nav3D</title>
+<meta name="description" content="Add an LCM Nav3D AI Perception Bridge next to your agent's UAIPerceptionComponent → its perceived threats auto-feed the LCM Nav3D  Threats From AI Perce...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/ai-perception.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 08 - Perception-driven tactical AI | LCM Nav3D">
+<meta property="og:description" content="Add an LCM Nav3D AI Perception Bridge next to your agent's UAIPerceptionComponent → its perceived threats auto-feed the LCM Nav3D  Threats From AI Perce...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception" class="on">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-08---perception-driven-tactical-ai">Tutorial 08 -
+Perception-driven tactical AI</h1>
+<p><strong>TL;DR:</strong> Add an <strong>LCM Nav3D AI Perception
+Bridge</strong> next to your agent's <code>UAIPerceptionComponent</code>
+→ its perceived threats auto-feed the <strong>LCM Nav3D | Threats From
+AI Perception</strong> EQS context → a true-3D LCM Nav3D EQS query
+(volumetric candidate points + 3D-LOS / cover / threat-exposure tests)
+picks a flanking or cover position → your BT/StateTree moves the agent
+there. Mass crowds get the same via the <strong>LCM Nav3D Mass
+Perception Agent</strong> trait, which writes a perceived-threats
+fragment.</p>
+<h2 id="why-this-exists">Why this exists</h2>
+<p>Stock UE tactical AI flows through EQS, but the stock
+generators/tests are 2.5D (navmesh-projected). A flying or multi-level
+NPC can't reason about cover, line-of-sight, or flanking in true 3D with
+them. LCM Nav3D ships <strong>true-3D EQS</strong> - candidate points
+anywhere in the navigable volume, scored by <strong>volumetric
+SVO</strong> line-of-sight, cover, and threat exposure - and a
+<strong>one-click bridge</strong> so the threats those tests score
+against come straight from UE's own perception system.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>LCMNav3D plugin enabled, an <code>ALcmNavigationManagerSVO</code>
+with a built SVO in the level.</li>
+<li>An AI agent with an <code>AAIController</code> and a
+<code>UAIPerceptionComponent</code> configured with an
+<strong>AISense_Sight</strong> config (the standard UE setup - LCM Nav3D
+doesn't change this).</li>
+<li>Threats set up so perception can sense them (registered stimuli
+source / pawns on a hostile team), per your normal UE perception
+configuration.</li>
+</ul>
+<hr />
+<h2 id="part-a---uactor-agent-bt--statetree">Part A - UActor agent (BT /
+StateTree)</h2>
+<h3 id="step-1---add-the-perception-bridge">Step 1 - Add the perception
+bridge</h3>
+<p>On your agent (the pawn or its controller - wherever the
+<code>UAIPerceptionComponent</code> lives), <strong>Add Component → "LCM
+Nav3D AI Perception Bridge"</strong>
+(<code>ULcmAIPerceptionBridge</code>).</p>
+<ul>
+<li>It auto-finds the owner's <code>UAIPerceptionComponent</code> on
+BeginPlay and subscribes to <code>OnTargetPerceptionUpdated</code>.</li>
+<li><code>DecayWindowSeconds</code> (default <code>5</code>) - how long
+a lost-sight threat stays queryable before it fades. Tune to taste.</li>
+<li>No other wiring: successfully-sensed actors are tracked; lost ones
+decay out.</li>
+</ul>
+<p>That's the entire perception-to-LCM Nav3D link.</p>
+<h3 id="step-2---build-the-tactical-eqs-query">Step 2 - Build the
+tactical EQS query</h3>
+<p>Create an EQS query (e.g. <code>EQS_FindFlankingApproach</code>) and
+assemble it from these nodes:</p>
+<p><strong>Generator</strong> (pick one): | Node | Use it for |
+|---|---| | <strong>LCM Nav3D | Points In SVO Volume</strong> | general
+3D candidate cloud around the agent | | <strong>LCM Nav3D |
+Hemispherical Ring 3D</strong> | sniper-perch / high-ground / orbit
+candidates (set <em>Upper Hemisphere Only</em>) | | <strong>LCM Nav3D |
+Points Along Path</strong> | candidates strung along the LCM Nav3D path
+to a goal |</p>
+<p><strong>Tests</strong> (add several; set each one's
+<strong>Context</strong> to <strong>LCM Nav3D | Threats From AI
+Perception</strong> where it scores against threats): | Node | Purpose |
+Typical setup | |---|---|---| | <strong>LCM Nav3D | Threat
+Exposure</strong> | prefer low summed danger toward threats | Score,
+prefer <strong>less</strong> | | <strong>LCM Nav3D | Cover Score
+3D</strong> | prefer positions occluded from threats | Score, prefer
+<strong>greater</strong> | | <strong>LCM Nav3D | Line Of Sight
+3D</strong> | filter to (or away from) visible-to-threat | Filter | |
+<strong>LCM Nav3D | Reachability 3D</strong> | drop positions the agent
+can't path to | Filter (Context = Querier) | | <strong>LCM Nav3D | Path
+Distance 3D</strong> | prefer near / far by <em>LCM Nav3D</em> path
+length | Score (Context = Querier) | | <strong>LCM Nav3D | Height
+Advantage</strong> | favour high ground over threats | Score, prefer
+<strong>greater</strong> |</p>
+<p>A solid "flank to cover" query: <strong>Points In SVO Volume</strong>
+→ <strong>Reachability 3D</strong> (filter) → <strong>Cover Score
+3D</strong> (score↑) → <strong>Threat Exposure</strong> (score↓) →
+<strong>Path Distance 3D</strong> (score↓, mild weight).</p>
+<blockquote>
+<p>The threats every threat-scoring test sees come from the bridge via
+<strong>LCM Nav3D | Threats From AI Perception</strong> - no manual
+tagging. (For non-perception workflows, <strong>LCM Nav3D | Known
+Threats</strong> returns actors tagged <code>ApexThreat</code>
+instead.)</p>
+</blockquote>
+<h3 id="step-3---wire-it-into-bt-or-statetree-then-verify">Step 3 - Wire
+it into BT or StateTree, then verify</h3>
+<ul>
+<li><strong>Behavior Tree:</strong> add a <code>Run EQS Query</code>
+service/task that runs your query and writes the result
+<code>Vector</code>/<code>Actor</code> to the blackboard, then a
+<code>MoveTo</code> (or an LCM Nav3D <code>FlyTo</code>) to that
+key.</li>
+<li><strong>StateTree:</strong> run the query from a task that stores
+the chosen location, then transition into your LCM Nav3D move task (see
+Tutorial 05).</li>
+</ul>
+<p><strong>Verify in PIE:</strong> the agent should pick positions that
+are reachable, in cover from, and low-exposure toward the threats it
+currently perceives - and should <strong>stop reacting to a threat ~5 s
+after losing sight of it</strong> (the decay window). Walk a threat out
+of the sight cone and watch the chosen position shift once it
+decays.</p>
+<hr />
+<h2 id="part-b---mass-crowd-variant">Part B - Mass crowd variant</h2>
+<p>For crowd-scale tactical perception, use the native LCM Nav3D Mass
+perception (Tutorial 06 covers Mass setup):</p>
+<ol type="1">
+<li>Add the <strong>LCM Nav3D Mass Perception Agent</strong> trait
+(<code>ULcmMassPerceptionTrait</code>) to your Mass entity config - set
+<code>FactionId</code>, <code>SightRadius</code>,
+<code>FOVDegrees</code>. Agents perceive different-faction agents within
+range + FOV + <strong>true-3D SVO line of sight</strong>.</li>
+<li>The <code>ULcmMassPerceptionProcessor</code> writes each agent's
+closest visible hostile into its
+<strong><code>FLcmMassPerceivedThreatsFragment</code></strong>
+(<code>ClosestThreatPos</code>, <code>bHasThreat</code>,
+<code>VisibleCount</code>, <code>LastSeenSeconds</code>).</li>
+<li>Read that fragment in your Mass logic (a StateTree task via
+<code>UMassStateTreeProcessor</code>, a steering processor, etc.) to
+drive evade / engage / regroup behaviour.</li>
+</ol>
+<p>Mass agents consume the perceived-threats fragment
+<strong>directly</strong> - they don't issue EQS queries (there is no
+Mass-native EQS querier). EQS tactical queries are the UActor path (Part
+A). A hero-NPC-as-UActor querying with <code>Apex: Known Threats</code>
+can include crowd-relevant threats by tagging, giving a practical
+hybrid.</p>
+<hr />
+<h2 id="what-you-build-by-hand">What you build by hand</h2>
+<p>The nodes above are all shipped and usable. What is
+<strong>not</strong> shipped is prebuilt query assets - you author your
+own from the generators and tests, which <a
+href="tactical-eqs.html">Tutorial 07</a> walks through end to end.</p>
+<p>Four nodes need live flow-field or macro-graph state and are not
+available: the flow-field-directed generator, the flow-field-alignment
+test, the active-flow-field context, and the portal-proximity
+generator.</p>
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="statetree-agent.html">Tutorial 04 - StateTree</a>, the
+move-task side of step 3.</li>
+<li><a href="mass-entity-crowds.html">Tutorial 06 - Mass Entity</a>, for
+the Part B agent setup.</li>
+<li><a href="tactical-eqs.html">Tutorial 07 - Tactical EQS</a>,
+authoring queries from these nodes.</li>
+<li><code>ULcmTacticalQueryLibrary</code> - the Blueprint tactical
+primitives (<code>Is Segment LOS Clear</code>,
+<code>Find Best Cover</code>, ...) the EQS tests wrap.</li>
+</ul>
+
+  <div class="pager"><a href="tactical-eqs.html">&larr; Tactical EQS in true 3D</a><a href="hybrid-recast.html">Hybrid Recast + Nav3D &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

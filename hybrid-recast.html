@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 09 - Hybrid LCM Nav3D + Recast crowd avoidance | LCM Nav3D</title>
+<meta name="description" content="Add ULcmCrowdAvoidanceBridge to your LCM Nav3D flying pawn → stock UE5 UCrowdManager Detour RVO sees the LCM Nav3D pawn and steers Recast crowd agents a...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/hybrid-recast.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 09 - Hybrid LCM Nav3D + Recast crowd avoidance | LCM Nav3D">
+<meta property="og:description" content="Add ULcmCrowdAvoidanceBridge to your LCM Nav3D flying pawn → stock UE5 UCrowdManager Detour RVO sees the LCM Nav3D pawn and steers Recast crowd agents a...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast" class="on">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-09---hybrid-lcm-nav3d--recast-crowd-avoidance">Tutorial
+09 - Hybrid LCM Nav3D + Recast crowd avoidance</h1>
+<p><strong>TL;DR:</strong> Add <code>ULcmCrowdAvoidanceBridge</code> to
+your LCM Nav3D flying pawn → stock UE5 <code>UCrowdManager</code> Detour
+RVO sees the LCM Nav3D pawn and steers Recast crowd agents around it.
+The Z-band filter (auto-applied by the bridge) prevents false-collision
+avoidance between agents at different vertical bands.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>The third-person template (or any project with a Character +
+AIController).</li>
+<li>LCMNav3D plugin enabled.</li>
+<li>An <code>ALcmNavigationManagerSVO</code> in the level.</li>
+<li>An <code>ALcmFlyingPawn</code> (or your own LCM Nav3D flying
+pawn).</li>
+</ul>
+<h2 id="step-1---add-the-bridge-to-your-lcm-nav3d-pawn">Step 1 - Add the
+bridge to your LCM Nav3D pawn</h2>
+<p>In the editor, select your LCM Nav3D pawn → Add Component → search
+"LCM Crowd Avoidance Bridge".</p>
+<p>Defaults are sensible:</p>
+<ul>
+<li><code>bAutoRegister = true</code> - registers with
+<code>UCrowdManager</code> on BeginPlay automatically</li>
+<li><code>AgentRadius = 50 cm</code> - typical pawn radius</li>
+<li><code>AgentHalfHeight = 100 cm</code> - cylinder extent for
+Detour</li>
+<li><code>MaxSpeed = 800 cm/s</code> - matches
+<code>ULcmNavMovementComponent</code> default</li>
+</ul>
+<p>That's it for the LCM Nav3D side.</p>
+<h2 id="step-2---add-recast-crowd-agents-existing-ue5-pattern">Step 2 -
+Add Recast crowd agents (existing UE5 pattern)</h2>
+<p>Your Recast ground crowd agents should already use
+<code>UCrowdFollowingComponent</code> instead of the default
+<code>UPathFollowingComponent</code>. This is the standard UE5 setup for
+any project using crowd avoidance - LCM Nav3D doesn't change this. If
+you're not already on <code>UCrowdFollowingComponent</code>:</p>
+<pre class="cpp"><code>// In your AAIController subclass constructor
+GetCharacterMovement()-&gt;bUseAccelerationForPaths = true;
+//. and override the AIController to use UCrowdFollowingComponent</code></pre>
+<p>Or in Blueprint: the AIController's
+<code>UCrowdFollowingComponent</code> is auto-registered as the
+agent.</p>
+<h2 id="step-3---play">Step 3 - Play</h2>
+<p>Hit Play. Your LCM Nav3D flying pawn and Recast ground crowd agents
+now avoid each other (per the Z-band filter rules below).</p>
+<h2 id="how-the-z-band-filter-works">How the Z-band filter works</h2>
+<p>Unreal's <code>UCrowdManager</code> Detour RVO <strong>assumes
+coplanar agents</strong> - out of the box, a flying LCM Nav3D agent at
+Z=500 would be flagged as a "neighbour" by a Recast ground agent at Z=0,
+producing avoidance behaviour that looks like the ground agent dodging
+an obstacle 5 meters overhead.</p>
+<p>The bridge fixes this at the <strong>avoidance-group bitfield
+level</strong>:</p>
+<ul>
+<li>Each agent gets an <code>AvoidanceGroup</code> bit derived from its
+world Z divided by <code>r.LcmNav.Crowd.ZBandHeightCm</code> (default
+200 cm).</li>
+<li>Each agent's <code>GroupsToAvoid</code> is set to its own band + the
+±1 adjacent bands (so vertically close agents still see each
+other).</li>
+<li>Cross-band agents (e.g. ground Z=0 and aerial Z=500 with 200 cm
+bands → bands 0 and 2) <strong>ignore each other</strong> via Detour's
+standard bitfield mask.</li>
+</ul>
+<p>Same engineering work, leverages stock Detour rather than fighting
+it.</p>
+<h2 id="tuning-rlcmnavcrowdzbandheightcm">Tuning
+<code>r.LcmNav.Crowd.ZBandHeightCm</code></h2>
+<table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Recommended value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default (typical pawn-height scenes)</td>
+<td><code>200</code></td>
+</tr>
+<tr>
+<td>Low-ceiling interior (1.5m floors)</td>
+<td><code>150</code></td>
+</tr>
+<tr>
+<td>Vertical skyscraper (need fine-grained per-floor separation)</td>
+<td><code>100</code></td>
+</tr>
+<tr>
+<td>Open sky (most LCM Nav3D traffic is far above ground)</td>
+<td><code>400</code></td>
+</tr>
+<tr>
+<td>Disable filter (legacy Detour coplanar behaviour)</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table>
+<p>Set the CVar in PIE to live-tune, then commit to your project's
+<code>DefaultEngine.ini</code> once you're happy.</p>
+<h2 id="stacked-multi-floor-scenarios">Stacked multi-floor
+scenarios</h2>
+<p><code>UCrowdManager</code> is one global instance per world. For
+stacked-floor scenarios (e.g. LCM Nav3D agents at Z=200, 500, 800
+sharing the same UCrowdManager), the Z-band filter handles it
+automatically - each pair of agents whose Z-distance is &gt; 1
+band-height ignores each other.</p>
+<p>For <strong>truly independent</strong> crowds (each floor should be
+its own crowd zone), you'd need to spawn separate
+<code>UCrowdManager</code> instances per zone via project-side
+subclassing. This is out of scope for v1.</p>
+<h2 id="performance-notes">Performance notes</h2>
+<ul>
+<li>Each registered LCM Nav3D bridge contributes ~1
+<code>RegisterAgent</code> call at BeginPlay + ~7 virtual-call
+evaluations per Detour tick (Detour reads the ICrowdAgentInterface
+getters once per query).</li>
+<li>The Z-band filter eliminates ~99% of cross-band RVO computation cost
+- only agents within ±1 band of you contribute to your avoidance
+solve.</li>
+<li>Disabling the filter (<code>r.LcmNav.Crowd.ZBandHeightCm = 0</code>)
+restores legacy Detour coplanar behaviour for benchmarking.</li>
+</ul>
+<h2 id="acceptance-test-manual">Acceptance test (manual)</h2>
+<ol type="1">
+<li>Spawn 5 Recast ground crowd agents in a circle at Z=0.</li>
+<li>Spawn 1 LCM Nav3D flying pawn with
+<code>ULcmCrowdAvoidanceBridge</code> at Z=500.</li>
+<li>Fly the LCM Nav3D pawn through the middle of the ground-agent
+circle.</li>
+<li><strong>Expected</strong>: ground agents continue their pathing
+without dodging the airborne pawn (Z-band separation &gt; 200cm
+default).</li>
+<li>Now fly the LCM Nav3D pawn down to Z=100 - ground agents dodge
+it.</li>
+</ol>
+<p>If step 4 fails (ground agents dodge the airborne pawn), check
+<code>r.LcmNav.Crowd.ZBandHeightCm</code> is not 0.</p>
+<h2 id="what-about-the-lcm-nav3d-pawns-own-avoidance">What about the LCM
+Nav3D pawn's own avoidance?</h2>
+<p>Two paths, both work:</p>
+<ol type="1">
+<li><p><strong>LCM Nav3D CBS/ORCA</strong> (default, the FlyTo task's
+built-in steering): the LCM Nav3D pawn avoids Recast crowd agents via
+the existing CBS context. Detour Crowd is purely the <em>publishing</em>
+surface to the rest of the world.</p></li>
+<li><p><strong>Use UCrowdFollowingComponent on the LCM Nav3D
+pawn</strong>: replace the LCM Nav3D pawn's AIController's
+<code>UPathFollowingComponent</code> with
+<code>UCrowdFollowingComponent</code>. The pawn becomes a full Detour
+Crowd participant - receives the suggested-velocity from Detour and
+applies it through its movement component. Combine with
+<code>ULcmNavMovementComponent</code> for the locomotion side.</p></li>
+</ol>
+<p>Path 1 is the default; Path 2 is for projects that want a uniform
+crowd avoidance solver across LCM Nav3D and Recast agents.</p>
+<h2 id="mass-variant">Mass variant</h2>
+<p>The Mass-Entity equivalent
+(<code>UApexCrowdMassBridgeProcessor</code>) ships with T26 Mass Entity
+work - not yet available.</p>
+<h2 id="related-lcm-nav3d-surfaces">Related LCM Nav3D surfaces</h2>
+<ul>
+<li><code>LCM_BTTask_FlyTo</code> - already has CBS+ORCA built-in for
+LCM Nav3D-internal avoidance</li>
+<li><code>LCM_BTTask_EvadeCBS</code> - pure-defensive evade using the
+same CBS context</li>
+<li><code>ULcmNavMovementComponent</code> - LCM Nav3D-aware flying-pawn
+movement component</li>
+</ul>
+
+  <div class="pager"><a href="ai-perception.html">&larr; AI perception</a><a href="nav-links-and-areas.html">Nav links and area modifiers &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LCM Nav3D Documentation - True Volumetric 3D Navigation for Unreal Engine</title>
+<meta name="description" content="Documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine. Installation, tutorials, settings reference, Mass Entity crowds and the full API.">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/index.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LCM Nav3D Documentation - True Volumetric 3D Navigation for Unreal Engine">
+<meta property="og:description" content="Documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine. Installation, tutorials, settings reference, Mass Entity crowds and the full API.">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index" class="on">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"></p>
+  <h1 id="lcm-nav3d-documentation">LCM Nav3D: Documentation</h1>
+<p><img src="images/welcome-screen.png"
+alt="The LCM Nav3D welcome screen" /></p>
+<blockquote>
+<p><strong>Stuck, or want to talk to the author?</strong> → Discord:
+<strong><a
+href="https://discord.gg/nXkpD6uaBG">https://discord.gg/nXkpD6uaBG</a></strong>
+Verify your purchase in <code>#get-help</code> for direct support, bug
+tracking and early builds. More UEDEV plugins and resources: <strong><a
+href="https://uedevlabs.github.io/">https://uedevlabs.github.io/</a></strong>
+The manual and quick start are also available as PDFs:
+**pdf/LCM_Nav3D_Manual.pdf (The same PDFs ship in this folder - the
+download is only for reading away from the editor.)</p>
+</blockquote>
+<h2 id="start-here">Start here</h2>
+<p><strong>→ [<a
+href="pdf/LCM_Nav3D_QuickStart.pdf">LCM_Nav3D_QuickStart.pdf</a>](pdf/LCM_Nav3D_QuickStart.pdf)
+- 13 pages.</strong> Install it, understand the five settings that
+matter, and have a pawn flying through 3D space in your own level. About
+forty-five minutes end to end. This is the only document most people
+need to read from front to back.</p>
+<p>Everything else is there for when you need it:</p>
+<table>
+<thead>
+<tr>
+<th>If you want to...</th>
+<th>Open</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Get running</strong></td>
+<td>[<a
+href="pdf/LCM_Nav3D_QuickStart.pdf">LCM_Nav3D_QuickStart.pdf</a>](pdf/LCM_Nav3D_QuickStart.pdf)</td>
+<td>13 pp</td>
+</tr>
+<tr>
+<td><strong>Read up on one topic</strong></td>
+<td><a href="PDF"><code>PDF/</code></a> - one file per document</td>
+<td>1-18 pp each</td>
+</tr>
+<tr>
+<td><strong>Look something up</strong></td>
+<td>[<a
+href="pdf/LCM_Nav3D_Manual.pdf">LCM_Nav3D_Manual.pdf</a>](pdf/LCM_Nav3D_Manual.pdf)
+- everything, bookmarked and searchable</td>
+<td>127 pp</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Every PDF is generated from the markdown in this folder, so they
+cannot disagree with each other or with the source. If you are reading a
+<code>.md</code> in a text editor, you are reading exactly what the
+manual contains.</p>
+</blockquote>
+<hr />
+<h2 id="the-editor-tools-at-a-glance">The editor tools, at a glance</h2>
+<p>Everything below lives behind the <strong>Nav3D</strong> button in
+the Level Editor toolbar. If you are looking for a specific panel, this
+is the fastest way to find which document covers it.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Panel</th>
+<th>What it is for</th>
+<th>Documented in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="images/setup-wizard.png" width="150"></td>
+<td><strong>Setup Wizard</strong></td>
+<td>Configure a level from nothing, in one page</td>
+<td><a href="editor-tools.html#setup-wizard">Editor Tools</a></td>
+</tr>
+<tr>
+<td><img src="images/health-check.png" width="150"></td>
+<td><strong>Health Check</strong></td>
+<td>Anything that would stop agents moving, with a Fix button per
+row</td>
+<td><a href="editor-tools.html#health-check">Editor Tools</a></td>
+</tr>
+<tr>
+<td><img src="images/tuner-3-measured-results.png" width="150"></td>
+<td><strong>Auto-Tuner</strong></td>
+<td>Measure candidate voxel settings against your real routes and rank
+them</td>
+<td><a href="editor-tools.html#auto-tuner">Editor Tools</a></td>
+</tr>
+<tr>
+<td><img src="images/manager-details-top.png" width="150"></td>
+<td><strong>Manager panel</strong></td>
+<td>Every navigation setting, plus what those settings resolve to</td>
+<td><a href="settings.html">Settings Reference</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="building-an-agent">Building an agent</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Approach</th>
+<th>Best for</th>
+<th>Tutorial</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="images/behavior-tree-example.png" width="150"></td>
+<td><strong>Behavior Tree</strong></td>
+<td>Most projects. The familiar route.</td>
+<td><a href="your-first-flying-agent.html">03: Your First Flying
+Agent</a></td>
+</tr>
+<tr>
+<td><img src="images/statetree-example.png" width="150"></td>
+<td><strong>StateTree</strong></td>
+<td>State-driven behaviour, data binding instead of a blackboard</td>
+<td><a href="statetree-agent.html">04: The Same Agent in
+StateTree</a></td>
+</tr>
+<tr>
+<td><img src="images/mass-entity-config.png" width="150"></td>
+<td><strong>Mass Entity</strong></td>
+<td>10,000+ agents through the ECS</td>
+<td><a href="mass-entity-crowds.html">06: Mass Entity Crowds</a></td>
+</tr>
+<tr>
+<td><img src="images/eqs-example.png" width="150"></td>
+<td><strong>Tactical EQS</strong></td>
+<td>Queries that score real volume, not a floor plane</td>
+<td><a href="tactical-eqs.html">07: Tactical EQS in True 3D</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="part-i-getting-started">Part I: Getting Started</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What it covers</th>
+<th>PDF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td><a href="installation.html">Installation</a></td>
+<td>Getting the plugin into your project and proving the install is
+good</td>
+<td></td>
+</tr>
+<tr>
+<td>02</td>
+<td><a href="core-concepts.html">Core Concepts</a></td>
+<td>What the navigation manager does, and the settings that decide
+whether it works well</td>
+<td></td>
+</tr>
+<tr>
+<td>03</td>
+<td><a href="your-first-flying-agent.html">Your First Flying
+Agent</a></td>
+<td>A pawn that flies through 3D space to a goal, in your own level</td>
+<td></td>
+</tr>
+<tr>
+<td>04</td>
+<td><a href="statetree-agent.html">The Same Agent in StateTree</a></td>
+<td>The StateTree route to identical flight behaviour</td>
+<td></td>
+</tr>
+<tr>
+<td>05</td>
+<td><a href="dynamic-obstacles.html">Dynamic Obstacles</a></td>
+<td>Making the world move underneath your agents</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="part-ii-going-further">Part II: Going Further</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What it covers</th>
+<th>PDF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>06</td>
+<td><a href="mass-entity-crowds.html">Mass Entity Crowds</a></td>
+<td>10,000+ agents pathfound through the Mass ECS</td>
+<td></td>
+</tr>
+<tr>
+<td>07</td>
+<td><a href="tactical-eqs.html">Tactical EQS in True 3D</a></td>
+<td>Environment queries that score real volume, not a floor plane</td>
+<td></td>
+</tr>
+<tr>
+<td>08</td>
+<td><a href="ai-perception.html">AI Perception</a></td>
+<td>Stock UE perception wired into volumetric threat tracking and
+cover</td>
+<td></td>
+</tr>
+<tr>
+<td>09</td>
+<td><a href="hybrid-recast.html">Hybrid Recast + LCM Nav3D</a></td>
+<td>Walking agents on Recast and flying agents on the SVO, in one
+level</td>
+<td></td>
+</tr>
+<tr>
+<td>10</td>
+<td><a href="nav-links-and-areas.html">Nav Links and Area
+Modifiers</a></td>
+<td>Traversal shortcuts, and regions agents should avoid or prefer</td>
+<td></td>
+</tr>
+<tr>
+<td>11</td>
+<td><a href="gameplay-debugger.html">The Gameplay Debugger</a></td>
+<td>Reading agent and plugin state live in PIE</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="chapter-12-behaviour-tree-stock-patterns">Chapter 12: Behaviour
+Tree stock patterns</h3>
+<p>Seven jobs the engine already does well, and where an LCM Nav3D node
+earns its place instead:</p>
+<table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Document</th>
+<th>PDF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><a href="bt-wait.html">Wait</a></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td><a href="bt-is-at-location.html">IsAtLocation</a></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td><a href="bt-look-at.html">LookAt</a></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td><a href="bt-turn-in-place.html">TurnInPlace</a></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td><a href="bt-health-below.html">HealthBelow</a></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td><a href="bt-perception-relay.html">PerceptionRelay</a></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td><a href="bt-memory-decay.html">MemoryDecay</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="part-iii-reference">Part III: Reference</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What it covers</th>
+<th>PDF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>13</td>
+<td><a href="settings.html">Settings Reference</a></td>
+<td>Every field on the navigation manager, with verified defaults and
+limits</td>
+<td></td>
+</tr>
+<tr>
+<td>14</td>
+<td><a href="troubleshooting.html">Troubleshooting</a></td>
+<td>Problems in the order people actually hit them</td>
+<td></td>
+</tr>
+<tr>
+<td>15</td>
+<td><a href="flight-locomotion.html">Flight and Swim Locomotion</a></td>
+<td>The 6-DOF dynamics layer that turns guidance into believable
+movement</td>
+<td></td>
+</tr>
+<tr>
+<td>16</td>
+<td><a href="mass-traits.html">Mass Trait Reference</a></td>
+<td>Every Mass Entity trait, and the one rule you must not break</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="part-iv-appendix">Part IV: Appendix</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Document</th>
+<th>What it covers</th>
+<th>PDF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>17</td>
+<td><a href="api-reference.html">API Reference</a></td>
+<td>Everything you can reach from Blueprint, the Details panel, a
+Behaviour Tree, a StateTree or a Mass config</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="demo-maps">Demo maps</h2>
+<p>The worked examples referred to throughout live in the plugin's
+<code>Content/Demo/</code> folder, grouped by Behaviour Tree, StateTree
+and Mass Entity. <code>Content/Demo/MainMenu</code> is a gallery that
+opens any of them. Enable <strong>Show Plugin Content</strong> in the
+Content Browser to see them.</p>
+
+  <div class="pager"><span></span><a href="installation.html">Installation &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LCM Nav3D - Realistic Flight/Swim Locomotion Reference | LCM Nav3D</title>
+<meta name="description" content="Ultra-realistic 6-DOF locomotion for flying/swimming pawns , layered on top of LCMNav3D navigation. The nav system provides guidance ; this layer provid...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/flight-locomotion.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LCM Nav3D - Realistic Flight/Swim Locomotion Reference | LCM Nav3D">
+<meta property="og:description" content="Ultra-realistic 6-DOF locomotion for flying/swimming pawns , layered on top of LCMNav3D navigation. The nav system provides guidance ; this layer provid...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion" class="on">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="lcm-nav3d---realistic-flightswim-locomotion-reference">LCM Nav3D
+- Realistic Flight/Swim Locomotion Reference</h1>
+<p>Ultra-realistic 6-DOF locomotion for flying/swimming pawns (drones,
+birds, fish), layered on top of LCMNav3D navigation. The nav system
+provides <strong>guidance</strong> (where to go); this layer provides
+physically-plausible <strong>dynamics</strong> (how the body moves).</p>
+<h2 id="concept---guidance--control--dynamics">Concept - Guidance →
+Control → Dynamics</h2>
+<ul>
+<li><strong>Nav (unchanged):</strong> SVO path / flow field →
+pure-pursuit + CBS/ORCA avoidance → a <em>desired velocity</em>.</li>
+<li><strong><code>ULcmFlightMovementComponent</code> (new):</strong>
+consumes that desired velocity and runs a 6-DOF rigid-body flight/hydro
+model (thrust, lift/drag, gravity/buoyancy, attitude PID) per archetype,
+producing the pawn transform <strong>and</strong> an animation-drive
+struct.</li>
+</ul>
+<h2 id="quick-start">Quick start</h2>
+<ol type="1">
+<li>Add a <strong>Lcm Flight Movement Component</strong> to a pawn whose
+root is a collision primitive.</li>
+<li>Set: <code>bEnabled = true</code>,
+<code>LocomotionModel = FlightDynamics</code>, <code>Archetype</code>
+(Multirotor / Bird / Fish / Generic6DOF), and tune
+<code>FlightConfig</code>.</li>
+<li>Drive it one of two ways:
+<ul>
+<li><strong>Nav-driven (recommended):</strong> on the pawn's
+<strong>BT/StateTree FlyTo</strong> task, tick
+<strong><code>Use Flight Movement Component</code></strong>. The task
+feeds guidance automatically.</li>
+<li><strong>Manual:</strong> call
+<code>RequestVelocity(WorldDesiredVelocity)</code> each tick from your
+own code/Blueprint.</li>
+</ul></li>
+</ol>
+<p>Off by default: with <code>bEnabled=false</code> (or the task flag
+off) nothing changes - motion is the legacy kinematic FlyTo.</p>
+<p><strong>Already have a movement component on the pawn?</strong> Leave
+it there - nothing to remove. While the flight component is enabled it
+takes <strong>sole movement authority</strong>: any other movement
+component driving the same root (<code>FloatingPawnMovement</code>,
+<code>CharacterMovement</code>, <code>ULcmNavMovementComponent</code>)
+is automatically paused (velocity zeroed, deactivated, tick off) and
+restored exactly as found the moment flight stops driving
+(<code>bEnabled=false</code>, the component deactivated, or the pawn
+torn down). Without this, UE runs both integrators against one body and
+the last ticker overwrites the pawn's velocity readout - and a
+<code>CharacterMovement</code> keeps applying gravity against the flight
+dynamics. Opt out per-instance with <strong>Pause Conflicting Movement
+Components</strong>, or globally with
+<code>r.LcmNav.Flight.MovementAuthority 0</code>. Two notes: stock
+<code>MoveTo</code> path-following still binds the pawn's original
+movement component, so drive an enabled flight component with
+<strong>FlyTo</strong> (or <code>RequestVelocity</code>) - and the
+pawn's root primitive must not have <strong>Simulate Physics</strong>
+enabled (the component warns in the log if it does).</p>
+<h3 id="stopping-at-the-goal-hold-station-when-idle">Stopping at the
+goal (Hold Station When Idle)</h3>
+<p>A movement component is told <em>what velocity to have</em>, so
+"stop" has always meant "target zero velocity" - and a body with
+momentum answers that by coasting until drag absorbs it, with nothing to
+bring it back. Measured settling error after arriving inside a 150 cm
+sphere and being told to stop: multirotor 267 cm past the goal, jet 936
+cm, fish 2369 cm, and the bird 14,790 cm away and still descending.</p>
+<p><strong>Hold Station When Idle</strong> (on by default,
+<code>r.LcmNav.Flight.HoldStation</code>) makes an unguided component
+steer back to the point guidance handed it over at, on a gentle
+brake-shaped approach with a deadband so a parked body is genuinely at
+rest. Any <code>RequestVelocity</code> call takes over immediately, so
+it only ever governs an otherwise-idle body. With it on, all four
+archetypes now settle within ~2 m of the goal and stay there.</p>
+<h2
+id="debugging-the-flight-path---planned-vs-predicted-vs-flown">Debugging
+the flight path - planned vs predicted vs flown</h2>
+<p>Turn on the navigation manager's
+<strong><code>bDrawPathfindingDebug</code></strong> (the master switch
+for all path debug) and a flight-component pawn draws three distinct
+lines:</p>
+<table>
+<thead>
+<tr>
+<th>line</th>
+<th>what it shows</th>
+<th>switch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Orange</strong> polyline + red spheres</td>
+<td>the PLANNED path the planner delivered</td>
+<td>manager <code>bDrawPathfindingDebug</code></td>
+</tr>
+<tr>
+<td><strong>Magenta</strong> arc ahead of the pawn</td>
+<td>the PREDICTED dynamic flight path - the component's real dynamics
+rolled forward along the remaining route (look-ahead, banking, braking
+included)</td>
+<td>component <code>bDrawDebugPrediction</code> (default on) /
+<code>r.LcmNav.Flight.DebugPredict</code>, horizon
+<code>r.LcmNav.Flight.DebugPredictSec</code></td>
+</tr>
+<tr>
+<td><strong>Green→red</strong> fading trail behind</td>
+<td>the FLOWN trajectory (speed-coloured), plus yellow = velocity and
+cyan = guidance arrows</td>
+<td>component <code>bDrawDebugTrail</code> (default off) /
+<code>r.LcmNav.Flight.DebugTrail</code>, lifetime
+<code>r.LcmNav.Flight.DebugTrailSec</code></td>
+</tr>
+</tbody>
+</table>
+<p>How to read them: the gap between orange and magenta is the body's
+<em>physics</em> (corner-cutting, brake distance - expected and
+correct); the gap between magenta and the trail is <em>live
+avoidance</em> (neighbours, walls - the prediction deliberately excludes
+what depends on other agents' futures). A lone agent whose trail leaves
+the magenta line is a tracking defect worth reporting. All three draw
+nothing in Shipping builds.</p>
+<h2 id="archetypes-key-flightconfig-params">Archetypes (key
+<code>FlightConfig</code> params)</h2>
+<table>
+<thead>
+<tr>
+<th>Archetype</th>
+<th>Model</th>
+<th>Notable params</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Jet / Fixed-Wing</strong> (<code>Generic6DOF</code>)</td>
+<td>Body-forward thrust, airspeed² lift carrying the weight, coordinated
+bank-to-turn, thrust-vectored VTOL blend below
+<code>WingBorneSpeed</code></td>
+<td><code>MaxThrust</code>, <code>ThrottleResponse</code>,
+<code>WingBorneSpeed</code>, <code>LiftCoeff</code>,
+<code>MaxLiftFactor</code>, <code>BankTurnGain</code>,
+<code>MaxBankAngleDeg</code>, <code>VelocityP</code>,
+<code>AttitudeP/D</code></td>
+</tr>
+<tr>
+<td><strong>Multirotor</strong></td>
+<td>Tilt-to-translate, altitude hold, spool lag, wind/gust, hover
+jitter</td>
+<td><code>RotorSpinUpRate</code>, <code>WindVelocity</code>,
+<code>GustStrength/Frequency</code>, <code>HoverJitterStrength</code>,
+<code>bYawTracksVelocity</code>, <code>RotorMaxRPM</code></td>
+</tr>
+<tr>
+<td><strong>Bird</strong></td>
+<td>Effort-throttled pulsed wingbeat, airspeed² lift, flap↔︎glide, banked
+turns, flare</td>
+<td><code>FlapFrequency</code>, <code>FlapThrust</code>,
+<code>LiftCoeff</code>, <code>MaxLiftFactor</code>,
+<code>BankTurnGain</code>, <code>MaxBankAngleDeg</code>,
+<code>FlareSpeed</code>, <code>FlareDragScale</code></td>
+</tr>
+<tr>
+<td><strong>Fish</strong></td>
+<td>Neutral buoyancy, tail-beat undulatory thrust + sway, anisotropic
+hydro drag, current</td>
+<td><code>bNeutralBuoyancy</code>, <code>TailBeatFrequency</code>,
+<code>TailBeatFreqGain</code>, <code>TailWiggleStrength</code>,
+<code>LateralDragMult</code>, <code>WaterCurrent</code></td>
+</tr>
+</tbody>
+</table>
+<p>Shared: <code>MaxSpeed</code>, <code>MaxAcceleration</code>,
+<code>MaxTiltAngleDeg</code> (Multirotor), <code>MaxTurnRateDeg</code>,
+<code>SubSteps</code> (integration sub-steps; higher = stiffer +
+smoother), <code>BankingAmount</code>/<code>MaxBankingAngle</code>
+(kinematic-mode roll).</p>
+<h3
+id="winged-bodies-jet-bird---how-they-fly-and-how-to-tune-them">Winged
+bodies (Jet, Bird) - how they fly, and how to tune them</h3>
+<p>Both share one wing model, and it behaves like an aircraft rather
+than a hovering body:</p>
+<ul>
+<li><strong>Turns are made by banking.</strong> The heading error
+commands a bank; the banked lift supplies the centripetal force; the
+nose then follows the <em>velocity</em>. So a winged body has a genuine
+minimum turn radius, <code>v² / (g·tan(MaxBankAngleDeg))</code> - 212 cm
+at 600 cm/s and 60°. Raise <code>MaxBankAngleDeg</code> (and
+<code>MaxLiftFactor</code> with it) for tighter turns; lower it for a
+heavy bomber.</li>
+<li><strong>Lift carries the weight, thrust only fights drag.</strong>
+At cruise the throttle sits near <code>drag/MaxThrust</code> (~0.12 at
+defaults). <code>LiftCoeff</code> sets how much airspeed the wing needs:
+weight is balanced when <code>LiftCoeff·v² = Mass·980</code>.</li>
+<li><strong>They cannot pinpoint-stop on aerodynamics alone.</strong>
+Commanded to a hard stop, a wing has nothing to push against. The
+<strong>Jet</strong> answers this with a thrust-vectored blend below
+<code>WingBorneSpeed</code>; the <strong>Bird</strong> flares to shed
+speed and hover-flaps to hold. Both rely on the nav layer's arrival ramp
+- with a constant full-speed command any fast forward-flyer orbits its
+goal, which is expected.</li>
+<li><strong>Arriving is not the same as staying.</strong> When a FlyTo
+task arrives it stops feeding guidance, and an unguided flight component
+<strong>holds the position it was left at</strong> rather than coasting
+to wherever momentum runs out (see <em>Hold Station When Idle</em>
+below). Without that a winged body sails past its goal and never comes
+back.</li>
+<li><strong>The Jet is <code>Generic6DOF</code> remodelled</strong> (the
+enum name is unchanged so existing content keeps working).
+<code>r.LcmNav.Flight.JetGeneric 0</code> restores the previous
+hover-thruster behaviour exactly.</li>
+</ul>
+<p>Notes:</p>
+<ul>
+<li><p>A fast forward-flyer (bird/fish) can't pinpoint-stop; the nav
+layer's <strong>arrival slowdown</strong> makes it flare to a perch.
+Without arrival-aware guidance a fast body orbits its goal
+(expected).</p></li>
+<li><p>Realistic dynamics <em>lag</em> guidance by design; raise
+<code>MaxAcceleration</code> for snappier, lower for
+heavier/driftier.</p></li>
+<li><p><strong>The two control loops are a cascade - tune them as a
+pair, never one alone.</strong> <code>VelocityP</code> is the outer loop
+(time constant <code>1/VelocityP</code>); it commands a <em>tilt</em>
+that the inner <code>AttitudeP</code>/<code>AttitudeD</code> loop must
+then achieve. Keep the inner loop <strong>~4× faster</strong> than the
+outer one, or the body wanders side to side and hunts back and forth
+around its goal:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>formula</th>
+<th>shipped default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>inner natural frequency</td>
+<td><code>wn = sqrt(AttitudeP)</code></td>
+<td>7.75 rad/s</td>
+</tr>
+<tr>
+<td>inner damping ratio</td>
+<td><code>z = (AttitudeD + AngularDrag) / (2*wn)</code></td>
+<td>0.84</td>
+</tr>
+<tr>
+<td>inner time constant</td>
+<td><code>1/(z*wn)</code></td>
+<td>0.15 s</td>
+</tr>
+<tr>
+<td>outer time constant</td>
+<td><code>1/VelocityP</code></td>
+<td>0.67 s</td>
+</tr>
+</tbody>
+</table>
+<p>⚠ <code>AngularDrag</code> adds to <code>AttitudeD</code> - the
+integrator applies <code>-AttitudeD*w</code> and then
+<code>-AngularDrag*w</code>, so the loop's real damping is the
+<strong>sum</strong>. Raising <code>AttitudeP</code> for a snappier body
+without raising <code>AttitudeD</code> with it drops <code>z</code>
+below ~0.7 and the body visibly rings after every heading change.
+Damping must scale as <code>2*z*sqrt(AttitudeP)</code>.</p></li>
+</ul>
+<h3
+id="altitude-while-manoeuvring---maxtiltangledeg-and-the-thrust-budget">Altitude
+while manoeuvring - <code>MaxTiltAngleDeg</code> and the thrust
+budget</h3>
+<p>A tilt-to-translate body (Generic6DOF / Multirotor) keeps only
+<code>cos(tilt)</code> of its thrust opposing gravity, so holding height
+while tilted needs a thrust-to-weight ratio of
+<code>1/cos(tilt)</code>:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">tilt</th>
+<th style="text-align: right;">lateral accel available</th>
+<th style="text-align: right;">thrust-to-weight needed just to hold
+height</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">566 cm/s²</td>
+<td style="text-align: right;">1.15×</td>
+</tr>
+<tr>
+<td style="text-align: right;">45°</td>
+<td style="text-align: right;">980 cm/s²</td>
+<td style="text-align: right;">1.41×</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>60°</strong> (default)</td>
+<td style="text-align: right;"><strong>1697 cm/s²</strong></td>
+<td style="text-align: right;"><strong>2.0×</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">75°</td>
+<td style="text-align: right;">3657 cm/s²</td>
+<td style="text-align: right;">3.9×</td>
+</tr>
+</tbody>
+</table>
+<p><code>MaxTiltAngleDeg</code> caps this so the body cannot ask for a
+manoeuvre that costs it altitude, and when the thrust budget saturates
+the <strong>vertical axis is served first</strong> and the lateral axis
+takes the remainder. ⚠ Raising the tilt limit without raising
+<code>MaxThrust</code> to match makes the body descend under hard
+lateral commands - the harder you ask it to move, the faster it sinks.
+Keep <code>MaxThrust ≳ Mass * 980 / cos(MaxTiltAngleDeg)</code>; at the
+shipped 1 kg / 3000 / 60° there is 2× margin.</p>
+<h3 id="reaching-the-commanded-speed---drag-is-fed-forward">Reaching the
+commanded speed - drag is fed forward</h3>
+<p>The velocity loop cancels the drag it is about to apply, exactly as
+it already cancels gravity. That matters more than it sounds: drag is a
+<em>constant disturbance</em> to a proportional-only loop, and a P-only
+loop answers one with a <strong>permanent offset</strong> of
+<code>|drag| / (Mass * VelocityP)</code>. Left uncancelled at the
+shipped defaults that is 336 cm/s against a 600 cm/s command - the body
+would cruise at 44 % of what it was told, and no gain fixes it (raising
+<code>VelocityP</code> shrinks the error but costs the visible lean).
+Kill switch <code>r.LcmNav.Flight.DragFeedForward 0</code>.</p>
+<h3 id="making-a-body-lean-tilt-to-translate-look">Making a body
+<em>lean</em> (tilt-to-translate look)</h3>
+<p>A thrust-vector body leans because thrust must point along
+<code>Mass*accel + weight</code>. There is no cosmetic lean parameter in
+<code>FlightDynamics</code> mode - the attitude is physical, so you get
+lean by changing what the body has to <em>do</em>. Three separate
+mechanisms, commonly confused:</p>
+<table>
+<thead>
+<tr>
+<th>Want</th>
+<th>Knob</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Forward lean while cruising</strong></td>
+<td><code>LinearDragCoeff.X/Y</code> ⬆</td>
+<td>At steady speed accel≈0, so lean is exactly
+<code>atan(drag/weight)</code>. <strong>No control gain can change
+this.</strong> 0.5→1.4 takes it from 10°→28° at 600 cm/s.</td>
+</tr>
+<tr>
+<td><strong>Lean while accelerating/braking</strong></td>
+<td><code>VelocityP</code> ⬇</td>
+<td>Peak lean is <code>atan(VelocityP*MaxSpeed/g)</code> but it decays
+over <code>1/VelocityP</code>, and the area is fixed. High gain = a
+spike too brief to see; low gain = a shallower lean actually held.</td>
+</tr>
+<tr>
+<td><strong>Bank into turns</strong></td>
+<td><code>YawP</code> ⬇ (keep ≪ <code>AttitudeP</code>)</td>
+<td>The body banks only while its velocity error is <em>lateral</em>.
+Fast yaw whips the nose onto the new heading first, making the error
+forward instead - pivot-then-go, no bank.</td>
+</tr>
+</tbody>
+</table>
+<p>⚠ In <code>Kinematic</code> mode none of the above applies: attitude
+there is cosmetic, driven by <code>BankingAmount</code> and
+<code>MaxBankingAngle</code>.</p>
+<h3
+id="bankingamount-is-now-a-multiple-of-the-physically-correct-bank"><code>BankingAmount</code>
+is now a multiple of the physically correct bank</h3>
+<p><code>BankingAmount</code> (Kinematic mode, and the matching field on
+BT/StateTree FlyTo) is a <strong>multiplier on the coordinated-turn
+angle</strong> <code>tan(bank) = V * yawRate / g</code>. <code>1</code>
+is the true bank a real body holds in that turn; above 1 exaggerates it
+for readability; <code>0</code> flies wings-level.</p>
+<p>⚠ <strong>Its default changed from 4 to 1 and the old number does not
+carry over.</strong> The previous law dotted a <em>normalised</em>
+per-frame velocity delta with the right vector - normalising throws away
+how hard the turn actually is, so the roll command sat near ±1 on
+ordinary velocity noise and the body flicked between ±4° every frame in
+straight flight. Multiplying the correct law by 4 instead saturates
+<code>MaxBankingAngle</code> in any ordinary turn. If you had authored a
+value here, re-tune it around 1. Legacy law:
+<code>r.LcmNav.Flight.CoordinatedBank 0</code>.</p>
+<h3 id="flying-straight-up-or-down">Flying straight up or down</h3>
+<p>Travel-referenced attitude is built by <strong>parallel
+transport</strong> of the previous frame, not from a world-up reference.
+This is not a refinement - the two obvious UE builders are
+<em>discontinuous</em> at vertical travel, and both were in use:</p>
+<ul>
+<li><code>FVector::Rotation</code> yaws by <code>atan2(Y, X)</code>,
+which at <code>X = Y = 0</code> is <code>atan2(0,0) = 0</code>: a body
+climbing straight up snaps its heading to world +X, then swings with any
+lateral noise.</li>
+<li><code>FRotationMatrix::MakeFromXZ</code>
+<strong>substitutes</strong> <code>(1,0,0)</code> for its up reference
+once <code>|Fwd.Z|</code> passes <code>1 - KINDA_SMALL_NUMBER</code> -
+the frame teleports rather than degrading.</li>
+</ul>
+<p>Either one makes a climbing or diving agent roll hard for reasons
+invisible in its flight path. World-up levelling is still applied,
+weighted by how horizontal the travel is, so it fades out exactly where
+the reference stops being meaningful and the body simply holds its roll
+through vertical. Applies to Kinematic, Bird, Fish and both FlyTo tasks.
+Kill switch <code>r.LcmNav.Flight.ContinuousFrame 0</code>.</p>
+<h3 id="the-vertical-axis-has-its-own-gain---velocitypz">The vertical
+axis has its own gain - <code>VelocityPZ</code></h3>
+<p><code>VelocityP</code> is held low on purpose: horizontally it
+commands a <strong>tilt</strong> the attitude loop then has to achieve,
+so it must stay ~4× slower than that loop. The vertical axis has no such
+constraint - thrust acts on it <strong>directly</strong>, with no
+attitude change in between - so making it share the slow gain costs
+bandwidth for nothing. Every production multirotor controller splits
+these (PX4 <code>MPC_Z_VEL_P</code> vs <code>MPC_XY_VEL_P</code>;
+ArduPilot <code>PSC_VELZ_P</code> vs <code>PSC_VELXY_P</code>).</p>
+<p>Measured on a closed-loop rig flying a <strong>dead-level</strong>
+path, so any altitude motion is controller-generated:</p>
+<table>
+<thead>
+<tr>
+<th><code>VelocityPZ</code></th>
+<th style="text-align: right;">settled altitude wander</th>
+<th style="text-align: right;">settled vertical speed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>legacy (shares <code>VelocityP</code> = 1.5)</td>
+<td style="text-align: right;">40.3 cm</td>
+<td style="text-align: right;">33.4 cm/s</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">26.1</td>
+<td style="text-align: right;">30.3</td>
+</tr>
+<tr>
+<td><strong>4 (default)</strong></td>
+<td style="text-align: right;"><strong>6.0 cm</strong></td>
+<td style="text-align: right;"><strong>12.1 cm/s</strong></td>
+</tr>
+<tr>
+<td>8</td>
+<td style="text-align: right;">5.4</td>
+<td style="text-align: right;">9.9</td>
+</tr>
+</tbody>
+</table>
+<p>Cross-track error and arrival time are unchanged (173.8→173.6 cm,
+10.85→10.83 s), so it costs nothing horizontally. <strong>4 is derived,
+not chosen:</strong> position-loop damping
+<code>ζ = 0.5·√(Kz·L/v)</code> reaches 1.0 at Kz=4 when the look-ahead
+equals the speed, and the velocity loop's damping against the rotor
+spool, <code>ζ = 1/(2√(Kz·τ_spool))</code>, is 0.707 at exactly Kz=4
+with <code>RotorSpinUpRate</code> 8. Raise <code>RotorSpinUpRate</code>
+too if you push it much past 4.</p>
+<h3 id="a-path-that-ends-short-of-the-goal-no-longer-orbits">A path that
+ends short of the goal no longer orbits</h3>
+<p>If the delivered path's last waypoint is further than <strong>2 ×
+Acceptance Radius</strong> from the goal, the task used to pin the index
+back to that waypoint <em>every tick</em> - and since the agent is
+already inside the acceptance radius of it, the next tick retired it and
+pinned again. Measured: <strong>1750 pin events in 40 s</strong>, with
+the task neither succeeding nor failing. It now pins once, holds
+position, replans twice, and then reports <strong>Failed</strong> with a
+log line naming the likely cause. Common causes of a short path: the
+goal quantises to a leaf centre, or
+<code>r.LcmNav.SeamSafe.TruncateUnprovable</code> (default ON) truncated
+the route at its first unprovable leg.</p>
+<h2 id="troubleshooting---symptom-to-cause">Troubleshooting - symptom to
+cause</h2>
+<p>Every row below is a <em>structural</em> cause with its own kill
+switch, so each can be A/B'd on its own. Work down the list; do not
+start by re-tuning gains, because none of these is a gain problem.</p>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Switch to A/B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Altitude swings up and down continuously, even in level
+flight</strong></td>
+<td><strong>The vertical axis shared the (deliberately slow) horizontal
+<code>VelocityP</code>, leaving the pure-pursuit position loop at ζ≈0.61
+- underdamped, with nothing to damp it</strong></td>
+<td><strong><code>VelocityPZ</code> (default 4; set 0 for the legacy
+shared gain)</strong></td>
+</tr>
+<tr>
+<td><strong>Never reaches a waypoint, circles it forever, task never
+Succeeds or Fails</strong></td>
+<td><strong>End-of-path fallsafe re-pinned the index every tick when the
+path ended &gt;2×AcceptanceRadius short of the goal</strong></td>
+<td>fixed unconditionally; look for the <code>[FlyTo] giving up:</code>
+warning</td>
+</tr>
+<tr>
+<td>Altitude rings up then sags whenever it starts a horizontal
+move</td>
+<td>Thrust magnitude applied along the body's <em>current</em> axis
+instead of projected onto it</td>
+<td><code>r.LcmNav.Flight.ThrustProjection</code></td>
+</tr>
+<tr>
+<td>Sinks during hard turns or fast starts</td>
+<td>Tilt unbounded / thrust saturation cutting the vertical
+component</td>
+<td><code>r.LcmNav.Flight.ThrustPriority</code>, then raise
+<code>MaxThrust</code> or lower <code>MaxTiltAngleDeg</code></td>
+</tr>
+<tr>
+<td>Never reaches its commanded speed; feels unresponsive</td>
+<td>Drag not fed forward → permanent P-loop offset</td>
+<td><code>r.LcmNav.Flight.DragFeedForward</code></td>
+</tr>
+<tr>
+<td>Rolls violently when climbing or diving steeply</td>
+<td>Discontinuous world-up attitude reference</td>
+<td><code>r.LcmNav.Flight.ContinuousFrame</code></td>
+</tr>
+<tr>
+<td>Twitches side to side in straight, level flight</td>
+<td>Roll commanded from a <em>normalised</em> velocity delta</td>
+<td><code>r.LcmNav.Flight.CoordinatedBank</code></td>
+</tr>
+<tr>
+<td>Lurches when it passes a waypoint or an avoidance term flips</td>
+<td>Discontinuous guidance command stepping the cascade</td>
+<td><code>r.LcmNav.Flight.GuidanceSlew</code></td>
+</tr>
+<tr>
+<td>Judders / grinds along a surface it is touching</td>
+<td>Velocity not corrected after a blocking sweep</td>
+<td><code>r.LcmNav.Flight.SlideVelocity</code></td>
+</tr>
+<tr>
+<td>Weaves near geometry it is not even approaching</td>
+<td>Wall whiskers cast off the <em>nose</em> (which lags travel),
+binary, no forward or vertical coverage</td>
+<td><code>r.LcmNav.WallAvoidV2 1</code> (⚠ default 0 - see below)</td>
+</tr>
+<tr>
+<td>Bird's wingbeat stutters on and off at cruise</td>
+<td>Flap/glide threshold had no hysteresis</td>
+<td>fixed unconditionally (Schmitt trigger on
+<code>GaitEffort</code>)</td>
+</tr>
+<tr>
+<td>Fish rolls in time with its own tail beat</td>
+<td>Wiggle force fed back into the attitude error</td>
+<td>fixed unconditionally</td>
+</tr>
+<tr>
+<td>Passes waypoints / overshoots the goal</td>
+<td>Guidance solving stopping distance against
+<code>MaxAcceleration</code>, a ceiling the loop rarely reaches</td>
+<td><code>r.LcmNav.FlightGuidanceAccelFromVelocityP</code> (already
+default 1)</td>
+</tr>
+<tr>
+<td>Weaves along a dense path</td>
+<td>Pure-pursuit look-ahead shorter than the body's response
+distance</td>
+<td><code>r.LcmNav.PursuitLagFloorK</code> (already default 1.5)</td>
+</tr>
+</tbody>
+</table>
+<p>⚠ <strong><code>r.LcmNav.WallAvoidV2</code> defaults to 0 on
+purpose.</strong> Reducing this term's authority has been <em>measured
+harmful</em> once already - a bounded version cost a single agent its
+arrival (33 loop events, orbiting), because a planned route sometimes
+points into a wall and only a full-authority push clears it. V2 keeps
+full authority at contact and only ramps the far field, but that
+measurement has not been retaken against it. Turn it on if flyers judder
+near geometry, and re-check arrival rates.</p>
+<h2 id="animation-contract---flcmflightstate">Animation contract -
+<code>FLcmFlightState</code></h2>
+<p>Every tick the component produces <code>FLcmFlightState</code>
+(archetype-agnostic where possible):</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Speed01</code></td>
+<td>Normalized airspeed (|velocity| / MaxSpeed) - blendspace axis</td>
+</tr>
+<tr>
+<td><code>VerticalSpeed</code></td>
+<td>cm/s, climb + / dive − - climb/dive pose blend</td>
+</tr>
+<tr>
+<td><code>BankAngleDeg</code> / <code>PitchDeg</code></td>
+<td>Body roll / pitch - additive lean/pitch</td>
+</tr>
+<tr>
+<td><code>YawRateDeg</code></td>
+<td>Turn rate - lean/tilt into turns</td>
+</tr>
+<tr>
+<td><code>GaitPhase</code></td>
+<td>0.1 cyclic driver: rotor spin / wingbeat / tail-beat</td>
+</tr>
+<tr>
+<td><code>GaitAmplitude01</code></td>
+<td>Throttle (drone) / flap-glide blend (bird) / undulation vigour
+(fish)</td>
+</tr>
+<tr>
+<td><code>RotorRPM</code></td>
+<td>Multirotor rotor RPM</td>
+</tr>
+<tr>
+<td><code>Throttle01</code> / <code>Airspeed</code></td>
+<td>Commanded effort / raw speed</td>
+</tr>
+</tbody>
+</table>
+<p>Consume it two ways:</p>
+<ul>
+<li><strong>Pull:</strong> <code>GetFlightState</code> (BlueprintPure)
+on the component, e.g. from an AnimBP's Update.</li>
+<li><strong>Push:</strong> implement
+<strong><code>ILcmFlightAnimInterface::ReceiveFlightState</code></strong>
+on your AnimBP (or pawn). The component calls it every tick
+(<code>bBroadcastAnimState</code>, default on). Cache the struct and
+drive:
+<ul>
+<li><code>GaitPhase</code> → rotor/wing/tail cyclic pose (Sine/curve on
+the phase)</li>
+<li><code>Speed01</code> + <code>VerticalSpeed</code> → locomotion
+blendspace</li>
+<li><code>BankAngleDeg</code> / <code>PitchDeg</code> → additive
+lean/pitch</li>
+<li><code>GaitAmplitude01</code> → flap-vs-glide (bird) or effort
+(fish/drone) blend weight</li>
+<li><code>RotorRPM</code> → prop-spin material/WPO param
+(Multirotor)</li>
+</ul></li>
+</ul>
+<h2 id="mass-crowds--scale-p7-p8">Mass crowds &amp; scale (P7-P8)</h2>
+<p>The <strong>LCM Nav3D Agent</strong> trait (NavMode = PathFollowing)
+carries the same flight options (<code>LocomotionModel</code>,
+<code>FlightArchetype</code>, <code>FlightConfig</code>) - set them and
+a whole crowd flies with the identical 6-DOF physics as a pawn, still
+pathing + avoiding + arriving. Default <code>Kinematic</code> →
+byte-identical to before.</p>
+<p><strong>Dynamics LOD (the scale knob).</strong> Full 6-DOF per agent
+is expensive; set <code>FlightDynamicsLODDistance</code> (cm) so only
+agents within that distance of the viewer run full dynamics - everyone
+else uses the cheap kinematic integrator (face-velocity, no roll). So a
+10K crowd keeps only the on-screen agents on the expensive path.
+<code>0</code> = always full. Global kill switch:
+<code>r.LcmNav.Mass.FlightLOD</code> (1 default / 0 = full everywhere).
+LOD switching is seamless - a far agent's integrator state re-syncs from
+its live transform when it returns to range.</p>
+<p><strong>Deferred (documented) scale extensions:</strong></p>
+<ul>
+<li><strong>GPU 6-DOF compute</strong> for very large crowds is a
+designed extension, intentionally not shipped here: CPU dynamics-LOD
+already bounds cost to the visible set, which is the cheaper win.
+Revisit with engine uplift.</li>
+<li><strong>Shared flight config</strong> - <code>FlightConfig</code> is
+currently per-entity; moving it to a const-shared fragment per archetype
+would cut crowd memory. Deferred (shared-fragment archetype
+plumbing).</li>
+</ul>
+<h2 id="determinism">Determinism</h2>
+<p>The dynamics are deterministic: fixed integration sub-steps, no RNG
+or wall-clock; gust/jitter are seeded per-agent sinusoidal noise. Same
+input sequence → identical trajectory.</p>
+<h2 id="bird-and-fish-do-not-share-the-drone-control-cascade">Bird and
+Fish do not share the drone control cascade</h2>
+<p>⚠ <strong><code>StepBird</code> and <code>StepFish</code> are
+separate integrators - they never call
+<code>RunStep6DOF</code>.</strong> That is deliberate (a bird does not
+translate sideways by tilting a rotor), but it meant they also never had
+its velocity-tracking loop: thrust acts along body-forward only, and
+until 2026-08-06 <strong>nothing corrected a velocity error
+perpendicular to the nose</strong>. They pointed at the guidance
+direction and waited for drag, so cross-track and altitude error could
+only decay passively - never be driven to zero. That is what "drifts
+away from the path points" was.</p>
+<p>They now generate the perpendicular force a banked wing or a flexing
+body actually produces, bounded by what the body can physically supply -
+<strong>lift</strong> for the bird, <strong>tail/fin thrust scaled by
+swim effort</strong> for the fish. <code>BankTurnGain</code> is the rate
+(1/s) that converts a cm/s error into that demand, which is what its own
+description always claimed. Measured on one corner path, same
+guidance:</p>
+<table>
+<thead>
+<tr>
+<th>archetype</th>
+<th style="text-align: right;">cross-track before → after</th>
+<th style="text-align: right;">altitude error before → after</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generic6DOF (reference)</td>
+<td style="text-align: right;">174.3 → 174.3</td>
+<td style="text-align: right;">9.4 → 9.4</td>
+</tr>
+<tr>
+<td>Multirotor (reference)</td>
+<td style="text-align: right;">173.6 → 173.6</td>
+<td style="text-align: right;">22.8 → 22.8</td>
+</tr>
+<tr>
+<td><strong>Bird</strong></td>
+<td style="text-align: right;"><strong>234.4 → 183.9</strong></td>
+<td style="text-align: right;">69.7 → 61.5</td>
+</tr>
+<tr>
+<td><strong>Fish</strong></td>
+<td style="text-align: right;">203.7 → 198.4</td>
+<td style="text-align: right;"><strong>64.0 → 17.4</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Both drone archetypes are byte-identical (their gate checksums are
+unchanged), because the change is scoped to the two integrators that
+lacked the loop. Kill switch
+<code>r.LcmNav.Flight.BodyManeuver 0</code>.</p>
+<p>⛔ <strong>Do not "simplify" the bird by removing its
+<code>LiftControl</code> trim as a duplicate vertical
+controller.</strong> Measured and reverted: it is the bird's only means
+of balancing lift against gravity - lift is
+<code>LiftCoeff × airspeed²</code>, which at cruise exceeds body weight,
+so without the trim the bird climbs away (altitude error 61.5 → 186.4
+cm). The trim sets lift <em>magnitude</em> for equilibrium; the
+manoeuvre force supplies <em>perpendicular authority</em>. They are not
+redundant.</p>
+<h2 id="hard-turns-progress-does-not-depend-on-hitting-a-sphere">Hard
+turns: progress does not depend on hitting a sphere</h2>
+<p>⚠ <strong>If a tighter Acceptance Radius makes your agents stick,
+this is why.</strong> A waypoint used to be retired only by
+<code>HasReachedOrPassedWaypoint</code>: <em>within Acceptance
+Radius</em>, <strong>or</strong> <em>past the plane through it normal to
+the incoming leg</em>. At a corner sharper than the body's minimum turn
+radius - <code>v / VelocityP</code>, which is <strong>400 cm</strong> at
+the shipped defaults - the agent cannot pass within a 100 cm radius, and
+the plane has rotated with the path so it is not past that either.
+<strong>The gate becomes unsatisfiable</strong>, the index stalls on a
+point now <em>behind</em> the agent, and because pure pursuit measures
+its look-ahead <em>from the current index</em>, the aim point sits
+behind too and drags the agent backwards.</p>
+<p>Measured on 375 cm waypoint spacing (what <code>ChunkSize</code> 3000
+produces), 135° corner:</p>
+<table>
+<thead>
+<tr>
+<th>acceptance radius</th>
+<th>gate only</th>
+<th>+ projection advance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>50 cm</td>
+<td><strong>stuck</strong> - 39.9 s stalled, 1214 backtrack ticks</td>
+<td>arrives, 0 backtrack</td>
+</tr>
+<tr>
+<td><strong>100 cm</strong></td>
+<td><strong>stuck</strong> - 40.0 s stalled, 1214 backtrack ticks</td>
+<td>arrives, 0 backtrack</td>
+</tr>
+<tr>
+<td>200 cm</td>
+<td>arrives</td>
+<td>identical</td>
+</tr>
+<tr>
+<td>400 cm</td>
+<td>arrives</td>
+<td>identical</td>
+</tr>
+</tbody>
+</table>
+<p>The index now <em>also</em> advances by <strong>projecting the agent
+onto its path</strong>, so progress is monotone and independent of the
+acceptance gate. It is <strong>inert</strong> wherever the gate already
+works (45° and 90° corners are byte-identical; 200 cm and 400 cm radii
+are byte-identical). On the demo map at <code>ChunkSize</code> 3000 with
+7 agents it took arrivals from 1/7 to 3-4/7 and mean cross-track from
+392 cm to ~225 cm.</p>
+<p>⚠ <strong><code>r.LcmNav.PathProjectWindow</code> (default 3) is
+load-bearing, not an optimisation.</strong> On a hairpin the return leg
+runs spatially alongside the outbound one, so an unbounded
+nearest-segment search would snap the agent onto the return leg before
+it had rounded the corner and cut the whole turn. Kill switch for the
+whole behaviour: <code>r.LcmNav.PathProjectAdvance 0</code>.</p>
+<p>⚠ Acceptance Radius still does not control path adherence - it never
+did. It decides when a point is <em>retired</em>, not how closely the
+agent flies. Corner-cutting is bounded by physics: minimum turn radius
+is <code>v²/a_eff</code>, so waypoints spaced closer than that will be
+passed wide however you tune this.</p>
+<h3
+id="scope-every-follower-rework-in-this-section-is-6-dof-only">Scope:
+every follower rework in this section is 6-DOF ONLY</h3>
+<p>⛔ The behaviours documented below - progress-based stall detection,
+the visibility-clamped look-ahead, the backward speed profile, and the
+projection index advance - apply <strong>only</strong> to a pawn driven
+by an enabled <code>ULcmFlightMovementComponent</code> in
+<strong>FlightDynamics (6-DOF)</strong> mode.</p>
+<p>The <strong>Kinematic (legacy point-mass)</strong> model and pawns
+with no component at all (which the task integrates itself) keep their
+original behaviour exactly: the acceptance-gate-only waypoint advance,
+the unclamped look-ahead target, the one-corner speed cap, and the
+displacement-based stall timer. Those are separate shipped locomotion
+models whose feel users have already built content against.</p>
+<p>⚠ <strong>Both defaults point away from 6-DOF</strong>
+(<code>LocomotionModel = Kinematic</code>,
+<code>bUseFlightMovementComponent = false</code>), so a
+<strong>default-configured pawn gets none of this</strong>. It is
+opt-in, by design. <code>LcmFlightLocomotion::IsSixDofBody</code> is the
+single predicate; do not re-derive it.</p>
+<p>The same rule covers the attitude rework
+(<code>r.LcmNav.Flight.LegacyAttitudeOutside6DOF</code>, default 1) and
+the component's guidance-reference limiter and slide-velocity
+correction, which are likewise 6-DOF only. The limiter in particular
+<strong>must not</strong> reach Kinematic:
+<code>ELcmFlightStyle::LinearDirect</code> exists to answer a command
+directly and <code>PhysicsWeighted</code> to answer it with inertia, and
+handing <code>LinearDirect</code> a reference already ramped at
+<code>MaxAcceleration</code> makes the two indistinguishable.</p>
+<h3 id="stall-recovery-measures-progress-not-motion">Stall recovery
+measures PROGRESS, not motion</h3>
+<p>An agent that is flying in a circle is, to every speed-based health
+check, perfectly healthy. That is not a hypothetical: on
+<code>Vertical_Skyscraper</code> at <code>ChunkSize</code> 3000 the
+flyer went <strong>828 m to gain 35 m</strong> (tortuosity 23.8, 53 loop
+events) and <em>every</em> recovery counter read zero -
+<code>stallFrac</code> 0.00, <code>escapeTicks</code> 0,
+<code>replans</code> 0, <code>paths</code> 1. It orbited the first
+storey until the run timed out.</p>
+<p>The cause was one line. The stall timer reset whenever the pawn had
+moved more than 50 cm from <code>StallEscapeAnchor</code> - and then
+moved the anchor to the pawn:</p>
+<pre class="cpp"><code>if (FVector::DistSquared(NowPos, StallEscapeAnchor) &gt; 2500.0f) // &quot;&gt;50 cm = progress&quot;
+{ StallEscapeAnchor = NowPos; StallEscapeSeconds = 0.0f; }</code></pre>
+<p>An orbiting agent clears 50 cm every few frames, so the timer could
+never accumulate. <strong>The one recovery path that could have broken
+the loop was held open by the loop itself.</strong></p>
+<p>Progress is now <strong>remaining arc length along the path</strong>
+(<code>ULcmSteeringMath::RemainingPathLengthCm</code>), which falls
+monotonically along any correct traversal and does not fall at all while
+orbiting.</p>
+<p>⛔ <strong>Straight-line distance to the goal is the wrong scalar and
+must not be substituted.</strong> A correct route routinely moves
+<em>away</em> from the goal - the horizontal leg of a vertical
+switchback, or any detour round an obstacle - so a goal-distance
+watchdog fires on healthy navigation.</p>
+<p>⚠ <code>StallBestRemainCm</code> <strong>must</strong> be reset to
+<code>TNumericLimits&lt;float&gt;::Max</code> every time
+<code>CurrentPath</code> is replaced. A fresh path legitimately has a
+larger remaining length; without the reset it reads as permanent
+no-progress and arms recovery forever.</p>
+<table>
+<thead>
+<tr>
+<th><code>Vertical_Skyscraper</code>, CS 3000</th>
+<th>legacy</th>
+<th>progress-based</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>outcome</td>
+<td>stuck at Z=−6999 (first storey)</td>
+<td>climbs the tower</td>
+</tr>
+<tr>
+<td>closest approach</td>
+<td>15855 cm</td>
+<td>600 cm (143 cm with a shorter look-ahead)</td>
+</tr>
+<tr>
+<td>tortuosity</td>
+<td>23.8-31.6</td>
+<td>5.6-6.8</td>
+</tr>
+<tr>
+<td>loop events</td>
+<td>53-68</td>
+<td>0-13</td>
+</tr>
+<tr>
+<td>replans</td>
+<td><strong>1</strong></td>
+<td>19-39</td>
+</tr>
+</tbody>
+</table>
+<p>The legacy failure is bit-reproducible (15855 cm / 31.56 / 68 loops /
+1 path on every run), which makes this map a far better regression
+instrument than the 7-agent demo scenario.</p>
+<p>Kill switch: <code>r.LcmNav.ProgressStallDetect 0</code>. Threshold:
+<code>r.LcmNav.ProgressEpsilonCm</code> (default 50).</p>
+<h3
+id="the-look-ahead-target-must-be-reachable-not-merely-on-the-path">The
+look-ahead target must be REACHABLE, not merely on the path</h3>
+<p>Pure pursuit measures its look-ahead <strong>along the path</strong>,
+then flies at the result in a <strong>straight line</strong>. Those are
+the same thing only where the path is locally straight. In a vertical
+shaft with offset floor openings, a target 400-1000 cm along the path
+sits on the far side of a <strong>slab</strong>, and the straight line
+to it goes through solid. The agent charges a point it cannot reach, is
+blocked, retries, and orbits - the user-visible <em>"it reaches for a
+further point before finishing the nearest one, then gets
+stuck"</em>.</p>
+<p><code>ULcmSteeringMath::GetPurePursuitTargetVisible</code> walks the
+look-ahead back until the agent→target segment is clear in the SVO, and
+falls back to <code>Path[CurrentIndex]</code> - the nearest unconsumed
+waypoint, which is always a safe aim because the planner already proved
+the path traversable. At most 4 line-of-sight tests per tick.</p>
+<p>⚠ <strong>It fails OPEN.</strong> With no chunk data - unstreamed, or
+the segment leaves the single chunk this test can see - it returns the
+unmodified target, i.e. exactly legacy behaviour. Never infer a blockage
+from missing data; that would brake the follower at every chunk
+boundary.</p>
+<table>
+<thead>
+<tr>
+<th><code>Vertical_Skyscraper</code>, CS 3000, progress detector on</th>
+<th>look-ahead unclamped</th>
+<th><strong>visibility-clamped</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>arrives</td>
+<td>no, no</td>
+<td><strong>yes, yes</strong></td>
+</tr>
+<tr>
+<td>time to goal</td>
+<td>never</td>
+<td><strong>80.12 s, 80.25 s</strong></td>
+</tr>
+<tr>
+<td>closest approach</td>
+<td>6615, 6615 cm</td>
+<td><strong>144, 145 cm</strong></td>
+</tr>
+<tr>
+<td>loop events</td>
+<td>46, 46</td>
+<td><strong>0, 0</strong></td>
+</tr>
+<tr>
+<td>replans</td>
+<td>40, 40</td>
+<td>15, 15</td>
+</tr>
+</tbody>
+</table>
+<p>Both fixes are needed. The progress detector alone breaks the
+orbit-lock but still ends 66 m short; the visibility clamp alone leaves
+the stall detector blind to any orbit it does not prevent.</p>
+<p>Kill switch: <code>r.LcmNav.PursuitVisibleTarget 0</code>.</p>
+<p><strong>Regression on <code>Mixed_Indoor_Outdoor</code></strong>
+(same pinned single-agent instrument, 2 runs per arm): loop events fell
+<strong>48/46 → 3/1</strong> there too, with <code>trackErrMax</code>
+unchanged (2326/2406 → 2683/2133, overlapping). ⚠ Replans rose 23/10 →
+76/64: that is the progress detector doing its job - the agent now
+<em>notices</em> it is getting nowhere instead of orbiting silently -
+but it is real planner load. Raise
+<code>r.LcmNav.ProgressEpsilonCm</code> if that rate is too high for
+your budget.</p>
+<p>⚠ <strong><code>ChunkSize</code> 8000 cannot navigate this map at
+all, for an unrelated reason.</strong> It yields leaves up to 1000 cm,
+too coarse to resolve the floor openings, so the slabs seal the shaft
+into disconnected components and no path exists to plan
+(<code>portalsInAgentComp=0</code>, <code>open set exhausted</code>).
+The agent never moves because there is nothing to follow - do not read
+that as a follower defect.</p>
+<h3
+id="speed-planning-the-agent-slows-down-for-corners-it-can-already-see">Speed
+planning: the agent slows down <em>for corners it can already
+see</em></h3>
+<p>Fixing the index advance stops the agent sticking, but it does not
+stop it going into a corner <strong>too fast</strong>. Those are
+separate defects with the same symptom, and the second one is
+speed-dependent - which is exactly the "fine when it's slow, sticks when
+I speed it up" report.</p>
+<p>The speed governor's corner cap used to look <strong>exactly one
+waypoint ahead</strong>: it capped speed at
+<code>sqrt(v_corner² + 2·a·d)</code> where <code>d</code> is the
+distance to the <em>single</em> next waypoint. That is the right
+equation solved over the wrong distance. Braking distance grows as
+<strong>v²</strong>, waypoint spacing is fixed by the voxel grid, and
+the body's response lag is a fixed <code>v / VelocityP</code> - so past
+some speed the brake command is issued too late to be achievable, and
+the agent simply carries its speed through the corner. Measured at a
+135° corner on 375 cm spacing, <code>MaxSpeed</code> 1200: the old cap
+held mean speed to 823 cm/s - <em>precisely</em>
+<code>sqrt(v_corner² + 2·900·375)</code>, i.e. it did exactly what it
+was written to do, and that was not enough. Peak deviation from the path
+was still 371 cm. In a corridor, 371 cm is a wall.</p>
+<p>The governor now builds a proper <strong>backward velocity
+profile</strong> over a window
+(<code>r.LcmNav.SpeedProfilePoints</code>, default 8):</p>
+<ol type="1">
+<li>Give every upcoming waypoint the speed <em>its own</em> curvature
+allows, <code>v_i = sqrt(a · R_i)</code>.</li>
+<li>Sweep <strong>backward</strong>:
+<code>v_i = min(v_i, sqrt(v_{i+1}² + 2·a·d_i))</code>, so each corner's
+limit propagates upstream as far as the braking distance actually
+needs.</li>
+<li>Brake from the agent's position to <strong>every</strong> limit in
+the window and obey the tightest, charging the body's response distance
+<code>v / VelocityP</code> against each available braking distance.</li>
+</ol>
+<p>Peak cross-track at a 135° corner, 375 cm spacing, by
+<code>MaxSpeed</code>:</p>
+<table>
+<thead>
+<tr>
+<th><code>MaxSpeed</code></th>
+<th>ungoverned</th>
+<th>one-corner cap (old)</th>
+<th><strong>backward profile</strong></th>
+<th>mean speed, old → new</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>300</td>
+<td>94.5 cm</td>
+<td>94.5 cm</td>
+<td>95.0 cm</td>
+<td>284 → 281</td>
+</tr>
+<tr>
+<td>600</td>
+<td>201.5 cm</td>
+<td>184.8 cm</td>
+<td><strong>93.4 cm</strong></td>
+<td>517 → 506</td>
+</tr>
+<tr>
+<td>900</td>
+<td>287.2 cm</td>
+<td>268.1 cm</td>
+<td><strong>89.8 cm</strong></td>
+<td>693 → 688</td>
+</tr>
+<tr>
+<td>1200</td>
+<td>397.8 cm</td>
+<td>371.4 cm</td>
+<td><strong>103.5 cm</strong></td>
+<td>823 → <strong>827</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Tracking error is now <strong>flat in speed</strong> instead of
+growing linearly with it, and it is not bought with travel time - mean
+speed is unchanged (at 1200 it is marginally <em>higher</em>, because
+the agent stops holding a compromise speed down the straight and instead
+runs fast then brakes late-but-sufficiently).</p>
+<p>⛔ <code>r.LcmNav.SpeedProfilePoints 1</code> narrows the window to a
+single corner but is <strong>NOT</strong> the legacy cap, and must not
+be used as a way to restore it. The old cap took the incoming leg from
+the agent's own position (<code>Path[i] - CurrentLoc</code>); the
+profile takes it from the path (<code>Path[i] - Path[i-1]</code>),
+because path geometry is the only definition available for the waypoints
+further out. The braking distances differ, and on a
+<code>LinearDirect</code> body that difference shows up as overshooting
+the waypoint. Non-6-DOF bodies therefore run the original block verbatim
+rather than a 1-wide profile.</p>
+<p><strong>On the demo map</strong> (<code>Mixed_Indoor_Outdoor</code>,
+<code>BT_FlightBehavior_Loop</code>, single agent, pinned start/goal, 3
+runs per arm) exactly one follower metric moves, and it is the one that
+matters:</p>
+<table>
+<thead>
+<tr>
+<th>metric</th>
+<th>one-corner cap</th>
+<th>backward profile</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>worst-case cross-track</strong></td>
+<td>3570 / 3244 / 3282 cm</td>
+<td><strong>2536 / 2560 / 2544 cm</strong></td>
+<td>−24%, no overlap</td>
+</tr>
+<tr>
+<td>mean cross-track</td>
+<td>1226 / 1197 / 1320</td>
+<td>839 / 1232 / 1047</td>
+<td>overlaps - no effect</td>
+</tr>
+<tr>
+<td>commanded deflection</td>
+<td>13.7 / 7.7 / 2.8°</td>
+<td>1.8 / 5.0 / 16.1°</td>
+<td>overlaps - no effect</td>
+</tr>
+<tr>
+<td>avoidance-dominated ticks</td>
+<td>10 / 7 / 4 %</td>
+<td>2 / 4 / 10 %</td>
+<td>overlaps - no effect</td>
+</tr>
+</tbody>
+</table>
+<p>The worst-case figure is not merely better, it is
+<strong>tight</strong>: ±12 cm across runs whose replan counts ranged
+16-47, against ±170 cm for the one-corner cap. That is the signature of
+a bound that now holds structurally rather than by luck. <em>Mean</em>
+cross-track not moving is consistent with the mechanism - the profile
+acts at corners, and the mean is dominated by the straights, where both
+arms are identical.</p>
+<p>⚠ <strong>Do not measure this with the 7-agent
+configuration.</strong> ORCA/flocking interference, a looping BT that
+disperses agents differently each run, and an unpinned start together
+produce a <strong>57× spread within a single arm</strong>
+(wall-avoidance term 0.08 to 4.60), which is far larger than the effect.
+Arrival count alone came back 0, 1 and 3 of 7 across runs of the
+<em>same</em> build. Pin the start and goal and use one agent. Note also
+that <code>reach=</code> is meaningless under a looping BT - it cycles
+targets by design.</p>
+<p>⛔ <strong>Do not "improve" step 3 by walking the response distance
+forward along the path and evaluating the profile at that single lagged
+point.</strong> It reads as the more principled model of a lagging body,
+and it is worse at every speed (166 / 238 / 288 cm against 95 / 163 /
+247): once the lagged point passes the corner, the limit there is the
+<em>post</em>-corner straight-leg limit, so the governor releases the
+brake while the body is still entering the turn. The lag credit is sound
+for accelerating and unsound for braking - only the pessimistic
+direction may use it.</p>
+
+  <div class="pager"><a href="troubleshooting.html">&larr; Troubleshooting</a><a href="mass-traits.html">Mass traits reference &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>

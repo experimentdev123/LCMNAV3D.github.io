@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial 11 - LCMNav3D in the Gameplay Debugger | LCM Nav3D</title>
+<meta name="description" content="LCMNav3D ships an LCMNav3D category in the stock UE5 Gameplay Debugger. In PIE, press the standard Gameplay Debugger key , select an agent → the categor...">
+<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/gameplay-debugger.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tutorial 11 - LCMNav3D in the Gameplay Debugger | LCM Nav3D">
+<meta property="og:description" content="LCMNav3D ships an LCMNav3D category in the stock UE5 Gameplay Debugger. In PIE, press the standard Gameplay Debugger key , select an agent → the categor...">
+<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="top">
+ <button id="burger" aria-label="Menu">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <span class="sp"></span>
+ <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
+</header>
+<div class="wrap">
+ <nav class="side">
+  <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
+  <div id="results"></div>
+  <h4>Start here</h4>
+  <a href="index.html" data-slug="index">Overview</a>
+  <h4>Getting started</h4>
+  <a href="installation.html" data-slug="installation">Installation</a>
+  <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
+  <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
+  <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
+  <h4>Going further</h4>
+  <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
+  <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
+  <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
+  <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas">Nav links and area modifiers</a>
+  <a href="gameplay-debugger.html" data-slug="gameplay-debugger" class="on">The Gameplay Debugger</a>
+  <h4>Behaviour Tree patterns</h4>
+  <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
+  <a href="bt-is-at-location.html" data-slug="bt-is-at-location">Is At Location</a>
+  <a href="bt-look-at.html" data-slug="bt-look-at">Look At</a>
+  <a href="bt-turn-in-place.html" data-slug="bt-turn-in-place">Turn In Place</a>
+  <a href="bt-health-below.html" data-slug="bt-health-below">Health Below</a>
+  <a href="bt-perception-relay.html" data-slug="bt-perception-relay">Perception Relay</a>
+  <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
+  <h4>Reference</h4>
+  <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
+  <a href="settings.html" data-slug="settings">Settings reference</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
+  <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
+  <a href="api-reference.html" data-slug="api-reference">API reference</a>
+ </nav>
+ <main>
+  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+  <h1 id="tutorial-11---lcmnav3d-in-the-gameplay-debugger">Tutorial 11 -
+LCMNav3D in the Gameplay Debugger</h1>
+<p><strong>TL;DR:</strong> LCMNav3D ships an <code>LCMNav3D</code>
+category in the stock UE5 Gameplay Debugger. In PIE, press the standard
+Gameplay Debugger key (usually apostrophe <code>'</code>), select an
+agent → the category renders per-agent + plugin-wide state alongside
+Recast / BT / EQS / Perception. Zero project setup beyond the plugin
+being loaded.</p>
+<h2 id="what-it-shows">What it shows</h2>
+<h3 id="plugin-wide-block-always">Plugin-wide block (always)</h3>
+<pre><code>== LCMNav3D ==
+  Manager: resolved
+  Loaded chunks: 7
+  NavLink registry: 3
+  NavArea registry: 1
+  NavSystem bridge: active</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Manager</code></td>
+<td>Green when <code>ALcmNavigationManagerSVO</code> is in the world;
+red if missing</td>
+</tr>
+<tr>
+<td><code>Loaded chunks</code></td>
+<td><code>ActiveVirtualChunks.Num</code> for infinite worlds; 1 for
+finite</td>
+</tr>
+<tr>
+<td><code>NavLink registry</code></td>
+<td>Count of <code>ULcmNavLinkComponent</code> currently registered</td>
+</tr>
+<tr>
+<td><code>NavArea registry</code></td>
+<td>Count of <code>ALcmNavAreaModifier</code> currently registered</td>
+</tr>
+<tr>
+<td><code>NavSystem bridge</code></td>
+<td>Green when the T37 proxy is registered with UNavigationSystemV1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="per-agent-block-when-an-actor-is-selected">Per-agent block (when
+an actor is selected)</h3>
+<pre><code>== Agent: BP_FlyingPawn_C_0 ==
+  Pos: X=1234.5 Y=678.9 Z=500.0
+  Speed: 624 cm/s
+  Chunk: (0,0,0) full
+  SweepPenalty: 0
+  Perceived: 2 (closest: BP_Enemy_C_1)</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Pos</code></td>
+<td>Pawn world location</td>
+</tr>
+<tr>
+<td><code>Speed</code></td>
+<td><code>Pawn-&gt;GetVelocity.Size</code> in cm/s</td>
+</tr>
+<tr>
+<td><code>Chunk</code></td>
+<td><code>(IntVec3) resolution</code> - <code>full</code>,
+<code>coarse</code> (T12 stub), or <code>none</code> (streaming
+gap)</td>
+</tr>
+<tr>
+<td><code>SweepPenalty</code></td>
+<td>§P9.3 risk-field byte at the agent's location (0.255)</td>
+</tr>
+<tr>
+<td><code>Perceived</code></td>
+<td>Count of currently-perceived actors + closest threat name</td>
+</tr>
+</tbody>
+</table>
+<h2 id="how-to-toggle">How to toggle</h2>
+<ol type="1">
+<li>In PIE, press the standard Gameplay Debugger key (usually apostrophe
+<code>'</code> - check
+<code>Project Settings → Engine → Gameplay Debugger</code> if you've
+rebound it).</li>
+<li>The Gameplay Debugger HUD appears at the top of the viewport.</li>
+<li>Look for the <code>LCMNav3D</code> category - it should be enabled
+by default (state set to <code>EnabledInGameAndSimulate</code> at module
+init).</li>
+<li>Click an actor in the level to select it as the debug target -
+per-agent block populates.</li>
+</ol>
+<p>If the category isn't showing:</p>
+<ul>
+<li>Confirm you're in PIE (Gameplay Debugger only runs in
+PIE/Standalone, not the editor itself).</li>
+<li>Confirm the plugin is loaded (check Output Log for
+<code>[LcmNavBridge]</code> messages on map load).</li>
+<li>Confirm you're not in a Shipping/Test build (the category compiles
+out when <code>WITH_GAMEPLAY_DEBUGGER=0</code>).</li>
+</ul>
+<h2 id="what-survives-pie--editor--pie-reloads">What survives PIE →
+editor → PIE reloads</h2>
+<ul>
+<li><strong>CVars</strong> (debug toggles, chase tuning, OTel NDJSON,
+etc.) - persist across PIE sessions, reset on editor restart.</li>
+<li><strong>Profile loader state</strong>
+(<code>ULcmNavProfileSubsystem</code>) - re-applied on each PIE init if
+the profile path is in your project's startup.</li>
+<li><strong>Telemetry buffer</strong> - flushed at module shutdown;
+survives PIE-stop but not editor-close.</li>
+<li><strong>NavLink + NavArea registry</strong> - populated at each
+actor's <code>BeginPlay</code>; PIE-stop clears via
+<code>EndPlay</code>.</li>
+<li><strong>NavSystem bridge proxy</strong> - spawned per-world; new PIE
+session = new proxy.</li>
+</ul>
+<p>The Gameplay Debugger category itself is <strong>always-on after
+module load</strong> - it doesn't lose its registration across PIE
+sessions because the category lives in the GameplayDebugger module's
+category map, not in the world.</p>
+<h2 id="adding-new-fields-v2-design-hook">Adding new fields (v2 design
+hook)</h2>
+<p>To extend the category in your project subclass:</p>
+<pre class="cpp"><code>#if WITH_GAMEPLAY_DEBUGGER
+class FProjectGameplayDebuggerCategory_Apex: public FGameplayDebuggerCategory_LcmNav3D
+{
+public:
+    virtual void CollectData(APlayerController* PC, AActor* DebugActor) override
+    {
+        Super::CollectData(PC, DebugActor);
+        // Gather project-specific state here
+    }
+    virtual void DrawData(APlayerController* PC, FGameplayDebuggerCanvasContext&amp; Canvas) override
+    {
+        Super::DrawData(PC, Canvas);
+        Canvas.Printf(TEXT(&quot;  ProjectField: %s&quot;), *MyProjectState);
+    }
+};
+#endif</code></pre>
+<p>Register your subclass instead of the stock one in your project's
+module startup.</p>
+<h2 id="performance">Performance</h2>
+<ul>
+<li><code>CollectData</code> is called once per tick per active
+category. Cost ≈ 10 µs (one <code>GetActorOfClass</code> + a few
+accessors + a perception query when an actor is selected).</li>
+<li><code>DrawData</code> runs only when the HUD is visible. Cost ≈
+negligible (text rendering).</li>
+<li>Shipping builds: <strong>zero cost</strong> (entire category
+compiles out via <code>WITH_GAMEPLAY_DEBUGGER</code> gate).</li>
+</ul>
+<h2 id="related-lcm-nav3d-debug-surfaces">Related LCM Nav3D debug
+surfaces</h2>
+<ul>
+<li><code>r.LcmNav.Debug.StateTreeOverlay</code> - on-screen pawn state
+DrawDebugString</li>
+<li><code>r.LcmNav.Debug.CoverViz</code> - cover-spot DrawDebugSphere
+overlay</li>
+<li><code>r.LcmNav.Debug.FlowFieldViz</code> - flow-field arrow
+grid</li>
+<li><code>LcmNavStress.SpawnAgents &lt;N&gt;</code> - stress-spawn
+helper for scale testing</li>
+</ul>
+
+  <div class="pager"><a href="nav-links-and-areas.html">&larr; Nav links and area modifiers</a><a href="bt-wait.html">Wait &rarr;</a></div>
+  <footer>
+   <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
+    <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
+    <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+   <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
+  </footer>
+ </main>
+</div>
+<script src="search.js"></script>
+</body></html>
