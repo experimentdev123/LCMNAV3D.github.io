@@ -2,34 +2,186 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tutorial 04: The Same Agent in StateTree | LCM Nav3D</title>
-<meta name="description" content="Identical flight behaviour to Tutorial 03, authored in StateTree instead of a Behavior Tree. Swap the AIController's RunBehaviorTree for a StateTreeAICo...">
-<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/statetree-agent.html">
+<title>Flying AI with StateTree in Unreal Engine | LCM Nav3D</title>
+<meta name="description" content="Author identical 3D flight behaviour in StateTree instead of a Behavior Tree. Swap RunBehaviorTree for a StateTreeAIComponent and bind the Fly To task target.">
+<link rel="canonical" href="https://lcmnav3d.github.io/statetree-agent.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="L. Charitha Madhushanka">
+<meta name="generator" content="LCM Nav3D docs">
+<!-- Search Console: set GSC_VERIFICATION in build.js to emit the verification tag here. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0f1211" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tutorial 04: The Same Agent in StateTree | LCM Nav3D">
-<meta property="og:description" content="Identical flight behaviour to Tutorial 03, authored in StateTree instead of a Behavior Tree. Swap the AIController's RunBehaviorTree for a StateTreeAICo...">
-<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta property="og:site_name" content="LCM Nav3D Documentation">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://lcmnav3d.github.io/statetree-agent.html">
+<meta property="og:title" content="Flying AI with StateTree in Unreal Engine | LCM Nav3D">
+<meta property="og:description" content="Author identical 3D flight behaviour in StateTree instead of a Behavior Tree. Swap RunBehaviorTree for a StateTreeAIComponent and bind the Fly To task target.">
+<meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="favicon.png">
+<meta name="twitter:title" content="Flying AI with StateTree in Unreal Engine | LCM Nav3D">
+<meta name="twitter:description" content="Author identical 3D flight behaviour in StateTree instead of a Behavior Tree. Swap RunBehaviorTree for a StateTreeAIComponent and bind the Fly To task target.">
+<meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="alternate" type="application/atom+xml" title="LCM Nav3D Documentation" href="https://lcmnav3d.github.io/feed.xml">
+<link rel="sitemap" type="application/xml" href="https://lcmnav3d.github.io/sitemap.xml">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://lcmnav3d.github.io/#organization",
+   "name": "UEDEV Labs",
+   "url": "https://uedevlabs.github.io/",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/logo.png",
+    "width": 49,
+    "height": 60
+   },
+   "sameAs": [
+    "https://uedevlabs.github.io/",
+    "https://www.fab.com/sellers/UEDEV",
+    "https://discord.gg/nXkpD6uaBG"
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://lcmnav3d.github.io/#website",
+   "url": "https://lcmnav3d.github.io/",
+   "name": "LCM Nav3D Documentation",
+   "description": "Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://lcmnav3d.github.io/#software",
+   "name": "LCM Nav3D",
+   "alternateName": "LCM Nav3D — True Volumetric 3D Navigation for Unreal Engine",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Game Engine Plugin",
+   "operatingSystem": "Windows 64-bit, Linux",
+   "softwareRequirements": "Unreal Engine 5.2 to 5.8",
+   "url": "https://lcmnav3d.github.io/",
+   "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
+   "image": "https://lcmnav3d.github.io/og.jpg",
+   "description": "A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.",
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "featureList": [
+    "Sparse voxel octree 3D pathfinding",
+    "Flying, swimming and free-floating agent locomotion",
+    "Mass Entity crowds at 10,000+ agents",
+    "True volumetric EQS generators and tests",
+    "Dynamic runtime obstacles",
+    "Hybrid Recast and Nav3D navigation in one level",
+    "Behavior Tree and StateTree tasks",
+    "Gameplay Debugger integration"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://lcmnav3d.github.io/statetree-agent.html#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Documentation",
+     "item": "https://lcmnav3d.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Getting Started",
+     "item": "https://lcmnav3d.github.io/index.html#part-i-getting-started"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "The Same Agent in StateTree",
+     "item": "https://lcmnav3d.github.io/statetree-agent.html"
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://lcmnav3d.github.io/statetree-agent.html#article",
+   "headline": "Tutorial 04: The Same Agent in StateTree",
+   "name": "Flying AI with StateTree in Unreal Engine | LCM Nav3D",
+   "description": "Author identical 3D flight behaviour in StateTree instead of a Behavior Tree. Swap RunBehaviorTree for a StateTreeAIComponent and bind the Fly To task target.",
+   "url": "https://lcmnav3d.github.io/statetree-agent.html",
+   "inLanguage": "en",
+   "isPartOf": {
+    "@id": "https://lcmnav3d.github.io/#website"
+   },
+   "about": {
+    "@id": "https://lcmnav3d.github.io/#software"
+   },
+   "breadcrumb": {
+    "@id": "https://lcmnav3d.github.io/statetree-agent.html#breadcrumb"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lcmnav3d.github.io/statetree-agent.html"
+   },
+   "image": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/og.jpg",
+    "width": 1200,
+    "height": 675
+   },
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "datePublished": "2026-08-16",
+   "dateModified": "2026-08-16",
+   "proficiencyLevel": "Beginner",
+   "dependencies": "Unreal Engine 5.2 to 5.8"
+  }
+ ]
+}
+</script>
 </head><body>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
- <button id="burger" aria-label="Menu">&#9776;</button>
- <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
- <nav class="side">
+ <nav class="side" id="sidenav" aria-label="Documentation">
   <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
-  <div id="results"></div>
+  <div id="results" role="listbox" aria-label="Search results"></div>
+  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>
   <h4>Start here</h4>
   <a href="index.html" data-slug="index">Overview</a>
   <h4>Getting started</h4>
   <a href="installation.html" data-slug="installation">Installation</a>
   <a href="core-concepts.html" data-slug="core-concepts">Core concepts</a>
   <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
-  <a href="statetree-agent.html" data-slug="statetree-agent" class="on">The same agent in StateTree</a>
+  <a href="statetree-agent.html" data-slug="statetree-agent" class="on" aria-current="page">The same agent in StateTree</a>
   <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
   <h4>Going further</h4>
   <a href="mass-entity-crowds.html" data-slug="mass-entity-crowds">Mass Entity crowds</a>
@@ -54,8 +206,8 @@
   <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
   <a href="api-reference.html" data-slug="api-reference">API reference</a>
  </nav>
- <main>
-  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+ <main id="content">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Documentation</a><span class="sep" aria-hidden="true">/</span><a href="index.html#part-i-getting-started">Getting Started</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">The Same Agent in StateTree</span></nav>
   <h1 id="tutorial-04-the-same-agent-in-statetree">Tutorial 04: The Same
 Agent in StateTree</h1>
 <p><strong>TL;DR:</strong> Identical flight behaviour to <a
@@ -73,6 +225,7 @@ chapter only covers the differences.</p>
 StateTree or Behavior Tree?</h2>
 <p>Both are fully supported and produce the same flight. Pick on
 authoring preference, not capability.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -100,6 +253,7 @@ stable from 5.3</td>
 </tr>
 </tbody>
 </table>
+</div>
 <blockquote>
 <p><strong>The 5.2 caveat.</strong> The plugin is flagged beta on 5.2
 <em>only</em> because Epic's StateTree plugin is experimental there. If
@@ -137,6 +291,7 @@ click <strong>+</strong> and choose <strong>Fly To</strong> (listed
 under the <strong>LCM Nav3D</strong> category).</li>
 <li>Set the task's properties:</li>
 </ol>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -163,6 +318,7 @@ under the <strong>LCM Nav3D</strong> category).</li>
 </tr>
 </tbody>
 </table>
+</div>
 <h3 id="binding-the-goal">Binding the goal</h3>
 <p>This is <em>the</em> structural difference from Behavior Trees.
 There's no blackboard; you bind the task's <code>Target Location</code>
@@ -209,6 +365,7 @@ would send the agent to where the target was when the state began.</p>
 actor with the evaluator, not the task</h3>
 <p>Two nodes resolve a tag. Pick by whether you want a snapshot or a
 live reference:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -251,6 +408,7 @@ one</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p><strong>Prefer the evaluator for goal sources.</strong> Put it on the
 parent state, set <code>Tag</code> to <code>Player</code>, and bind
 <code>Fly To</code>'s <code>Target Actor</code> to its
@@ -288,7 +446,7 @@ Random Goal</strong> task, which does the same loop with random
 <code>Stay Running After Resolve</code> switch for the same reason.</p>
 </blockquote>
 <p><img src="images/statetree-example.png"
-alt="A StateTree with GoToA, FlyToA, GoToB and FlyToB states, evaluators in the left panel, and the LCM Fly To task&#39;s Details on the right" /></p>
+alt="A StateTree with GoToA, FlyToA, GoToB and FlyToB states, evaluators in the left panel, and the LCM Fly To task&#39;s Details on the right" width="2551" height="1116" decoding="async" fetchpriority="high"></p>
 <p><strong>Figure 04.1 - A two-goal patrol, the StateTree way.</strong>
 This is the shipped <code>STS_FlightBehavior</code>. Each
 <code>FlyTo*</code> state runs one <strong>LCM Fly To</strong> task and
@@ -301,7 +459,7 @@ in between are what fill in each goal at runtime.</p>
 StateTree replacement for a blackboard: an evaluator produces a value,
 and the task binds to it.</p>
 <p><img src="images/statetree-flyto-settings.png"
-alt="The LCM Fly To StateTree task Details panel, every row carrying a Bind control on the right" /></p>
+alt="The LCM Fly To StateTree task Details panel, every row carrying a Bind control on the right" width="720" height="1017" loading="lazy" decoding="async"></p>
 <p><strong>Figure 04.2 - The same task, in StateTree form.</strong> The
 properties are the ones you already met in <a
 href="your-first-flying-agent.html">Tutorial 03</a> - the difference is
@@ -354,6 +512,7 @@ through 3D space to the goal.</p>
 surface</h2>
 <p>The plugin ships a full StateTree task set, all under the <strong>LCM
 Nav3D</strong> category:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -410,6 +569,7 @@ Goal</strong> / <strong>Wait</strong></td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Plus conditions (<code>Path Exists</code>,
 <code>Is At Location</code>, <code>Chunk Loaded</code>,
 <code>Has Line Of Sight</code>, <code>Is In Cover</code>,
@@ -433,6 +593,7 @@ href="api-reference.html">API Reference</a>.</p>
 knowing</h2>
 <p>The BT and ST Fly To tasks are built for parity, but a few things
 genuinely differ:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -460,11 +621,13 @@ genuinely differ:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>The arrival difference is a sub-frame detail: it only matters if
 you're comparing the two side-by-side with a very small
 <code>Acceptance Radius</code>.</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -494,6 +657,7 @@ assigned, or <code>Auto Possess AI</code> is off</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>More: <a href="troubleshooting.html">Troubleshooting</a>.</p>
 <hr />
 <p><strong>Next:</strong> <a href="dynamic-obstacles.html">Tutorial 05:

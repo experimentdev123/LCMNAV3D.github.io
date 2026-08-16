@@ -2,27 +2,179 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LCM Nav3D - Mass Entity Trait Reference | LCM Nav3D</title>
-<meta name="description" content="How to build a Mass crowd/agent with LCM Nav3D. Add these traits to a Mass Entity Config asset  and use it on an AMassSpawner.">
-<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/mass-traits.html">
+<title>Mass Entity Trait Reference | LCM Nav3D</title>
+<meta name="description" content="Every LCM Nav3D Mass Entity trait, the combination matrix, the editor validator and the one rule you must not break: exactly one movement trait per agent.">
+<link rel="canonical" href="https://lcmnav3d.github.io/mass-traits.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="L. Charitha Madhushanka">
+<meta name="generator" content="LCM Nav3D docs">
+<!-- Search Console: set GSC_VERIFICATION in build.js to emit the verification tag here. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0f1211" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LCM Nav3D - Mass Entity Trait Reference | LCM Nav3D">
-<meta property="og:description" content="How to build a Mass crowd/agent with LCM Nav3D. Add these traits to a Mass Entity Config asset  and use it on an AMassSpawner.">
-<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta property="og:site_name" content="LCM Nav3D Documentation">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://lcmnav3d.github.io/mass-traits.html">
+<meta property="og:title" content="Mass Entity Trait Reference | LCM Nav3D">
+<meta property="og:description" content="Every LCM Nav3D Mass Entity trait, the combination matrix, the editor validator and the one rule you must not break: exactly one movement trait per agent.">
+<meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="favicon.png">
+<meta name="twitter:title" content="Mass Entity Trait Reference | LCM Nav3D">
+<meta name="twitter:description" content="Every LCM Nav3D Mass Entity trait, the combination matrix, the editor validator and the one rule you must not break: exactly one movement trait per agent.">
+<meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="alternate" type="application/atom+xml" title="LCM Nav3D Documentation" href="https://lcmnav3d.github.io/feed.xml">
+<link rel="sitemap" type="application/xml" href="https://lcmnav3d.github.io/sitemap.xml">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://lcmnav3d.github.io/#organization",
+   "name": "UEDEV Labs",
+   "url": "https://uedevlabs.github.io/",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/logo.png",
+    "width": 49,
+    "height": 60
+   },
+   "sameAs": [
+    "https://uedevlabs.github.io/",
+    "https://www.fab.com/sellers/UEDEV",
+    "https://discord.gg/nXkpD6uaBG"
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://lcmnav3d.github.io/#website",
+   "url": "https://lcmnav3d.github.io/",
+   "name": "LCM Nav3D Documentation",
+   "description": "Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://lcmnav3d.github.io/#software",
+   "name": "LCM Nav3D",
+   "alternateName": "LCM Nav3D — True Volumetric 3D Navigation for Unreal Engine",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Game Engine Plugin",
+   "operatingSystem": "Windows 64-bit, Linux",
+   "softwareRequirements": "Unreal Engine 5.2 to 5.8",
+   "url": "https://lcmnav3d.github.io/",
+   "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
+   "image": "https://lcmnav3d.github.io/og.jpg",
+   "description": "A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.",
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "featureList": [
+    "Sparse voxel octree 3D pathfinding",
+    "Flying, swimming and free-floating agent locomotion",
+    "Mass Entity crowds at 10,000+ agents",
+    "True volumetric EQS generators and tests",
+    "Dynamic runtime obstacles",
+    "Hybrid Recast and Nav3D navigation in one level",
+    "Behavior Tree and StateTree tasks",
+    "Gameplay Debugger integration"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://lcmnav3d.github.io/mass-traits.html#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Documentation",
+     "item": "https://lcmnav3d.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Reference",
+     "item": "https://lcmnav3d.github.io/index.html#part-iii-reference"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Mass Traits Reference",
+     "item": "https://lcmnav3d.github.io/mass-traits.html"
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://lcmnav3d.github.io/mass-traits.html#article",
+   "headline": "LCM Nav3D - Mass Entity Trait Reference",
+   "name": "Mass Entity Trait Reference | LCM Nav3D",
+   "description": "Every LCM Nav3D Mass Entity trait, the combination matrix, the editor validator and the one rule you must not break: exactly one movement trait per agent.",
+   "url": "https://lcmnav3d.github.io/mass-traits.html",
+   "inLanguage": "en",
+   "isPartOf": {
+    "@id": "https://lcmnav3d.github.io/#website"
+   },
+   "about": {
+    "@id": "https://lcmnav3d.github.io/#software"
+   },
+   "breadcrumb": {
+    "@id": "https://lcmnav3d.github.io/mass-traits.html#breadcrumb"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lcmnav3d.github.io/mass-traits.html"
+   },
+   "image": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/og.jpg",
+    "width": 1200,
+    "height": 675
+   },
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "datePublished": "2026-08-16",
+   "dateModified": "2026-08-16",
+   "proficiencyLevel": "Beginner",
+   "dependencies": "Unreal Engine 5.2 to 5.8"
+  }
+ ]
+}
+</script>
 </head><body>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
- <button id="burger" aria-label="Menu">&#9776;</button>
- <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
- <nav class="side">
+ <nav class="side" id="sidenav" aria-label="Documentation">
   <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
-  <div id="results"></div>
+  <div id="results" role="listbox" aria-label="Search results"></div>
+  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>
   <h4>Start here</h4>
   <a href="index.html" data-slug="index">Overview</a>
   <h4>Getting started</h4>
@@ -51,11 +203,11 @@
   <a href="settings.html" data-slug="settings">Settings reference</a>
   <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
   <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
-  <a href="mass-traits.html" data-slug="mass-traits" class="on">Mass traits reference</a>
+  <a href="mass-traits.html" data-slug="mass-traits" class="on" aria-current="page">Mass traits reference</a>
   <a href="api-reference.html" data-slug="api-reference">API reference</a>
  </nav>
- <main>
-  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+ <main id="content">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Documentation</a><span class="sep" aria-hidden="true">/</span><a href="index.html#part-iii-reference">Reference</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Mass Traits Reference</span></nav>
   <h1 id="lcm-nav3d---mass-entity-trait-reference">LCM Nav3D - Mass Entity
 Trait Reference</h1>
 <p>How to build a Mass crowd/agent with LCM Nav3D. Add these traits to a
@@ -73,9 +225,10 @@ editor validator (below) enforces this.</p>
 one from each of three categories, and no more than one from the
 movement category.</p>
 <p><img src="images/mass-entity-config.png"
-alt="A Mass Entity Config asset with three traits: LCM Nav3D Representation, LCM Nav3D Agent in Flow Field mode, and LCM Nav3D Goal in Tagged Actor mode" /></p>
+alt="A Mass Entity Config asset with three traits: LCM Nav3D Representation, LCM Nav3D Agent in Flow Field mode, and LCM Nav3D Goal in Tagged Actor mode" width="1808" height="1292" decoding="async" fetchpriority="high"></p>
 <p><strong>Figure 1 - A three-trait config, one per
 category.</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -108,6 +261,7 @@ category.</strong></p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Things the screenshot shows that are easy to miss:</p>
 <ul>
 <li><strong><code>Validate Entity Config</code></strong> at the top runs
@@ -140,6 +294,7 @@ the path-request fragment). For a Flow Field agent, set the goal on the
 </blockquote>
 <p><strong>The fix is one of two things, and which one depends on what
 you want:</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -161,6 +316,7 @@ it stands.</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Press <strong>Validate Entity Config</strong> on any config you
 build. It catches this, the duplicate-movement-trait case, and the mixed
 Path+Flow case - all three of which are silent at runtime and present as
@@ -173,6 +329,7 @@ id="green_circle-lcm-nav3d-agent---the-one-movement-trait-start-here">🟢
 <code>LCM Nav3D Agent</code> - the one movement trait (start here)</h3>
 <p>The single authoring entry point. Pick a <strong>Navigation
 Mode</strong>:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -198,6 +355,7 @@ for 10K-scale crowds sharing goals (finite worlds).</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Mode-specific properties hide automatically via
 <code>EditCondition</code>. Common movement knobs (radius, speed, accel,
 turn-rate, avoidance style, flight style, lane bias) apply to both.</p>
@@ -218,6 +376,7 @@ visible threat" surface read by EQS, StateTree, or steering. Opt-in
 avoidance: <code>r.LcmNav.Mass.PerceptionAvoid 1</code> makes Flow Field
 agents veer from their own perceived threat.</p>
 <h3 id="art-rendering---pick-one">🎨 Rendering - pick ONE</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -253,8 +412,10 @@ distance.</td>
 </tr>
 </tbody>
 </table>
+</div>
 <hr />
 <h2 id="combination-matrix">Combination matrix</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -324,6 +485,7 @@ distance.</td>
 </tr>
 </tbody>
 </table>
+</div>
 <ul>
 <li>❌ <strong>conflict</strong> - two movement stacks; the editor
 validator errors and (at runtime) the two steerers mutually exclude →
@@ -348,6 +510,7 @@ traits</h2>
 <p>The pre-2026-07 traits still work (byte-identical archetypes) but are
 marked <strong>(Legacy)</strong> and superseded by the unified
 trait:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -368,6 +531,7 @@ Field</strong></td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Existing content (e.g. <code>DA_MassAgent_Apex</code>) keeps working
 - no forced migration.</p>
 <p><strong>Default-value deltas when migrating</strong> (the unified
@@ -426,6 +590,7 @@ roadmap feature - until then, crowds are persistent: they exist wherever
 you spawned them.</li>
 </ul>
 <h2 id="useful-cvars">Useful CVars</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -459,6 +624,7 @@ you spawned them.</li>
 </tr>
 </tbody>
 </table>
+</div>
 
   <div class="pager"><a href="flight-locomotion.html">&larr; Flight and locomotion</a><a href="api-reference.html">API reference &rarr;</a></div>
   <footer>

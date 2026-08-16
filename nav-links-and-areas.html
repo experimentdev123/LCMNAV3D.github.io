@@ -2,27 +2,179 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tutorial 10 - 3D NavLinks + volumetric NavArea modifiers | LCM Nav3D</title>
-<meta name="description" content="LCM Nav3D ships ULcmNavLinkComponent for vertical ladders/jump shafts/teleporters  and ALcmNavAreaModifier for volumetric cost overlays . Both auto-regi...">
-<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/nav-links-and-areas.html">
+<title>3D Nav Links and Volumetric Area Modifiers | LCM Nav3D</title>
+<meta name="description" content="Vertical ladders, jump shafts and teleporters via ULcmNavLinkComponent, plus volumetric cost overlays for water, storms and danger zones via NavArea modifiers.">
+<link rel="canonical" href="https://lcmnav3d.github.io/nav-links-and-areas.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="L. Charitha Madhushanka">
+<meta name="generator" content="LCM Nav3D docs">
+<!-- Search Console: set GSC_VERIFICATION in build.js to emit the verification tag here. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0f1211" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tutorial 10 - 3D NavLinks + volumetric NavArea modifiers | LCM Nav3D">
-<meta property="og:description" content="LCM Nav3D ships ULcmNavLinkComponent for vertical ladders/jump shafts/teleporters  and ALcmNavAreaModifier for volumetric cost overlays . Both auto-regi...">
-<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta property="og:site_name" content="LCM Nav3D Documentation">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://lcmnav3d.github.io/nav-links-and-areas.html">
+<meta property="og:title" content="3D Nav Links and Volumetric Area Modifiers | LCM Nav3D">
+<meta property="og:description" content="Vertical ladders, jump shafts and teleporters via ULcmNavLinkComponent, plus volumetric cost overlays for water, storms and danger zones via NavArea modifiers.">
+<meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="favicon.png">
+<meta name="twitter:title" content="3D Nav Links and Volumetric Area Modifiers | LCM Nav3D">
+<meta name="twitter:description" content="Vertical ladders, jump shafts and teleporters via ULcmNavLinkComponent, plus volumetric cost overlays for water, storms and danger zones via NavArea modifiers.">
+<meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="alternate" type="application/atom+xml" title="LCM Nav3D Documentation" href="https://lcmnav3d.github.io/feed.xml">
+<link rel="sitemap" type="application/xml" href="https://lcmnav3d.github.io/sitemap.xml">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://lcmnav3d.github.io/#organization",
+   "name": "UEDEV Labs",
+   "url": "https://uedevlabs.github.io/",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/logo.png",
+    "width": 49,
+    "height": 60
+   },
+   "sameAs": [
+    "https://uedevlabs.github.io/",
+    "https://www.fab.com/sellers/UEDEV",
+    "https://discord.gg/nXkpD6uaBG"
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://lcmnav3d.github.io/#website",
+   "url": "https://lcmnav3d.github.io/",
+   "name": "LCM Nav3D Documentation",
+   "description": "Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://lcmnav3d.github.io/#software",
+   "name": "LCM Nav3D",
+   "alternateName": "LCM Nav3D — True Volumetric 3D Navigation for Unreal Engine",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Game Engine Plugin",
+   "operatingSystem": "Windows 64-bit, Linux",
+   "softwareRequirements": "Unreal Engine 5.2 to 5.8",
+   "url": "https://lcmnav3d.github.io/",
+   "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
+   "image": "https://lcmnav3d.github.io/og.jpg",
+   "description": "A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.",
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "featureList": [
+    "Sparse voxel octree 3D pathfinding",
+    "Flying, swimming and free-floating agent locomotion",
+    "Mass Entity crowds at 10,000+ agents",
+    "True volumetric EQS generators and tests",
+    "Dynamic runtime obstacles",
+    "Hybrid Recast and Nav3D navigation in one level",
+    "Behavior Tree and StateTree tasks",
+    "Gameplay Debugger integration"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://lcmnav3d.github.io/nav-links-and-areas.html#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Documentation",
+     "item": "https://lcmnav3d.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Going Further",
+     "item": "https://lcmnav3d.github.io/index.html#part-ii-going-further"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Nav Links and Area Modifiers",
+     "item": "https://lcmnav3d.github.io/nav-links-and-areas.html"
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://lcmnav3d.github.io/nav-links-and-areas.html#article",
+   "headline": "Tutorial 10 - 3D NavLinks + volumetric NavArea modifiers",
+   "name": "3D Nav Links and Volumetric Area Modifiers | LCM Nav3D",
+   "description": "Vertical ladders, jump shafts and teleporters via ULcmNavLinkComponent, plus volumetric cost overlays for water, storms and danger zones via NavArea modifiers.",
+   "url": "https://lcmnav3d.github.io/nav-links-and-areas.html",
+   "inLanguage": "en",
+   "isPartOf": {
+    "@id": "https://lcmnav3d.github.io/#website"
+   },
+   "about": {
+    "@id": "https://lcmnav3d.github.io/#software"
+   },
+   "breadcrumb": {
+    "@id": "https://lcmnav3d.github.io/nav-links-and-areas.html#breadcrumb"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lcmnav3d.github.io/nav-links-and-areas.html"
+   },
+   "image": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/og.jpg",
+    "width": 1200,
+    "height": 675
+   },
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "datePublished": "2026-08-16",
+   "dateModified": "2026-08-16",
+   "proficiencyLevel": "Beginner",
+   "dependencies": "Unreal Engine 5.2 to 5.8"
+  }
+ ]
+}
+</script>
 </head><body>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
- <button id="burger" aria-label="Menu">&#9776;</button>
- <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
- <nav class="side">
+ <nav class="side" id="sidenav" aria-label="Documentation">
   <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
-  <div id="results"></div>
+  <div id="results" role="listbox" aria-label="Search results"></div>
+  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>
   <h4>Start here</h4>
   <a href="index.html" data-slug="index">Overview</a>
   <h4>Getting started</h4>
@@ -36,7 +188,7 @@
   <a href="tactical-eqs.html" data-slug="tactical-eqs">Tactical EQS in true 3D</a>
   <a href="ai-perception.html" data-slug="ai-perception">AI perception</a>
   <a href="hybrid-recast.html" data-slug="hybrid-recast">Hybrid Recast + Nav3D</a>
-  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas" class="on">Nav links and area modifiers</a>
+  <a href="nav-links-and-areas.html" data-slug="nav-links-and-areas" class="on" aria-current="page">Nav links and area modifiers</a>
   <a href="gameplay-debugger.html" data-slug="gameplay-debugger">The Gameplay Debugger</a>
   <h4>Behaviour Tree patterns</h4>
   <a href="bt-wait.html" data-slug="bt-wait">Wait</a>
@@ -54,8 +206,8 @@
   <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
   <a href="api-reference.html" data-slug="api-reference">API reference</a>
  </nav>
- <main>
-  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+ <main id="content">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Documentation</a><span class="sep" aria-hidden="true">/</span><a href="index.html#part-ii-going-further">Going Further</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Nav Links and Area Modifiers</span></nav>
   <h1
 id="tutorial-10---3d-navlinks--volumetric-navarea-modifiers">Tutorial 10
 - 3D NavLinks + volumetric NavArea modifiers</h1>
@@ -125,6 +277,7 @@ label)</li>
 </ol>
 <p>Stack multiple modifiers in the same volume - costs
 <strong>multiply</strong>:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -147,6 +300,7 @@ label)</li>
 </tr>
 </tbody>
 </table>
+</div>
 <h2 id="step-3---query-from-bt--statetree--blueprint">Step 3 - Query
 from BT / StateTree / Blueprint</h2>
 <pre class="cpp"><code>// In a BT service tick, or anywhere with C++ access:

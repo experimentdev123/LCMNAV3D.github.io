@@ -2,27 +2,179 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Settings Reference: `LcmNavigationManagerSVO` | LCM Nav3D</title>
-<meta name="description" content="Every field on the navigation manager, in the order the Details panel presents them. Defaults and limits below are the shipping values.">
-<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/settings.html">
+<title>Settings Reference: LcmNavigationManagerSVO | LCM Nav3D</title>
+<meta name="description" content="Every field on the LCM Nav3D navigation manager, with verified defaults and limits: setup, voxels, collision, performance, skeleton, debug and runtime state.">
+<link rel="canonical" href="https://lcmnav3d.github.io/settings.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="L. Charitha Madhushanka">
+<meta name="generator" content="LCM Nav3D docs">
+<!-- Search Console: set GSC_VERIFICATION in build.js to emit the verification tag here. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0f1211" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Settings Reference: `LcmNavigationManagerSVO` | LCM Nav3D">
-<meta property="og:description" content="Every field on the navigation manager, in the order the Details panel presents them. Defaults and limits below are the shipping values.">
-<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta property="og:site_name" content="LCM Nav3D Documentation">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://lcmnav3d.github.io/settings.html">
+<meta property="og:title" content="Settings Reference: LcmNavigationManagerSVO | LCM Nav3D">
+<meta property="og:description" content="Every field on the LCM Nav3D navigation manager, with verified defaults and limits: setup, voxels, collision, performance, skeleton, debug and runtime state.">
+<meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="favicon.png">
+<meta name="twitter:title" content="Settings Reference: LcmNavigationManagerSVO | LCM Nav3D">
+<meta name="twitter:description" content="Every field on the LCM Nav3D navigation manager, with verified defaults and limits: setup, voxels, collision, performance, skeleton, debug and runtime state.">
+<meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="alternate" type="application/atom+xml" title="LCM Nav3D Documentation" href="https://lcmnav3d.github.io/feed.xml">
+<link rel="sitemap" type="application/xml" href="https://lcmnav3d.github.io/sitemap.xml">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://lcmnav3d.github.io/#organization",
+   "name": "UEDEV Labs",
+   "url": "https://uedevlabs.github.io/",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/logo.png",
+    "width": 49,
+    "height": 60
+   },
+   "sameAs": [
+    "https://uedevlabs.github.io/",
+    "https://www.fab.com/sellers/UEDEV",
+    "https://discord.gg/nXkpD6uaBG"
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://lcmnav3d.github.io/#website",
+   "url": "https://lcmnav3d.github.io/",
+   "name": "LCM Nav3D Documentation",
+   "description": "Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://lcmnav3d.github.io/#software",
+   "name": "LCM Nav3D",
+   "alternateName": "LCM Nav3D — True Volumetric 3D Navigation for Unreal Engine",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Game Engine Plugin",
+   "operatingSystem": "Windows 64-bit, Linux",
+   "softwareRequirements": "Unreal Engine 5.2 to 5.8",
+   "url": "https://lcmnav3d.github.io/",
+   "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
+   "image": "https://lcmnav3d.github.io/og.jpg",
+   "description": "A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.",
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "featureList": [
+    "Sparse voxel octree 3D pathfinding",
+    "Flying, swimming and free-floating agent locomotion",
+    "Mass Entity crowds at 10,000+ agents",
+    "True volumetric EQS generators and tests",
+    "Dynamic runtime obstacles",
+    "Hybrid Recast and Nav3D navigation in one level",
+    "Behavior Tree and StateTree tasks",
+    "Gameplay Debugger integration"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://lcmnav3d.github.io/settings.html#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Documentation",
+     "item": "https://lcmnav3d.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Reference",
+     "item": "https://lcmnav3d.github.io/index.html#part-iii-reference"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Settings Reference",
+     "item": "https://lcmnav3d.github.io/settings.html"
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://lcmnav3d.github.io/settings.html#article",
+   "headline": "Settings Reference: LcmNavigationManagerSVO",
+   "name": "Settings Reference: LcmNavigationManagerSVO | LCM Nav3D",
+   "description": "Every field on the LCM Nav3D navigation manager, with verified defaults and limits: setup, voxels, collision, performance, skeleton, debug and runtime state.",
+   "url": "https://lcmnav3d.github.io/settings.html",
+   "inLanguage": "en",
+   "isPartOf": {
+    "@id": "https://lcmnav3d.github.io/#website"
+   },
+   "about": {
+    "@id": "https://lcmnav3d.github.io/#software"
+   },
+   "breadcrumb": {
+    "@id": "https://lcmnav3d.github.io/settings.html#breadcrumb"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lcmnav3d.github.io/settings.html"
+   },
+   "image": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/og.jpg",
+    "width": 1200,
+    "height": 675
+   },
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "datePublished": "2026-08-16",
+   "dateModified": "2026-08-16",
+   "proficiencyLevel": "Beginner",
+   "dependencies": "Unreal Engine 5.2 to 5.8"
+  }
+ ]
+}
+</script>
 </head><body>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
- <button id="burger" aria-label="Menu">&#9776;</button>
- <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
- <nav class="side">
+ <nav class="side" id="sidenav" aria-label="Documentation">
   <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
-  <div id="results"></div>
+  <div id="results" role="listbox" aria-label="Search results"></div>
+  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>
   <h4>Start here</h4>
   <a href="index.html" data-slug="index">Overview</a>
   <h4>Getting started</h4>
@@ -48,14 +200,14 @@
   <a href="bt-memory-decay.html" data-slug="bt-memory-decay">Memory Decay</a>
   <h4>Reference</h4>
   <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
-  <a href="settings.html" data-slug="settings" class="on">Settings reference</a>
+  <a href="settings.html" data-slug="settings" class="on" aria-current="page">Settings reference</a>
   <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
   <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
   <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
   <a href="api-reference.html" data-slug="api-reference">API reference</a>
  </nav>
- <main>
-  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+ <main id="content">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Documentation</a><span class="sep" aria-hidden="true">/</span><a href="index.html#part-iii-reference">Reference</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Settings Reference</span></nav>
   <h1 id="settings-reference-lcmnavigationmanagersvo">Settings Reference:
 <code>LcmNavigationManagerSVO</code></h1>
 <p>Every field on the navigation manager, in the order the Details panel
@@ -75,7 +227,7 @@ href="core-concepts.html">Tutorial 02: Core Concepts</a>.</p>
 floated above the inherited Actor sections, then seven numbered sections
 in the order below.</p>
 <p><img src="images/manager-details-top.png"
-alt="Manager Details, upper half: header pills, Configuration Health, What You Get, section 1 Setup and section 2 Voxels" /></p>
+alt="Manager Details, upper half: header pills, Configuration Health, What You Get, section 1 Setup and section 2 Voxels" width="792" height="1074" decoding="async" fetchpriority="high"></p>
 <p><strong>Figure 1 - Sections 1-2, plus the three blocks above
 them.</strong> <em>Configuration Health</em> and <em>What You Get</em>
 are not settings; they are what the settings below <em>resolve to</em>.
@@ -85,7 +237,7 @@ Get</em> block is reporting a 250 cm finest leaf from a 100 cm
 <code>Min Voxel Size</code>, which is the single most misread number in
 the plugin.</p>
 <p><img src="images/manager-details-lower.png"
-alt="Manager Details, lower half: sections 3 Collision, 4 Performance, 5 Coarse Skeleton, 6 Debug and 7 Runtime State" /></p>
+alt="Manager Details, lower half: sections 3 Collision, 4 Performance, 5 Coarse Skeleton, 6 Debug and 7 Runtime State" width="780" height="1008" loading="lazy" decoding="async"></p>
 <p><strong>Figure 2 - Sections 3-7.</strong> Two things to notice:</p>
 <ul>
 <li><strong>Section 7 is read-only.</strong> Every <code>(auto)</code>
@@ -151,6 +303,7 @@ limit is a voxel <em>count</em>: the world is
 <code>(2 × World Extent / Min Voxel Size)³</code> voxels against a 64 M
 ceiling - which is 400³. So the largest legal half-extent is
 <code>200 × Min Voxel Size</code>:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -182,6 +335,7 @@ ceiling - which is 400³. So the largest legal half-extent is
 </tr>
 </tbody>
 </table>
+</div>
 <p>The property clamp used to be a flat <strong>20000</strong>, which is
 the row for the <em>default</em> <code>Min Voxel Size</code> and wrong
 everywhere else - it blocked a perfectly legal 40 000 at 200 cm voxels,
@@ -236,6 +390,7 @@ The finest leaf edge you actually get is therefore
 4× <code>Min Voxel Size</code></strong>, and it does
 <strong>not</strong> improve as Chunk Size shrinks. Measured on a real
 level at <code>Min Voxel Size = 100</code>:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -270,6 +425,7 @@ level at <code>Min Voxel Size = 100</code>:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>So a smaller Chunk Size can give you a <strong>coarser</strong>
 octree. At <code>Chunk Size 3000</code> you get 375 cm leaves from a 100
 cm setting - and <strong>an opening that stays navigable at 250 cm can
@@ -383,6 +539,7 @@ many agents share similar long-range routes (large crowds spawning
 together).</p>
 <h3 id="pawn-agents-bt--statetree-subcategory">Pawn Agents (BT &amp;
 StateTree) subcategory</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -412,6 +569,7 @@ instead of individual paths</td>
 </tr>
 </tbody>
 </table>
+</div>
 <blockquote>
 <p>Flow fields are for <strong>swarms heading to the same
 place</strong>. For a handful of agents with individual goals they are
@@ -491,6 +649,7 @@ nothing to set.</p>
 <hr />
 <h2 id="build--tools-blueprint-callable">Build &amp; Tools
 (Blueprint-callable)</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -549,12 +708,14 @@ points</td>
 </tr>
 </tbody>
 </table>
+</div>
 <hr />
 <h2 id="per-agent-settings">Per-agent settings</h2>
 <p>These live on the <strong>Fly To</strong> BT task / <strong>Fly
 To</strong> StateTree task, not the manager. Both tasks expose the
 identical surface, in six numbered sections:</p>
 <p><strong>1. Goal</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -582,7 +743,9 @@ when chase is on</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p><strong>2. Movement</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -641,6 +804,7 @@ goal distance instead</td>
 </tr>
 </tbody>
 </table>
+</div>
 <blockquote>
 <p><strong>Whoever owns the body owns its caps.</strong> Tick
 <code>Use Flight Movement Component</code> and this section collapses to
@@ -651,6 +815,7 @@ Untick it and the task's own values apply. Exactly one place is ever
 live.</p>
 </blockquote>
 <p><strong>3. Pathfinding</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -668,8 +833,10 @@ preference</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p><strong>4. Avoidance</strong> <em>(the reactive knobs hide when
 Avoidance Style is CBS)</em></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -721,7 +888,9 @@ Avoidance Style is CBS)</em></p>
 </tr>
 </tbody>
 </table>
+</div>
 <p><strong>5. Moving Goal (Chase)</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -754,7 +923,9 @@ Avoidance Style is CBS)</em></p>
 </tr>
 </tbody>
 </table>
+</div>
 <p><strong>6. Streaming</strong> <em>(infinite worlds only)</em></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -773,6 +944,7 @@ Profile</td>
 </tr>
 </tbody>
 </table>
+</div>
 <blockquote>
 <p><code>Frontier Stall Recovery</code> is the
 <strong>locomotion</strong> half only. Pinning chunks <em>ahead</em> of
@@ -786,6 +958,7 @@ href="core-concepts.html#6-how-a-path-is-actually-found">Tutorial 02
 §6</a>.</p>
 <hr />
 <h2 id="recommended-starting-points">Recommended starting points</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -827,6 +1000,7 @@ href="core-concepts.html#6-how-a-path-is-actually-found">Tutorial 02
 </tr>
 </tbody>
 </table>
+</div>
 <p>Start here, then confirm with <code>Draw Debug Volumes</code> that
 the gaps you care about actually have voxels in them.</p>
 

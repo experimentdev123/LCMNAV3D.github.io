@@ -2,27 +2,179 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LCM Nav3D - Realistic Flight/Swim Locomotion Reference | LCM Nav3D</title>
-<meta name="description" content="Ultra-realistic 6-DOF locomotion for flying/swimming pawns , layered on top of LCMNav3D navigation. The nav system provides guidance ; this layer provid...">
-<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/flight-locomotion.html">
+<title>6-DOF Flight and Swim Locomotion Reference | LCM Nav3D</title>
+<meta name="description" content="Physically plausible 6-DOF locomotion for drones, birds and fish, layered on LCM Nav3D guidance. Archetypes, the animation contract, tuning and determinism.">
+<link rel="canonical" href="https://lcmnav3d.github.io/flight-locomotion.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="L. Charitha Madhushanka">
+<meta name="generator" content="LCM Nav3D docs">
+<!-- Search Console: set GSC_VERIFICATION in build.js to emit the verification tag here. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0f1211" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LCM Nav3D - Realistic Flight/Swim Locomotion Reference | LCM Nav3D">
-<meta property="og:description" content="Ultra-realistic 6-DOF locomotion for flying/swimming pawns , layered on top of LCMNav3D navigation. The nav system provides guidance ; this layer provid...">
-<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta property="og:site_name" content="LCM Nav3D Documentation">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://lcmnav3d.github.io/flight-locomotion.html">
+<meta property="og:title" content="6-DOF Flight and Swim Locomotion Reference | LCM Nav3D">
+<meta property="og:description" content="Physically plausible 6-DOF locomotion for drones, birds and fish, layered on LCM Nav3D guidance. Archetypes, the animation contract, tuning and determinism.">
+<meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="favicon.png">
+<meta name="twitter:title" content="6-DOF Flight and Swim Locomotion Reference | LCM Nav3D">
+<meta name="twitter:description" content="Physically plausible 6-DOF locomotion for drones, birds and fish, layered on LCM Nav3D guidance. Archetypes, the animation contract, tuning and determinism.">
+<meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="alternate" type="application/atom+xml" title="LCM Nav3D Documentation" href="https://lcmnav3d.github.io/feed.xml">
+<link rel="sitemap" type="application/xml" href="https://lcmnav3d.github.io/sitemap.xml">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://lcmnav3d.github.io/#organization",
+   "name": "UEDEV Labs",
+   "url": "https://uedevlabs.github.io/",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/logo.png",
+    "width": 49,
+    "height": 60
+   },
+   "sameAs": [
+    "https://uedevlabs.github.io/",
+    "https://www.fab.com/sellers/UEDEV",
+    "https://discord.gg/nXkpD6uaBG"
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://lcmnav3d.github.io/#website",
+   "url": "https://lcmnav3d.github.io/",
+   "name": "LCM Nav3D Documentation",
+   "description": "Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://lcmnav3d.github.io/#software",
+   "name": "LCM Nav3D",
+   "alternateName": "LCM Nav3D — True Volumetric 3D Navigation for Unreal Engine",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Game Engine Plugin",
+   "operatingSystem": "Windows 64-bit, Linux",
+   "softwareRequirements": "Unreal Engine 5.2 to 5.8",
+   "url": "https://lcmnav3d.github.io/",
+   "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
+   "image": "https://lcmnav3d.github.io/og.jpg",
+   "description": "A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.",
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "featureList": [
+    "Sparse voxel octree 3D pathfinding",
+    "Flying, swimming and free-floating agent locomotion",
+    "Mass Entity crowds at 10,000+ agents",
+    "True volumetric EQS generators and tests",
+    "Dynamic runtime obstacles",
+    "Hybrid Recast and Nav3D navigation in one level",
+    "Behavior Tree and StateTree tasks",
+    "Gameplay Debugger integration"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://lcmnav3d.github.io/flight-locomotion.html#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Documentation",
+     "item": "https://lcmnav3d.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Reference",
+     "item": "https://lcmnav3d.github.io/index.html#part-iii-reference"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Flight and Locomotion",
+     "item": "https://lcmnav3d.github.io/flight-locomotion.html"
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://lcmnav3d.github.io/flight-locomotion.html#article",
+   "headline": "LCM Nav3D - Realistic Flight/Swim Locomotion Reference",
+   "name": "6-DOF Flight and Swim Locomotion Reference | LCM Nav3D",
+   "description": "Physically plausible 6-DOF locomotion for drones, birds and fish, layered on LCM Nav3D guidance. Archetypes, the animation contract, tuning and determinism.",
+   "url": "https://lcmnav3d.github.io/flight-locomotion.html",
+   "inLanguage": "en",
+   "isPartOf": {
+    "@id": "https://lcmnav3d.github.io/#website"
+   },
+   "about": {
+    "@id": "https://lcmnav3d.github.io/#software"
+   },
+   "breadcrumb": {
+    "@id": "https://lcmnav3d.github.io/flight-locomotion.html#breadcrumb"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lcmnav3d.github.io/flight-locomotion.html"
+   },
+   "image": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/og.jpg",
+    "width": 1200,
+    "height": 675
+   },
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "datePublished": "2026-08-16",
+   "dateModified": "2026-08-16",
+   "proficiencyLevel": "Beginner",
+   "dependencies": "Unreal Engine 5.2 to 5.8"
+  }
+ ]
+}
+</script>
 </head><body>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
- <button id="burger" aria-label="Menu">&#9776;</button>
- <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
- <nav class="side">
+ <nav class="side" id="sidenav" aria-label="Documentation">
   <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
-  <div id="results"></div>
+  <div id="results" role="listbox" aria-label="Search results"></div>
+  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>
   <h4>Start here</h4>
   <a href="index.html" data-slug="index">Overview</a>
   <h4>Getting started</h4>
@@ -50,12 +202,12 @@
   <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
   <a href="settings.html" data-slug="settings">Settings reference</a>
   <a href="troubleshooting.html" data-slug="troubleshooting">Troubleshooting</a>
-  <a href="flight-locomotion.html" data-slug="flight-locomotion" class="on">Flight and locomotion</a>
+  <a href="flight-locomotion.html" data-slug="flight-locomotion" class="on" aria-current="page">Flight and locomotion</a>
   <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
   <a href="api-reference.html" data-slug="api-reference">API reference</a>
  </nav>
- <main>
-  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+ <main id="content">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Documentation</a><span class="sep" aria-hidden="true">/</span><a href="index.html#part-iii-reference">Reference</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Flight and Locomotion</span></nav>
   <h1 id="lcm-nav3d---realistic-flightswim-locomotion-reference">LCM Nav3D
 - Realistic Flight/Swim Locomotion Reference</h1>
 <p>Ultra-realistic 6-DOF locomotion for flying/swimming pawns (drones,
@@ -135,6 +287,7 @@ the flight path - planned vs predicted vs flown</h2>
 <strong><code>bDrawPathfindingDebug</code></strong> (the master switch
 for all path debug) and a flight-component pawn draws three distinct
 lines:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -168,6 +321,7 @@ cyan = guidance arrows</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>How to read them: the gap between orange and magenta is the body's
 <em>physics</em> (corner-cutting, brake distance - expected and
 correct); the gap between magenta and the trail is <em>live
@@ -177,6 +331,7 @@ the magenta line is a tracking defect worth reporting. All three draw
 nothing in Shipping builds.</p>
 <h2 id="archetypes-key-flightconfig-params">Archetypes (key
 <code>FlightConfig</code> params)</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -224,6 +379,7 @@ hydro drag, current</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Shared: <code>MaxSpeed</code>, <code>MaxAcceleration</code>,
 <code>MaxTiltAngleDeg</code> (Multirotor), <code>MaxTurnRateDeg</code>,
 <code>SubSteps</code> (integration sub-steps; higher = stiffer +
@@ -280,6 +436,7 @@ that the inner <code>AttitudeP</code>/<code>AttitudeD</code> loop must
 then achieve. Keep the inner loop <strong>~4× faster</strong> than the
 outer one, or the body wanders side to side and hunts back and forth
 around its goal:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -311,6 +468,7 @@ around its goal:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>⚠ <code>AngularDrag</code> adds to <code>AttitudeD</code> - the
 integrator applies <code>-AttitudeD*w</code> and then
 <code>-AngularDrag*w</code>, so the loop's real damping is the
@@ -327,6 +485,7 @@ budget</h3>
 <code>cos(tilt)</code> of its thrust opposing gravity, so holding height
 while tilted needs a thrust-to-weight ratio of
 <code>1/cos(tilt)</code>:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -359,6 +518,7 @@ height</th>
 </tr>
 </tbody>
 </table>
+</div>
 <p><code>MaxTiltAngleDeg</code> caps this so the body cannot ask for a
 manoeuvre that costs it altitude, and when the thrust budget saturates
 the <strong>vertical axis is served first</strong> and the lateral axis
@@ -385,6 +545,7 @@ Kill switch <code>r.LcmNav.Flight.DragFeedForward 0</code>.</p>
 <code>FlightDynamics</code> mode - the attitude is physical, so you get
 lean by changing what the body has to <em>do</em>. Three separate
 mechanisms, commonly confused:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -417,6 +578,7 @@ forward instead - pivot-then-go, no bank.</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>⚠ In <code>Kinematic</code> mode none of the above applies: attitude
 there is cosmetic, driven by <code>BankingAmount</code> and
 <code>MaxBankingAngle</code>.</p>
@@ -470,6 +632,7 @@ these (PX4 <code>MPC_Z_VEL_P</code> vs <code>MPC_XY_VEL_P</code>;
 ArduPilot <code>PSC_VELZ_P</code> vs <code>PSC_VELXY_P</code>).</p>
 <p>Measured on a closed-loop rig flying a <strong>dead-level</strong>
 path, so any altitude motion is controller-generated:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -501,6 +664,7 @@ path, so any altitude motion is controller-generated:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Cross-track error and arrival time are unchanged (173.8→173.6 cm,
 10.85→10.83 s), so it costs nothing horizontally. <strong>4 is derived,
 not chosen:</strong> position-loop damping
@@ -527,6 +691,7 @@ cause</h2>
 <p>Every row below is a <em>structural</em> cause with its own kill
 switch, so each can be A/B'd on its own. Work down the list; do not
 start by re-tuning gains, because none of these is a gain problem.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -624,6 +789,7 @@ distance</td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>⚠ <strong><code>r.LcmNav.WallAvoidV2</code> defaults to 0 on
 purpose.</strong> Reducing this term's authority has been <em>measured
 harmful</em> once already - a bounded version cost a single agent its
@@ -636,6 +802,7 @@ near geometry, and re-check arrival rates.</p>
 <code>FLcmFlightState</code></h2>
 <p>Every tick the component produces <code>FLcmFlightState</code>
 (archetype-agnostic where possible):</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -679,6 +846,7 @@ near geometry, and re-check arrival rates.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Consume it two ways:</p>
 <ul>
 <li><strong>Pull:</strong> <code>GetFlightState</code> (BlueprintPure)
@@ -751,6 +919,7 @@ swim effort</strong> for the fish. <code>BankTurnGain</code> is the rate
 (1/s) that converts a cm/s error into that demand, which is what its own
 description always claimed. Measured on one corner path, same
 guidance:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -782,6 +951,7 @@ guidance:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Both drone archetypes are byte-identical (their gate checksums are
 unchanged), because the change is scoped to the two integrators that
 lacked the loop. Kill switch
@@ -811,6 +981,7 @@ its look-ahead <em>from the current index</em>, the aim point sits
 behind too and drags the agent backwards.</p>
 <p>Measured on 375 cm waypoint spacing (what <code>ChunkSize</code> 3000
 produces), 135° corner:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -842,6 +1013,7 @@ produces), 135° corner:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>The index now <em>also</em> advances by <strong>projecting the agent
 onto its path</strong>, so progress is monotone and independent of the
 acceptance gate. It is <strong>inert</strong> wherever the gate already
@@ -921,6 +1093,7 @@ watchdog fires on healthy navigation.</p>
 <code>CurrentPath</code> is replaced. A fresh path legitimately has a
 larger remaining length; without the reset it reads as permanent
 no-progress and arms recovery forever.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -957,6 +1130,7 @@ no-progress and arms recovery forever.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>The legacy failure is bit-reproducible (15855 cm / 31.56 / 68 loops /
 1 path on every run), which makes this map a far better regression
 instrument than the 7-agent demo scenario.</p>
@@ -984,6 +1158,7 @@ the segment leaves the single chunk this test can see - it returns the
 unmodified target, i.e. exactly legacy behaviour. Never infer a blockage
 from missing data; that would brake the follower at every chunk
 boundary.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -1020,6 +1195,7 @@ boundary.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Both fixes are needed. The progress detector alone breaks the
 orbit-lock but still ends 66 m short; the visibility clamp alone leaves
 the stall detector blind to any orbit it does not prevent.</p>
@@ -1079,6 +1255,7 @@ the window and obey the tightest, charging the body's response distance
 </ol>
 <p>Peak cross-track at a 135° corner, 375 cm spacing, by
 <code>MaxSpeed</code>:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -1120,6 +1297,7 @@ the window and obey the tightest, charging the body's response distance
 </tr>
 </tbody>
 </table>
+</div>
 <p>Tracking error is now <strong>flat in speed</strong> instead of
 growing linearly with it, and it is not bought with travel time - mean
 speed is unchanged (at 1200 it is marginally <em>higher</em>, because
@@ -1139,6 +1317,7 @@ rather than a 1-wide profile.</p>
 <code>BT_FlightBehavior_Loop</code>, single agent, pinned start/goal, 3
 runs per arm) exactly one follower metric moves, and it is the one that
 matters:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -1175,6 +1354,7 @@ matters:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>The worst-case figure is not merely better, it is
 <strong>tight</strong>: ±12 cm across runs whose replan counts ranged
 16-47, against ±170 cm for the one-corner cap. That is the signature of

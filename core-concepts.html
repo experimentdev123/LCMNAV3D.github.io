@@ -2,32 +2,184 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tutorial 02: Core Concepts | LCM Nav3D</title>
-<meta name="description" content="LCM Nav3D carves your level's empty air into a tree of boxes  and paths through the empty ones. You place one LcmNavigationManagerSVO actor per level, t...">
-<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/core-concepts.html">
+<title>Core Concepts: Sparse Voxel Octree Navigation | LCM Nav3D</title>
+<meta name="description" content="How LCM Nav3D carves empty air into a sparse voxel octree and paths through it. Covers the navigation manager actor, world extent, voxel size and clearance.">
+<link rel="canonical" href="https://lcmnav3d.github.io/core-concepts.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="L. Charitha Madhushanka">
+<meta name="generator" content="LCM Nav3D docs">
+<!-- Search Console: set GSC_VERIFICATION in build.js to emit the verification tag here. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0f1211" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tutorial 02: Core Concepts | LCM Nav3D">
-<meta property="og:description" content="LCM Nav3D carves your level's empty air into a tree of boxes  and paths through the empty ones. You place one LcmNavigationManagerSVO actor per level, t...">
-<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta property="og:site_name" content="LCM Nav3D Documentation">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://lcmnav3d.github.io/core-concepts.html">
+<meta property="og:title" content="Core Concepts: Sparse Voxel Octree Navigation | LCM Nav3D">
+<meta property="og:description" content="How LCM Nav3D carves empty air into a sparse voxel octree and paths through it. Covers the navigation manager actor, world extent, voxel size and clearance.">
+<meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="favicon.png">
+<meta name="twitter:title" content="Core Concepts: Sparse Voxel Octree Navigation | LCM Nav3D">
+<meta name="twitter:description" content="How LCM Nav3D carves empty air into a sparse voxel octree and paths through it. Covers the navigation manager actor, world extent, voxel size and clearance.">
+<meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="alternate" type="application/atom+xml" title="LCM Nav3D Documentation" href="https://lcmnav3d.github.io/feed.xml">
+<link rel="sitemap" type="application/xml" href="https://lcmnav3d.github.io/sitemap.xml">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://lcmnav3d.github.io/#organization",
+   "name": "UEDEV Labs",
+   "url": "https://uedevlabs.github.io/",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/logo.png",
+    "width": 49,
+    "height": 60
+   },
+   "sameAs": [
+    "https://uedevlabs.github.io/",
+    "https://www.fab.com/sellers/UEDEV",
+    "https://discord.gg/nXkpD6uaBG"
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://lcmnav3d.github.io/#website",
+   "url": "https://lcmnav3d.github.io/",
+   "name": "LCM Nav3D Documentation",
+   "description": "Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://lcmnav3d.github.io/#software",
+   "name": "LCM Nav3D",
+   "alternateName": "LCM Nav3D — True Volumetric 3D Navigation for Unreal Engine",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Game Engine Plugin",
+   "operatingSystem": "Windows 64-bit, Linux",
+   "softwareRequirements": "Unreal Engine 5.2 to 5.8",
+   "url": "https://lcmnav3d.github.io/",
+   "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
+   "image": "https://lcmnav3d.github.io/og.jpg",
+   "description": "A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.",
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "featureList": [
+    "Sparse voxel octree 3D pathfinding",
+    "Flying, swimming and free-floating agent locomotion",
+    "Mass Entity crowds at 10,000+ agents",
+    "True volumetric EQS generators and tests",
+    "Dynamic runtime obstacles",
+    "Hybrid Recast and Nav3D navigation in one level",
+    "Behavior Tree and StateTree tasks",
+    "Gameplay Debugger integration"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://lcmnav3d.github.io/core-concepts.html#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Documentation",
+     "item": "https://lcmnav3d.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Getting Started",
+     "item": "https://lcmnav3d.github.io/index.html#part-i-getting-started"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Core Concepts",
+     "item": "https://lcmnav3d.github.io/core-concepts.html"
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://lcmnav3d.github.io/core-concepts.html#article",
+   "headline": "Tutorial 02: Core Concepts",
+   "name": "Core Concepts: Sparse Voxel Octree Navigation | LCM Nav3D",
+   "description": "How LCM Nav3D carves empty air into a sparse voxel octree and paths through it. Covers the navigation manager actor, world extent, voxel size and clearance.",
+   "url": "https://lcmnav3d.github.io/core-concepts.html",
+   "inLanguage": "en",
+   "isPartOf": {
+    "@id": "https://lcmnav3d.github.io/#website"
+   },
+   "about": {
+    "@id": "https://lcmnav3d.github.io/#software"
+   },
+   "breadcrumb": {
+    "@id": "https://lcmnav3d.github.io/core-concepts.html#breadcrumb"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lcmnav3d.github.io/core-concepts.html"
+   },
+   "image": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/og.jpg",
+    "width": 1200,
+    "height": 675
+   },
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "datePublished": "2026-08-16",
+   "dateModified": "2026-08-16",
+   "proficiencyLevel": "Beginner",
+   "dependencies": "Unreal Engine 5.2 to 5.8"
+  }
+ ]
+}
+</script>
 </head><body>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
- <button id="burger" aria-label="Menu">&#9776;</button>
- <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
- <nav class="side">
+ <nav class="side" id="sidenav" aria-label="Documentation">
   <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
-  <div id="results"></div>
+  <div id="results" role="listbox" aria-label="Search results"></div>
+  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>
   <h4>Start here</h4>
   <a href="index.html" data-slug="index">Overview</a>
   <h4>Getting started</h4>
   <a href="installation.html" data-slug="installation">Installation</a>
-  <a href="core-concepts.html" data-slug="core-concepts" class="on">Core concepts</a>
+  <a href="core-concepts.html" data-slug="core-concepts" class="on" aria-current="page">Core concepts</a>
   <a href="your-first-flying-agent.html" data-slug="your-first-flying-agent">Your first flying agent</a>
   <a href="statetree-agent.html" data-slug="statetree-agent">The same agent in StateTree</a>
   <a href="dynamic-obstacles.html" data-slug="dynamic-obstacles">Dynamic obstacles</a>
@@ -54,8 +206,8 @@
   <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
   <a href="api-reference.html" data-slug="api-reference">API reference</a>
  </nav>
- <main>
-  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+ <main id="content">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Documentation</a><span class="sep" aria-hidden="true">/</span><a href="index.html#part-i-getting-started">Getting Started</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Core Concepts</span></nav>
   <h1 id="tutorial-02-core-concepts">Tutorial 02: Core Concepts</h1>
 <p><strong>TL;DR:</strong> LCM Nav3D carves your level's <strong>empty
 air</strong> into a tree of boxes (a Sparse Voxel Octree) and paths
@@ -113,6 +265,7 @@ Every agent talks to it. If it isn't in the level, nothing
 navigates.</p>
 <p>Its Details panel is deliberately organised in the order you should
 think about it:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -147,6 +300,7 @@ think about it:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Full field-by-field detail is in the <a href="settings.html">Settings
 Reference</a>. Here we only cover the concepts behind them.</p>
 <hr />
@@ -249,6 +403,7 @@ works, the problem is usually <strong>macro</strong>. Either chunks are
 not generated yet, or <code>ChunkSize</code> is interacting badly with
 your layout.</p>
 <h3 id="choosing-a-solver">Choosing a solver</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -275,7 +430,9 @@ your layout.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <h3 id="smoothing">Smoothing</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -298,6 +455,7 @@ your layout.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <blockquote>
 <p>Smoothing runs <em>after</em> pathfinding and is validated against
 geometry, so a smoothed path won't cut through a wall.</p>
@@ -320,6 +478,7 @@ That's <a href="dynamic-obstacles.html">Tutorial 05</a>.</p>
 <hr />
 <h2 id="8-terms-youll-meet-in-the-rest-of-the-docs">8. Terms you'll meet
 in the rest of the docs</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -359,6 +518,7 @@ one</td>
 </tr>
 </tbody>
 </table>
+</div>
 <hr />
 <h2 id="recap">Recap</h2>
 <ul>

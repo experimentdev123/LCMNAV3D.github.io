@@ -2,27 +2,249 @@
 <html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Troubleshooting | LCM Nav3D</title>
-<meta name="description" content="Problems in the order people actually hit them. Start with the Quick Triage table: it resolves most issues in under a minute.">
-<link rel="canonical" href="https://uedevlabs.github.io/lcm-nav3d/troubleshooting.html">
+<title>Troubleshooting 3D Navigation Problems | LCM Nav3D</title>
+<meta name="description" content="LCM Nav3D problems in the order people hit them: agents that will not move, &quot;no path found&quot;, ignored geometry, dead dynamic obstacles and performance issues.">
+<link rel="canonical" href="https://lcmnav3d.github.io/troubleshooting.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="L. Charitha Madhushanka">
+<meta name="generator" content="LCM Nav3D docs">
+<!-- Search Console: set GSC_VERIFICATION in build.js to emit the verification tag here. -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0f1211" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Troubleshooting | LCM Nav3D">
-<meta property="og:description" content="Problems in the order people actually hit them. Start with the Quick Triage table: it resolves most issues in under a minute.">
-<meta property="og:image" content="https://uedevlabs.github.io/lcm-nav3d/og.png">
+<meta property="og:site_name" content="LCM Nav3D Documentation">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://lcmnav3d.github.io/troubleshooting.html">
+<meta property="og:title" content="Troubleshooting 3D Navigation Problems | LCM Nav3D">
+<meta property="og:description" content="LCM Nav3D problems in the order people hit them: agents that will not move, &quot;no path found&quot;, ignored geometry, dead dynamic obstacles and performance issues.">
+<meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="favicon.png">
+<meta name="twitter:title" content="Troubleshooting 3D Navigation Problems | LCM Nav3D">
+<meta name="twitter:description" content="LCM Nav3D problems in the order people hit them: agents that will not move, &quot;no path found&quot;, ignored geometry, dead dynamic obstacles and performance issues.">
+<meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
+<meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="alternate" type="application/atom+xml" title="LCM Nav3D Documentation" href="https://lcmnav3d.github.io/feed.xml">
+<link rel="sitemap" type="application/xml" href="https://lcmnav3d.github.io/sitemap.xml">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://lcmnav3d.github.io/#organization",
+   "name": "UEDEV Labs",
+   "url": "https://uedevlabs.github.io/",
+   "logo": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/logo.png",
+    "width": 49,
+    "height": 60
+   },
+   "sameAs": [
+    "https://uedevlabs.github.io/",
+    "https://www.fab.com/sellers/UEDEV",
+    "https://discord.gg/nXkpD6uaBG"
+   ]
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://lcmnav3d.github.io/#website",
+   "url": "https://lcmnav3d.github.io/",
+   "name": "LCM Nav3D Documentation",
+   "description": "Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.",
+   "inLanguage": "en",
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://lcmnav3d.github.io/#software",
+   "name": "LCM Nav3D",
+   "alternateName": "LCM Nav3D — True Volumetric 3D Navigation for Unreal Engine",
+   "applicationCategory": "DeveloperApplication",
+   "applicationSubCategory": "Game Engine Plugin",
+   "operatingSystem": "Windows 64-bit, Linux",
+   "softwareRequirements": "Unreal Engine 5.2 to 5.8",
+   "url": "https://lcmnav3d.github.io/",
+   "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
+   "image": "https://lcmnav3d.github.io/og.jpg",
+   "description": "A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.",
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "featureList": [
+    "Sparse voxel octree 3D pathfinding",
+    "Flying, swimming and free-floating agent locomotion",
+    "Mass Entity crowds at 10,000+ agents",
+    "True volumetric EQS generators and tests",
+    "Dynamic runtime obstacles",
+    "Hybrid Recast and Nav3D navigation in one level",
+    "Behavior Tree and StateTree tasks",
+    "Gameplay Debugger integration"
+   ]
+  },
+  {
+   "@type": "BreadcrumbList",
+   "@id": "https://lcmnav3d.github.io/troubleshooting.html#breadcrumb",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Documentation",
+     "item": "https://lcmnav3d.github.io/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Reference",
+     "item": "https://lcmnav3d.github.io/index.html#part-iii-reference"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "Troubleshooting",
+     "item": "https://lcmnav3d.github.io/troubleshooting.html"
+    }
+   ]
+  },
+  {
+   "@type": "TechArticle",
+   "@id": "https://lcmnav3d.github.io/troubleshooting.html#article",
+   "headline": "Troubleshooting",
+   "name": "Troubleshooting 3D Navigation Problems | LCM Nav3D",
+   "description": "LCM Nav3D problems in the order people hit them: agents that will not move, \"no path found\", ignored geometry, dead dynamic obstacles and performance issues.",
+   "url": "https://lcmnav3d.github.io/troubleshooting.html",
+   "inLanguage": "en",
+   "isPartOf": {
+    "@id": "https://lcmnav3d.github.io/#website"
+   },
+   "about": {
+    "@id": "https://lcmnav3d.github.io/#software"
+   },
+   "breadcrumb": {
+    "@id": "https://lcmnav3d.github.io/troubleshooting.html#breadcrumb"
+   },
+   "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://lcmnav3d.github.io/troubleshooting.html"
+   },
+   "image": {
+    "@type": "ImageObject",
+    "url": "https://lcmnav3d.github.io/og.jpg",
+    "width": 1200,
+    "height": 675
+   },
+   "author": {
+    "@type": "Person",
+    "name": "L. Charitha Madhushanka"
+   },
+   "publisher": {
+    "@id": "https://lcmnav3d.github.io/#organization"
+   },
+   "datePublished": "2026-08-16",
+   "dateModified": "2026-08-16",
+   "proficiencyLevel": "Beginner",
+   "dependencies": "Unreal Engine 5.2 to 5.8"
+  },
+  {
+   "@type": "FAQPage",
+   "@id": "https://lcmnav3d.github.io/troubleshooting.html#faq",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Why does my LCM Nav3D agent not move at all?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The usual cause is that there is no navigation manager in the level. If the Output Log shows \"LCMBTTask_FlyTo: No SVO Manager found in the level!\", drag an LcmNavigationManagerSVO into the level - one per level, required. Then check that the AI possessed the pawn (Auto Possess AI is set, an AI Controller Class is assigned, and the controller actually runs the tree), that the pawn has a movement component supporting flight with a non-zero Max Speed, and that the goal was actually set."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why does LCM Nav3D report \"no path found\" through a gap I can clearly see?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Clearance Padding sealed the opening. When Clearance Padding is close to Min Voxel Size, obstacle inflation fills narrow openings completely - a 2 m doorway with 100 cm voxels and 100 cm padding can vanish entirely. Lower Clearance Padding, or lower Min Voxel Size so the opening survives the inflation, then confirm with Draw Debug Volumes that free voxels run through the opening."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why do short paths work while long ones fail?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "This is almost always an infinite-world issue: the route crosses chunks that have not generated yet. Turn on Persistent Skeleton under section 5, Coarse Skeleton - it is off by default and is what allows long-range planning before the detail exists. For routing to be complete on the first frame, tick Use Baked Skeleton and click Bake Skeleton. Tick Assist Infinite Streaming on the Fly To task for agents that must traverse the frontier."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why do my agents fly straight through walls?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "If agents fly through a wall, the wall is not in the octree. Voxelization uses collision, not visual geometry, so a mesh set to No Collision is invisible to navigation. Check that the mesh has collision and that its channel is listed in Obstacle Query Channels under section 3, Collision."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why are my moving obstacles ignored by LCM Nav3D agents?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The moving actor is missing the Dynamic Obstacle component. Add an LCM Nav3D Dynamic Obstacle component to any actor that should push agents aside as it moves."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why can I not find the LCM Nav3D demo maps?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Show Plugin Content is switched off in the Content Browser. Enable it, and the worked examples appear under the plugin’s Content/Demo/ folder, grouped by Behaviour Tree, StateTree and Mass Entity."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why did my frame rate drop after adding LCM Nav3D?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Voxel resolution is too fine. Raise Min Voxel Size - finer voxels multiply the node count sharply - and re-measure before tuning anything else."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why does my agent jitter or vibrate in place?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Physics is fighting navigation. Set the mesh collision to No Collision to confirm that is the cause, then re-add collision carefully."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
 </head><body>
+<a class="skip" href="#content">Skip to content</a>
 <header class="top">
- <button id="burger" aria-label="Menu">&#9776;</button>
- <a class="mark" href="index.html"><img src="logo.png" alt=""> LCM Nav3D</a>
+ <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
+ <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
- <nav class="side">
+ <nav class="side" id="sidenav" aria-label="Documentation">
   <input id="q" class="searchbox" type="search" placeholder="Search the docs" aria-label="Search">
-  <div id="results"></div>
+  <div id="results" role="listbox" aria-label="Search results"></div>
+  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>
   <h4>Start here</h4>
   <a href="index.html" data-slug="index">Overview</a>
   <h4>Getting started</h4>
@@ -49,19 +271,20 @@
   <h4>Reference</h4>
   <a href="editor-tools.html" data-slug="editor-tools">Editor tools</a>
   <a href="settings.html" data-slug="settings">Settings reference</a>
-  <a href="troubleshooting.html" data-slug="troubleshooting" class="on">Troubleshooting</a>
+  <a href="troubleshooting.html" data-slug="troubleshooting" class="on" aria-current="page">Troubleshooting</a>
   <a href="flight-locomotion.html" data-slug="flight-locomotion">Flight and locomotion</a>
   <a href="mass-traits.html" data-slug="mass-traits">Mass traits reference</a>
   <a href="api-reference.html" data-slug="api-reference">API reference</a>
  </nav>
- <main>
-  <p style="color:var(--muted);font-size:13.5px;margin:0 0 6px"><a href="index.html">Documentation</a> / </p>
+ <main id="content">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Documentation</a><span class="sep" aria-hidden="true">/</span><a href="index.html#part-iii-reference">Reference</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Troubleshooting</span></nav>
   <h1 id="troubleshooting">Troubleshooting</h1>
 <p>Problems in the order people actually hit them. <strong>Start with
 the Quick Triage table</strong>: it resolves most issues in under a
 minute.</p>
 <hr />
 <h2 id="quick-triage">Quick triage</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -108,6 +331,7 @@ minute.</p>
 </tr>
 </tbody>
 </table>
+</div>
 <hr />
 <h2 id="the-two-diagnostics-that-answer-almost-everything">The two
 diagnostics that answer almost everything</h2>
@@ -156,6 +380,7 @@ Speed</strong> isn't 0.</p>
 started.</p>
 <hr />
 <h2 id="2-agent-moves-but-badly">2. Agent moves, but badly</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -202,6 +427,7 @@ avoidance</td>
 </tr>
 </tbody>
 </table>
+</div>
 <hr />
 <h2 id="3-no-path-found">3. "No path found"</h2>
 <h3 id="first-is-the-goal-reachable-at-all">First: is the goal reachable
@@ -331,6 +557,7 @@ default.</li>
 <code>Debug Redraw Coalesce Seconds</code>, or turn it off.</p>
 <hr />
 <h2 id="7-editor-and-install">7. Editor and install</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table">
 <table>
 <thead>
 <tr>
@@ -372,6 +599,7 @@ manager; EQS previews need navigation data without playing</td>
 </tr>
 </tbody>
 </table>
+</div>
 <hr />
 <h2 id="8-determinism-and-multiplayer">8. Determinism and
 multiplayer</h2>
