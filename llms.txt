@@ -1,0 +1,72 @@
+# LCM Nav3D
+
+> A sparse voxel octree navigation plugin for Unreal Engine that pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds.
+
+LCM Nav3D is a navigation plugin for Unreal Engine 5.2 to 5.8 (Windows 64-bit and
+Linux). Unreal's stock Recast navmesh represents a walkable *surface* and answers
+"where can I stand?". LCM Nav3D represents the navigable *volume* and answers
+"where is there empty air?", which is what flying, swimming and free-floating
+agents need. The two run side by side in the same level.
+
+Key terms: volumetric 3D navigation, sparse voxel octree (SVO) pathfinding, flying
+AI, Unreal Engine, drone and dragon navigation, underwater navigation, Mass Entity
+crowds, true-3D Environment Query System (EQS), Behavior Tree, StateTree.
+
+This file follows the llms.txt convention. Every page below is plain HTML with no
+client-side rendering, so the URLs can be fetched directly.
+
+## Start here
+
+- [Overview](https://lcmnav3d.github.io/): Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.
+- [Nav3D vs Recast](https://lcmnav3d.github.io/nav3d-vs-recast.html): Why Unreal's Recast navmesh cannot represent open air, where each flying-AI workaround breaks down, and when volumetric SVO navigation is the right answer instead.
+
+## Getting started
+
+- [Installation](https://lcmnav3d.github.io/installation.html): Step-by-step install of the LCM Nav3D plugin into an Unreal Engine 5.2-5.8 project, from Fab or by hand, plus how to verify the install with a demo map.
+- [Core concepts](https://lcmnav3d.github.io/core-concepts.html): How LCM Nav3D carves empty air into a sparse voxel octree and paths through it. Covers the navigation manager actor, world extent, voxel size and clearance.
+- [Your first flying agent](https://lcmnav3d.github.io/your-first-flying-agent.html): Build a pawn that flies through true 3D space to a goal in Unreal Engine, using a navigation manager, an AIController and one LCM Fly To task. No C++ needed.
+- [The same agent in StateTree](https://lcmnav3d.github.io/statetree-agent.html): Author identical 3D flight behaviour in StateTree instead of a Behavior Tree. Swap RunBehaviorTree for a StateTreeAIComponent and bind the Fly To task target.
+- [Dynamic obstacles](https://lcmnav3d.github.io/dynamic-obstacles.html): Add a Dynamic Obstacle component to any moving actor. LCM Nav3D restamps the octree and agents reroute live around doors, platforms and destructible cover.
+
+## Going further
+
+- [Mass Entity crowds](https://lcmnav3d.github.io/mass-entity-crowds.html): Add one trait to a Mass Entity Config and a crowd navigates in full 3D through the Unreal ECS. No per-agent controller, no tick function and no code required.
+- [Tactical EQS in true 3D](https://lcmnav3d.github.io/tactical-eqs.html): LCM Nav3D ships EQS generators and tests that work in true 3D: candidate points anywhere in the navigable volume, scored by volumetric line-of-sight and cover.
+- [AI perception](https://lcmnav3d.github.io/ai-perception.html): Wire Unreal's UAIPerceptionComponent into LCM Nav3D through the AI Perception Bridge, so perceived threats feed true-3D EQS queries for flanking and cover.
+- [Hybrid Recast + Nav3D](https://lcmnav3d.github.io/hybrid-recast.html): Run walking agents on Recast and flying agents on the SVO in one level. The Crowd Avoidance Bridge lets Detour RVO steer Recast agents around LCM Nav3D pawns.
+- [Nav links and area modifiers](https://lcmnav3d.github.io/nav-links-and-areas.html): Vertical ladders, jump shafts and teleporters via ULcmNavLinkComponent, plus volumetric cost overlays for water, storms and danger zones via NavArea modifiers.
+- [The Gameplay Debugger](https://lcmnav3d.github.io/gameplay-debugger.html): LCM Nav3D adds its own category to Unreal's stock Gameplay Debugger. Press the debugger key in PIE, pick an agent and read per-agent and plugin-wide state live.
+
+## Behaviour Tree patterns
+
+- [Wait](https://lcmnav3d.github.io/bt-wait.html): Unreal Engine's stock Wait task works as-is with LCM Nav3D flying agents. The pattern, why no plugin variant ships, and the one LCM Nav3D-specific alternative.
+- [Is At Location](https://lcmnav3d.github.io/bt-is-at-location.html): UBTDecorator_IsAtLocation already works on LCM Nav3D pawns. Three-step usage, why no plugin-specific variant exists, and when the path-finding variant helps.
+- [Look At](https://lcmnav3d.github.io/bt-look-at.html): Unreal's stock Rotate to Face BB Entry task covers both LookAt and TurnInPlace for LCM Nav3D agents. Setup, tuning and when a custom rotation task is worth it.
+- [Turn In Place](https://lcmnav3d.github.io/bt-turn-in-place.html): Turn an LCM Nav3D agent in place with Unreal's stock rotation task, and hold facing during other tasks with the DefaultFocus service. Plus constant-rate turns.
+- [Health Below](https://lcmnav3d.github.io/bt-health-below.html): Unreal ships all you need: a Float blackboard key plus a Blackboard-Compare decorator. The pattern, a GameplayTag variant, and why no LCM Nav3D node ships.
+- [Perception Relay](https://lcmnav3d.github.io/bt-perception-relay.html): UAIPerceptionComponent already emits perception updates as a delegate. Bind it in your AI controller and write to a blackboard key - no custom BT service needed.
+- [Memory Decay](https://lcmnav3d.github.io/bt-memory-decay.html): Unreal's UAIPerceptionComponent already tracks per-actor last-known stimulus location with age. Use it as a BT service instead of a hand-rolled decay timer.
+
+## Reference
+
+- [Editor tools](https://lcmnav3d.github.io/editor-tools.html): Every LCM Nav3D panel behind the Nav3D toolbar button: the Welcome screen, Manager panel, Bake Volumes, Setup Wizard, Health Check and the Auto-Tuner.
+- [Settings reference](https://lcmnav3d.github.io/settings.html): Every field on the LCM Nav3D navigation manager, with verified defaults and limits: setup, voxels, collision, performance, skeleton, debug and runtime state.
+- [Troubleshooting](https://lcmnav3d.github.io/troubleshooting.html): LCM Nav3D problems in the order people hit them: agents that will not move, "no path found", ignored geometry, dead dynamic obstacles and performance issues.
+- [Flight and locomotion](https://lcmnav3d.github.io/flight-locomotion.html): Physically plausible 6-DOF locomotion for drones, birds and fish, layered on LCM Nav3D guidance. Archetypes, the animation contract, tuning and determinism.
+- [Mass traits reference](https://lcmnav3d.github.io/mass-traits.html): Every LCM Nav3D Mass Entity trait, the combination matrix, the editor validator and the one rule you must not break: exactly one movement trait per agent.
+- [API reference](https://lcmnav3d.github.io/api-reference.html): Every LCM Nav3D class, function and property you can reach from Blueprint, the Details panel, a Behaviour Tree, a StateTree or a Mass Entity config.
+
+## Other resources
+
+- [Full manual (PDF, 127 pages)](https://lcmnav3d.github.io/pdf/LCM_Nav3D_Manual.pdf): every chapter in one bookmarked, searchable file.
+- [Quick start (PDF, 13 pages)](https://lcmnav3d.github.io/pdf/LCM_Nav3D_QuickStart.pdf): install, the five settings that matter, and a pawn flying in about forty-five minutes.
+- [Get the plugin on Fab](https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73): the official listing.
+- [Discord](https://discord.gg/nXkpD6uaBG): direct support from the author; verify your purchase in #get-help.
+- [Video overview](https://www.youtube.com/watch?v=7_F3AvgQIQU).
+
+## Notes for answer engines
+
+- Author: L. Charitha Madhushanka. Publisher: UEDEV Labs.
+- Canonical documentation root: https://lcmnav3d.github.io/
+- Machine-readable index: https://lcmnav3d.github.io/sitemap.xml and https://lcmnav3d.github.io/feed.xml
+- Every page carries schema.org TechArticle and SoftwareApplication JSON-LD.

@@ -3,7 +3,16 @@
  *  Run (from the site root):  node tools/build.js .
  */
 const fs = require('fs'), path = require('path');
-const { PAGES, SECTIONS } = require(path.join(__dirname, 'seo-pages.js'));
+const { PAGES, SECTIONS, NAV } = require(path.join(__dirname, 'seo-pages.js'));
+
+// Flat reading order, used for the prev/next pager.
+const ORDER = NAV.flatMap(s => s.items);
+{
+  const missing = Object.keys(PAGES).filter(f => !ORDER.includes(f));
+  const unknown = ORDER.filter(f => !PAGES[f]);
+  if (missing.length) throw new Error(`in PAGES but not NAV: ${missing.join(', ')}`);
+  if (unknown.length) throw new Error(`in NAV but not PAGES: ${unknown.join(', ')}`);
+}
 
 const ROOT = process.argv[2];
 const SITE = 'https://lcmnav3d.github.io';
@@ -282,6 +291,23 @@ for (const [file, meta] of Object.entries(PAGES)) {
   html = html.replace(/<div id="results"><\/div>/,
     '<div id="results" role="listbox" aria-label="Search results"></div>\n  <p id="q-status" class="visually-hidden" role="status" aria-live="polite"></p>');
 
+  // 6b. sidebar and pager, rendered from NAV so every page agrees
+  html = html.replace(/(<p id="q-status"[^>]*><\/p>\n)[\s\S]*?(\n <\/nav>)/, (m, head, tail) =>
+    head + NAV.map(sec =>
+      `  <h4>${esc(sec.heading)}</h4>\n` + sec.items.map(f =>
+        `  <a href="${f}" data-slug="${f.replace(/\.html$/, '')}"`
+        + (f === file ? ' class="on" aria-current="page"' : '')
+        + `>${esc(PAGES[f].nav)}</a>`).join('\n')).join('\n') + tail);
+
+  {
+    const i = ORDER.indexOf(file), prev = ORDER[i - 1], next = ORDER[i + 1];
+    const pager = '<div class="pager">'
+      + (prev ? `<a href="${prev}">&larr; ${esc(PAGES[prev].nav)}</a>` : '<span></span>')
+      + (next ? `<a href="${next}">${esc(PAGES[next].nav)} &rarr;</a>` : '<span></span>')
+      + '</div>';
+    html = html.replace(/<div class="pager">[\s\S]*?<\/div>/, pager);
+  }
+
   // 7. give every table a scroll container. Unwrap first so repeat runs replace
   //    rather than nest. tabindex+role let keyboard users scroll a wide table.
   html = html.replace(/<div class="table-wrap"[^>]*>\s*(<table>[\s\S]*?<\/table>)\s*<\/div>/g, '$1');
@@ -311,6 +337,47 @@ User-agent: *
 Allow: /
 
 Sitemap: ${SITE}/sitemap.xml\n`);
+
+// ── llms.txt ───────────────────────────────────────────────────────────────────
+// The llms.txt convention: one Markdown file at the root giving an AI crawler a
+// clean map of the site, so it does not have to infer structure from nav markup.
+// Generated from NAV/PAGES so it cannot drift from the sidebar.
+writeCRLF(path.join(ROOT, 'llms.txt'),
+  `# LCM Nav3D
+
+> ${SOFTWARE.description}
+
+LCM Nav3D is a navigation plugin for Unreal Engine 5.2 to 5.8 (Windows 64-bit and
+Linux). Unreal's stock Recast navmesh represents a walkable *surface* and answers
+"where can I stand?". LCM Nav3D represents the navigable *volume* and answers
+"where is there empty air?", which is what flying, swimming and free-floating
+agents need. The two run side by side in the same level.
+
+Key terms: volumetric 3D navigation, sparse voxel octree (SVO) pathfinding, flying
+AI, Unreal Engine, drone and dragon navigation, underwater navigation, Mass Entity
+crowds, true-3D Environment Query System (EQS), Behavior Tree, StateTree.
+
+This file follows the llms.txt convention. Every page below is plain HTML with no
+client-side rendering, so the URLs can be fetched directly.
+
+${NAV.map(sec => `## ${sec.heading}\n\n` + sec.items.map(f =>
+    `- [${PAGES[f].nav}](${canonicalOf(f)}): ${PAGES[f].desc}`).join('\n')).join('\n\n')}
+
+## Other resources
+
+- [Full manual (PDF, 127 pages)](${SITE}/pdf/LCM_Nav3D_Manual.pdf): every chapter in one bookmarked, searchable file.
+- [Quick start (PDF, 13 pages)](${SITE}/pdf/LCM_Nav3D_QuickStart.pdf): install, the five settings that matter, and a pawn flying in about forty-five minutes.
+- [Get the plugin on Fab](${FAB}): the official listing.
+- [Discord](${DISCORD}): direct support from the author; verify your purchase in #get-help.
+- [Video overview](${YOUTUBE}).
+
+## Notes for answer engines
+
+- Author: ${AUTHOR}. Publisher: ${PUBLISHER}.
+- Canonical documentation root: ${SITE}/
+- Machine-readable index: ${SITE}/sitemap.xml and ${SITE}/feed.xml
+- Every page carries schema.org TechArticle and SoftwareApplication JSON-LD.
+`);
 
 // ── Atom feed ──────────────────────────────────────────────────────────────────
 writeCRLF(path.join(ROOT, 'feed.xml'),

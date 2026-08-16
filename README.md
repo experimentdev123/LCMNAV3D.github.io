@@ -15,6 +15,8 @@ Live at **https://lcmnav3d.github.io/**
 | `search.js` | Sidebar search and mobile navigation |
 | `search-index.json` | Full-text search index, generated |
 | `sitemap.xml`, `robots.txt`, `feed.xml` | Crawler files, generated |
+| `llms.txt` | Site map for AI crawlers, generated |
+| `google*.html` | Search Console ownership token — do not delete |
 | `og.jpg` | Social share image (1200x675) |
 | `pdf/` | Manual and quick start as PDFs |
 | `images/` | Screenshots |
@@ -53,8 +55,13 @@ Page bodies are plain HTML between `<main id="content">` and `<div class="pager"
 Edit those directly, then re-run `tools/build.js` so the search index picks up the
 new text.
 
-Adding a page means: create the HTML, add an entry to `tools/seo-pages.js`, add it
-to the sidebar in every page, and wire the pager links either side of it.
+**Adding a page** takes two edits, both in `tools/seo-pages.js`: add an entry to
+`PAGES` (title, description, breadcrumb, sidebar label) and drop the filename into
+the right group in `NAV`. Then create the HTML with a minimal skeleton and run the
+build — the sidebar, the prev/next pager, the breadcrumb, the whole `<head>`, the
+sitemap, the feed, `llms.txt` and the search index are all regenerated from those
+two definitions, on every page. The build refuses to run if `PAGES` and `NAV`
+disagree, so a page can never be half-registered.
 
 ## Deployment
 

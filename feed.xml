@@ -16,6 +16,13 @@
     <summary>Official documentation for LCM Nav3D, true volumetric 3D navigation for Unreal Engine 5. Install guides, flying-agent tutorials, Mass crowds and the full API.</summary>
   </entry>
   <entry>
+    <title>Nav3D vs Recast Navmesh for Flying AI in Unreal Engine</title>
+    <link href="https://lcmnav3d.github.io/nav3d-vs-recast.html"/>
+    <id>https://lcmnav3d.github.io/nav3d-vs-recast.html</id>
+    <updated>2026-08-16T00:00:00Z</updated>
+    <summary>Why Unreal's Recast navmesh cannot represent open air, where each flying-AI workaround breaks down, and when volumetric SVO navigation is the right answer instead.</summary>
+  </entry>
+  <entry>
     <title>Install LCM Nav3D in Unreal Engine 5 - Fab or Manual Setup</title>
     <link href="https://lcmnav3d.github.io/installation.html"/>
     <id>https://lcmnav3d.github.io/installation.html</id>
