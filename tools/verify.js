@@ -1,7 +1,15 @@
 const fs = require('fs'), path = require('path');
 const ROOT = process.argv[2];
 const SITE = 'https://lcmnav3d.github.io';
-const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
+
+// Search-engine ownership tokens (Google, Bing, Yandex) are bare files with no
+// <head> of their own. They are part of the deploy but not pages, so they are
+// listed rather than validated - holding them to the page rules would crash.
+const NON_PAGE = /^(google[0-9a-f]+|BingSiteAuth|yandex_[0-9a-f]+|pinterest-[0-9a-z]+)\.html$/i;
+const allHtml = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
+const skipped = allHtml.filter(f => NON_PAGE.test(f));
+const files = allHtml.filter(f => !NON_PAGE.test(f));
+if (skipped.length) console.log(`(skipping ${skipped.length} verification file(s): ${skipped.join(', ')})\n`);
 const html = Object.fromEntries(files.map(f => [f, fs.readFileSync(path.join(ROOT, f), 'utf8')]));
 const ids = Object.fromEntries(files.map(f => [f, new Set([...html[f].matchAll(/\sid="([^"]+)"/g)].map(m => m[1]))]));
 const exists = p => fs.existsSync(path.join(ROOT, decodeURIComponent(p.split('#')[0].split('?')[0])));

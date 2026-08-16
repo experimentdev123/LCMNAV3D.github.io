@@ -6,7 +6,9 @@
  */
 const fs = require('fs'), path = require('path');
 const ROOT = process.argv[2] || '.';
-const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
+// Search-engine ownership tokens are bare files with no content to lint.
+const NON_PAGE = /^(google[0-9a-f]+|BingSiteAuth|yandex_[0-9a-f]+|pinterest-[0-9a-z]+)\.html$/i;
+const files = fs.readdirSync(ROOT).filter(f => f.endsWith('.html') && !NON_PAGE.test(f));
 const hits = {};
 const add = (k, m) => (hits[k] ||= []).push(m);
 
