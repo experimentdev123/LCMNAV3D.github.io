@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LCM Nav3D Documentation | 3D Pathfinding for Unreal Engine</title>
-<meta name="description" content="Production-grade volumetric 3D navigation for Unreal Engine 5. GPU-accelerated sparse voxel octree pathfinding, 10,000+ Mass Entity agents and true-3D EQS.">
+<meta name="description" content="Production-grade volumetric 3D navigation for Unreal Engine 5. Sparse voxel octree pathfinding, GPU voxelization, 10,000+ Mass Entity agents and true-3D EQS.">
 <link rel="canonical" href="https://lcmnav3d.github.io/">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta name="author" content="L. Charitha Madhushanka">
@@ -17,7 +17,7 @@
 <meta property="og:locale" content="en_GB">
 <meta property="og:url" content="https://lcmnav3d.github.io/">
 <meta property="og:title" content="LCM Nav3D Documentation | 3D Pathfinding for Unreal Engine">
-<meta property="og:description" content="Production-grade volumetric 3D navigation for Unreal Engine 5. GPU-accelerated sparse voxel octree pathfinding, 10,000+ Mass Entity agents and true-3D EQS.">
+<meta property="og:description" content="Production-grade volumetric 3D navigation for Unreal Engine 5. Sparse voxel octree pathfinding, GPU voxelization, 10,000+ Mass Entity agents and true-3D EQS.">
 <meta property="og:image" content="https://lcmnav3d.github.io/og.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
@@ -25,7 +25,7 @@
 <meta property="og:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="LCM Nav3D Documentation | 3D Pathfinding for Unreal Engine">
-<meta name="twitter:description" content="Production-grade volumetric 3D navigation for Unreal Engine 5. GPU-accelerated sparse voxel octree pathfinding, 10,000+ Mass Entity agents and true-3D EQS.">
+<meta name="twitter:description" content="Production-grade volumetric 3D navigation for Unreal Engine 5. Sparse voxel octree pathfinding, GPU voxelization, 10,000+ Mass Entity agents and true-3D EQS.">
 <meta name="twitter:image" content="https://lcmnav3d.github.io/og.jpg">
 <meta name="twitter:image:alt" content="LCM Nav3D - True Volumetric 3D Navigation for Unreal Engine">
 <link rel="icon" href="favicon.png" type="image/png">
@@ -59,7 +59,7 @@
    "@id": "https://lcmnav3d.github.io/#website",
    "url": "https://lcmnav3d.github.io/",
    "name": "LCM Nav3D Documentation",
-   "description": "Production-grade volumetric 3D navigation for Unreal Engine 5. GPU-accelerated sparse voxel octree pathfinding, 10,000+ Mass Entity agents and true-3D EQS.",
+   "description": "Production-grade volumetric 3D navigation for Unreal Engine 5. Sparse voxel octree pathfinding, GPU voxelization, 10,000+ Mass Entity agents and true-3D EQS.",
    "inLanguage": "en",
    "publisher": {
     "@id": "https://lcmnav3d.github.io/#organization"
@@ -77,7 +77,7 @@
    "url": "https://lcmnav3d.github.io/",
    "downloadUrl": "https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73",
    "image": "https://lcmnav3d.github.io/og.jpg",
-   "description": "An industry-leading, production-grade, heavily optimised sparse voxel octree navigation plugin for Unreal Engine, built for AAA-scale projects. It pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds. GPU voxelization and GPU 6-DOF compute with automatic CPU fallback, asynchronous pathfinding, deterministic results, explicit frame-budget controls and World Partition support. Complete C++ source, Blueprint exposed.",
+   "description": "An industry-leading, production-grade, heavily optimised sparse voxel octree navigation plugin for Unreal Engine, built for AAA-scale projects. It pathfinds through true 3D volume rather than a walkable surface, for flying, swimming and free-floating agents and Mass Entity crowds. GPU voxelization with automatic CPU fallback, asynchronous pathfinding, deterministic results, explicit frame-budget controls and World Partition support. Complete C++ source, Blueprint exposed.",
    "author": {
     "@type": "Person",
     "name": "L. Charitha Madhushanka"
@@ -87,7 +87,7 @@
    },
    "featureList": [
     "Sparse voxel octree 3D pathfinding",
-    "GPU voxelization and GPU 6-DOF compute with automatic CPU fallback",
+    "GPU voxelization with automatic CPU fallback",
     "Asynchronous pathfinding off the game thread",
     "Deterministic results for replays, lockstep multiplayer and automated tests",
     "Mass Entity ECS crowds at 10,000+ agents with LOD-culled rendering",
@@ -107,7 +107,7 @@
    "@id": "https://lcmnav3d.github.io/#webpage",
    "url": "https://lcmnav3d.github.io/",
    "name": "LCM Nav3D Documentation | 3D Pathfinding for Unreal Engine",
-   "description": "Production-grade volumetric 3D navigation for Unreal Engine 5. GPU-accelerated sparse voxel octree pathfinding, 10,000+ Mass Entity agents and true-3D EQS.",
+   "description": "Production-grade volumetric 3D navigation for Unreal Engine 5. Sparse voxel octree pathfinding, GPU voxelization, 10,000+ Mass Entity agents and true-3D EQS.",
    "isPartOf": {
     "@id": "https://lcmnav3d.github.io/#website"
    },
@@ -133,6 +133,7 @@
  <button id="burger" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidenav">&#9776;</button>
  <a class="mark" href="index.html"><img src="logo.png" alt="" width="49" height="60"> LCM Nav3D</a>
  <span class="sp"></span>
+ <a class="cta cta--demo" href="https://uedevlabs.itch.io/lcm-3d-navigation">Free demo</a>
  <a class="cta" href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Get it on Fab</a>
 </header>
 <div class="wrap">
@@ -183,6 +184,9 @@ href="https://discord.gg/nXkpD6uaBG">discord.gg/nXkpD6uaBG</a></strong>.
 Verify your purchase in <code>#get-help</code> for direct support, bug
 tracking and early builds. More UEDEV plugins and resources: <strong><a
 href="https://uedevlabs.github.io/">uedevlabs.github.io</a></strong>.
+Want to try it before buying? The <strong><a
+href="https://uedevlabs.itch.io/lcm-3d-navigation">free playable
+demo</a></strong> packs all 18 demo maps into a standalone Windows build.
 Everything on this site is also available as PDFs — the <a
 href="pdf/LCM_Nav3D_Manual.pdf">full manual</a> and the <a
 href="pdf/LCM_Nav3D_QuickStart.pdf">quick start</a> — for reading away
@@ -205,8 +209,9 @@ off your frame budget. The specifics:</p>
 <tbody>
 <tr>
 <td><strong>GPU acceleration</strong></td>
-<td>GPU voxelization and GPU 6-DOF compute, with automatic CPU fallback when no
-GPU is present - so it degrades gracefully instead of failing</td>
+<td>GPU voxelization with automatic CPU fallback when no GPU is present - so it
+degrades gracefully instead of failing. A GPU path solver is experimental,
+currently in research validation, and ships in a future free update</td>
 </tr>
 <tr>
 <td><strong>Crowd scale</strong></td>
@@ -585,7 +590,8 @@ Content Browser to see them.</p>
    <p><strong>LCM Nav3D</strong> True Volumetric 3D Navigation for Unreal Engine &nbsp;|&nbsp;
     <a href="https://www.fab.com/listings/92f05e42-d7be-4de3-abe8-7b0a3e70ba73">Fab</a> &nbsp;|&nbsp;
     <a href="https://www.youtube.com/watch?v=7_F3AvgQIQU">Video</a> &nbsp;|&nbsp;
-    <a href="https://discord.gg/nXkpD6uaBG">Discord</a></p>
+    <a href="https://discord.gg/nXkpD6uaBG">Discord</a> &nbsp;|&nbsp;
+    <a href="https://uedevlabs.itch.io/lcm-3d-navigation">Free demo</a></p>
    <p>Copyright (c) 2026 L.Charitha Madhushanka. All rights reserved.</p>
   </footer>
  </main>

@@ -85,14 +85,14 @@ const SOFTWARE = {
   description:
     'An industry-leading, production-grade, heavily optimised sparse voxel octree navigation plugin for '
     + 'Unreal Engine, built for AAA-scale projects. It pathfinds through true 3D volume rather than a walkable surface, '
-    + 'for flying, swimming and free-floating agents and Mass Entity crowds. GPU voxelization and GPU '
-    + '6-DOF compute with automatic CPU fallback, asynchronous pathfinding, deterministic results, '
+    + 'for flying, swimming and free-floating agents and Mass Entity crowds. GPU voxelization with '
+    + 'automatic CPU fallback, asynchronous pathfinding, deterministic results, '
     + 'explicit frame-budget controls and World Partition support. Complete C++ source, Blueprint exposed.',
   author: { '@type': 'Person', name: AUTHOR },
   publisher: { '@id': `${SITE}/#organization` },
   featureList: [
     'Sparse voxel octree 3D pathfinding',
-    'GPU voxelization and GPU 6-DOF compute with automatic CPU fallback',
+    'GPU voxelization with automatic CPU fallback',
     'Asynchronous pathfinding off the game thread',
     'Deterministic results for replays, lockstep multiplayer and automated tests',
     'Mass Entity ECS crowds at 10,000+ agents with LOD-culled rendering',
@@ -360,8 +360,8 @@ LCM Nav3D is an industry-leading, production-grade, heavily optimised navigation
 plugin for Unreal Engine 5.2 to 5.8 (Windows 64-bit and Linux), built for AAA-scale
 projects. It ships complete C++ source and is fully exposed to Blueprint.
 
-Engineering characteristics: GPU voxelization and GPU 6-DOF compute with automatic
-CPU fallback when no GPU is present; asynchronous pathfinding off the game thread;
+Engineering characteristics: GPU voxelization with automatic CPU fallback when no
+GPU is present; asynchronous pathfinding off the game thread;
 deterministic results, so replays, lockstep multiplayer and automated tests are
 reproducible; explicit frame-budget controls, with dynamic-obstacle updates
 coalesced into a single window rather than restamped per event; a sparse octree
@@ -389,6 +389,7 @@ ${NAV.map(sec => `## ${sec.heading}\n\n` + sec.items.map(f =>
 - [Full manual (PDF, 127 pages)](${SITE}/pdf/LCM_Nav3D_Manual.pdf): every chapter in one bookmarked, searchable file.
 - [Quick start (PDF, 13 pages)](${SITE}/pdf/LCM_Nav3D_QuickStart.pdf): install, the five settings that matter, and a pawn flying in about forty-five minutes.
 - [Get the plugin on Fab](${FAB}): the official listing.
+- [Free playable demo](https://uedevlabs.itch.io/lcm-3d-navigation): all 18 demo maps in a standalone Windows build - try it before buying.
 - [Discord](${DISCORD}): direct support from the author; verify your purchase in #get-help.
 - [Video overview](${YOUTUBE}).
 
